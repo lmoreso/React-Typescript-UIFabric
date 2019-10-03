@@ -40,6 +40,7 @@ export class DebugList {
     "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
   private static _subSpace: string =
     "················································································································";
+  private static _espacio: string = '·';
 
   public constructor(descripcion: string, listItems: IDebugListConfig[]) {
     this.config = listItems;
@@ -50,9 +51,9 @@ export class DebugList {
     this.config.forEach((item: IDebugListConfig) => {
       var aux: string = item.tituloColumna + DebugList._subSpace;
       this._colsNames =
-        this._colsNames + aux.substr(0, item.anchoColumna) + " ";
+        this._colsNames + aux.substr(0, item.anchoColumna) + DebugList._espacio;
       this._colsSubs =
-        this._colsSubs + DebugList._subChar.substr(0, item.anchoColumna) + " ";
+        this._colsSubs + DebugList._subChar.substr(0, item.anchoColumna) + DebugList._espacio;
     });
   }
 
@@ -85,7 +86,7 @@ export class DebugList {
       } else {
         sAux2 = DebugList._subSpace;
       }
-      sAux = sAux + sAux2.substr(0, item.anchoColumna) + " ";
+      sAux = sAux + sAux2.substr(0, item.anchoColumna) + DebugList._espacio;
     });
 
     return sAux;
@@ -119,7 +120,7 @@ export class DebugList {
         <p style={{ font: 'bold small monospace' }}>{this.getTitle(listDatos.length)}</p>
         <p style={{ font: 'bold small monospace' }}>{this.getColsNames()}</p>
         <p style={{ font: 'bold small monospace' }}>{this.getColsSubs()}</p>
-        {listDatos.map((dato: any, index) => <span key={index.toString()} style={{ font: 'bold small monospace' }}><br/>{this.getLine(dato)}</span>)}
+        {listDatos.map((dato: any, index) => <span key={index.toString()} style={{ font: 'bold small monospace' }}><br />{this.getLine(dato)}</span>)}
       </div>
     );
   }

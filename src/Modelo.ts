@@ -1,9 +1,16 @@
-export enum origenesDatos { ninguno, rest, json };
-const URL_PAISES = 'http://restcountries.eu/rest/v1/all';
+export enum origenesDatos { ninguno, rest, json, jsonret };
+export const URL_PAISES = 'http://restcountries.eu/rest/v1/all';
+export const JSON_PAISES = './recursos/countries.json';
 const datosJSON = require('./recursos/countries.json');
 
 export async function DescargarPaises(origen: origenesDatos): Promise<any> {
     switch (origen) {
+        case origenesDatos.jsonret:
+            return new Promise((resolve) => { 
+                setTimeout(function(){
+                    resolve(datosJSON);
+               }, 5000);               
+            })
         case origenesDatos.json:
             return new Promise((resolve) => { resolve(datosJSON); })
         case origenesDatos.rest:
@@ -23,6 +30,7 @@ export async function DescargarPaises(origen: origenesDatos): Promise<any> {
                     });
             });
         default:
-            throw "El Origen de Datos no es válido";
+            return new Promise((resolve) => { resolve([]); })
+        // throw "El Origen de Datos no es válido";
     }
 }
