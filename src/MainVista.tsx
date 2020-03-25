@@ -4,13 +4,16 @@ import { Label } from 'office-ui-fabric-react/lib/Label';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 
 import { DescargarPaises, origenesDatos, URL_PAISES, JSON_PAISES } from './Modelo';
-import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from './VDebugList';
+import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from './SimpleList';
 import { DetailsListDocumentsExample } from './DetailListDocumentsExample';
+import { SimpleListUIFabric } from './SimpleListUIFabric';
+import { IColumn, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
+import { ISimpleListCol } from './SimpleListCommon';
 
 
-enum menuOptionsId { debugListTable = 1, debugListTxt, fabricListDocExample }
-const DEF_MENU_ID: menuOptionsId = menuOptionsId.debugListTable;
-const DEF_ORG_DAT: origenesDatos = origenesDatos.ninguno;
+enum menuOptionsId { debugListTable = 1, debugListTxt, FabricList, fabricListDocExample }
+const DEF_MENU_ID: menuOptionsId = menuOptionsId.FabricList;
+const DEF_ORG_DAT: origenesDatos = origenesDatos.json;
 
 interface IMenuOptions {
   key: menuOptionsId;
@@ -21,6 +24,7 @@ interface IMenuOptions {
 const menuOptions: IMenuOptions[] = [
   { key: menuOptionsId.debugListTable, name: 'Tabla HTML de DebugList', loadCountries: true },
   { key: menuOptionsId.debugListTxt, name: 'Texto "tabulado" de DebugList', loadCountries: true },
+  { key: menuOptionsId.FabricList, name: 'Lista de UI Fabric', loadCountries: true },
   { key: menuOptionsId.fabricListDocExample, name: 'Ejemplo de Lista de UI Fabric', loadCountries: false },
 ]
 
@@ -38,22 +42,16 @@ export interface IGetRestExampleState {
   origenDatos: origenesDatos;
 }
 
-export interface IPaisCol {
-  titulo: string;
-  campo: string;
-  width: number;
-}
-
-export const PAISES: IPaisCol[] = [
-  { titulo: "Abrev.", campo: "alpha3Code", width: 3 },
-  { titulo: "Country", campo: "name", width: 20 },
-  { titulo: "Pais", campo: "Pais", width: 20 },
+export const COLUMNS_DEF: ISimpleListCol[] = [
+  { titulo: "Siglas", campo: "alpha3Code", width: 10, campoUrl: "banderaUrl" },
+  { titulo: "Nombre Inglés", campo: "name", width: 40, campoUrl: "wikiEnUrl" },
+  { titulo: "Nombre Español", campo: "Pais", width: 40, campoUrl: "wikiEsUrl" },
   { titulo: "Nombre Nativo", campo: "nativeName", width: 40 },
-  { titulo: "Capital", campo: "capital", width: 30 },
-  { titulo: "Continente", campo: "region", width: 30 },
+  { titulo: "Capital", campo: "capital", width: 20 },
+  { titulo: "Continente", campo: "region", width: 20 },
   { titulo: "Región", campo: "subregion", width: 30 },
-  { titulo: "Idiomas", campo: "languages", width: 20 },
-  { titulo: "Nº Husos", campo: "numHusos", width: 8 },
+  { titulo: "Idiomas", campo: "idiomas", width: 20 },
+  { titulo: "Nº Husos", campo: "numHusos", width: 12, campoTooltip: 'husosTooltip' },
 ]
 
 export const optionsComboDB: { key: number; text: string }[] = [
@@ -67,6 +65,7 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
   private _data: any[];
   private _dbgListRows: IDebugListConfig[];
   private _dbgList: DebugList;
+  private _columns: IColumn[];
   private _isMenuActive = (menuOptionId: menuOptionsId): boolean => (this.state.activeMenuOptionId === menuOptionId);
   private _getActiveMenuOption = (): IMenuOptions => {
     let menuOption = menuOptions.find((value: IMenuOptions, index, obj) => (this._isMenuActive(value.key)));
@@ -81,11 +80,36 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
     // Inicializar estados
     this.state = { numRegs: 0, estado: fetchStatus.Cargando, mensaje: '', activeMenuOptionId: DEF_MENU_ID, origenDatos: DEF_ORG_DAT }
 
-    // Inicializar las columnas para el DebugList
+    // Inicializar las columnas para el DebugList y para el DetailList
     if (this._getActiveMenuOption().loadCountries) {
       this._dbgListRows = new Array<IDebugListConfig>();
-      PAISES.forEach((unPais: IPaisCol, indice) => {
-        this._dbgListRows.push({ key: indice.toString(), tituloColumna: unPais.titulo, anchoColumna: unPais.width, nombreColumna: unPais.campo });
+      this._columns = new Array<IColumn>();
+      COLUMNS_DEF.forEach((unPais: ISimpleListCol, indice) => {
+        this._dbgListRows.push({
+          key: indice.toString(),
+          tituloColumna: unPais.titulo,
+          anchoColumna: unPais.width,
+          nombreColumna: unPais.campo,
+          tooltipColumna: (unPais.campoTooltip) ? unPais.campoTooltip : undefined,
+          linkColumna: (unPais.campoUrl) ? unPais.campoUrl : undefined,
+        });
+        this._columns.push({
+          key: indice.toString(),
+          name: unPais.titulo,
+          fieldName: unPais.campo,
+          minWidth: unPais.width * 3,
+          // maxWidth: unPais.width * 2,
+          // isRowHeader: true,
+          isResizable: true,
+          columnActionsMode: ColumnActionsMode.clickable,
+          // isSorted: true,
+          // isSortedDescending: false,
+          // sortAscendingAriaLabel: 'Sorted A to Z',
+          // sortDescendingAriaLabel: 'Sorted Z to A',
+          // onColumnClick: this._onColumnClick,
+          data: 'string',
+          isPadded: true
+        });
       })
       this._dbgList = new DebugList("Lista de Paises (se han encontrado %n paises)", this._dbgListRows)
     }
@@ -108,6 +132,11 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
           registro.key = indice.toString();
           registro.Pais = registro.translations.es;
           registro.numHusos = registro.timezones.length;
+          registro.idiomas = (Array.isArray(registro.languages)) ? registro.languages.join(', ') : registro.languages;
+          registro.husosTooltip = (Array.isArray(registro.timezones) ? registro.timezones.join(', ') : '')
+          registro.wikiEnUrl = `https://en.wikipedia.org/wiki/${registro.name}`;
+          registro.wikiEsUrl = `https://es.wikipedia.org/wiki/${registro.translations.es}`;
+          registro.banderaUrl = `http://flagshub.com/public/images/flag-of-${registro.name.toString().replace(/ /g, "-").toLowerCase()}.png`
         })
         console.log(this._data[5]);
         this.setState({ numRegs: datos.length, estado: fetchStatus.Cargado });
@@ -132,7 +161,7 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
 
   private _onChangeComboOrigenDatos = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
     console.log(`Cambiado origen de datos a ${item.key} (${item.text})`)
-    this.setState({  estado: fetchStatus.Cargando});
+    this.setState({ estado: fetchStatus.Cargando });
     this._descargarPaises(item.key as origenesDatos);
   };
 
@@ -194,6 +223,12 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
               />
               <DetailsListDocumentsExample
                 hidden={!this._isMenuActive(menuOptionsId.fabricListDocExample)}
+              />
+              <SimpleListUIFabric
+                hidden={!this._isMenuActive(menuOptionsId.FabricList)}
+                datos={this._data}
+                titulo={`Lista de UIFabric: se han encontrado ${this._data.length} Paises`}
+                columns={COLUMNS_DEF}
               />
             </div>
           </div>

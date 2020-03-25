@@ -1,6 +1,5 @@
 import * as React from "react";
-import { mergeStyleSets, getTheme } from "office-ui-fabric-react/lib/Styling";
-// import { VOrderMenu, } from './VOrderMenu';
+import { mergeStyleSets, getTheme } from '@uifabric/styling';
 
 export interface IDebugListConfig {
   key: string;

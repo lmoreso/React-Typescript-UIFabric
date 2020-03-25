@@ -23,7 +23,7 @@ class App extends React.Component<{}, IAppStates> {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React, Typescript & Fabric UI</h1>
+          <h1 className="App-title">Welcome to React, Typescript & UIFabric </h1>
         </header>
         <Fabric>
             <div>

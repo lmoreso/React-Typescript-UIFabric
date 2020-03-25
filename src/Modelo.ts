@@ -9,7 +9,7 @@ export async function DescargarPaises(origen: origenesDatos): Promise<any> {
             return new Promise((resolve) => { 
                 setTimeout(function(){
                     resolve(datosJSON);
-               }, 5000);               
+               }, 2000);               
             })
         case origenesDatos.json:
             return new Promise((resolve) => { resolve(datosJSON); })
