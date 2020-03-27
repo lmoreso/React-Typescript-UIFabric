@@ -136,7 +136,7 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
           registro.husosTooltip = (Array.isArray(registro.timezones) ? registro.timezones.join(', ') : '')
           registro.wikiEnUrl = `https://en.wikipedia.org/wiki/${registro.name}`;
           registro.wikiEsUrl = `https://es.wikipedia.org/wiki/${registro.translations.es}`;
-          registro.banderaUrl = `http://flagshub.com/public/images/flag-of-${registro.name.toString().replace(/ /g, "-").toLowerCase()}.png`
+          registro.banderaUrl = `http://flagshub.com/images/flag-of-${registro.name.toString().replace(/ /g, "-").toLowerCase()}.png`
         })
         console.log(this._data[5]);
         this.setState({ numRegs: datos.length, estado: fetchStatus.Cargado });
