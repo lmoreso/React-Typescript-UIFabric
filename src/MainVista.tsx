@@ -69,7 +69,7 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
   private _isMenuActive = (menuOptionId: menuOptionsId): boolean => (this.state.activeMenuOptionId === menuOptionId);
   private _getActiveMenuOption = (): IMenuOptions => {
     let menuOption = menuOptions.find((value: IMenuOptions, index, obj) => (this._isMenuActive(value.key)));
-    if (menuOption == undefined) throw `No hay ninguna opción seleccionada`
+    if (menuOption == undefined) throw `No hay ninguna opción seleccionada`;
     return (menuOption);
   }
   private _optionsComboMenu: { key: number; text: string }[];

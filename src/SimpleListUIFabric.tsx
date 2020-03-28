@@ -9,8 +9,9 @@ import { mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
 // import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { Label } from 'office-ui-fabric-react/lib/Label';
-import {  IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
+import { IDropdownOption, Dropdown } from 'office-ui-fabric-react/lib/Dropdown';
 
+const LABEL_OPTION_SIN_CONTINENTE = 'Sin Continente';
 
 const classNames = mergeStyleSets({
   controlWrapper: {
@@ -35,6 +36,7 @@ interface ISimpleListUIFabricStates {
   datos: any[];
   columns: IColumn[];
   isCompactMode: boolean;
+  filterContinentOption: number | string;
 }
 
 interface IContinente {
@@ -46,30 +48,33 @@ interface IContinente {
 export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps, ISimpleListUIFabricStates> {
   private _allItems: any[];
   private _filterName: string;
-  private _filterRegion: string;
-  private _filterContinent: string;
-  private _continentes: IDropdownOption[];
+  private _continentOption: IDropdownOption[];
+  private _continentFilter: IContinente[]
   // private _regions: { region: string; continent: string }[];
 
   private _getContinentes(): number {
-    let numItems: number = 0;
-    let continentes: IContinente[] = new Array<IContinente>()
+    let numContinentes: number = 0;
+    let numPaises: number = 0;
+    this._continentFilter = new Array<IContinente>();
     // Se cuentan el nº de paises por cada continente
     this._allItems.forEach(unPais => {
-      let nouContinent = continentes.find((unContinent) => (unContinent.continente === unPais.region));
+      let region = (unPais.region) ? unPais.region : LABEL_OPTION_SIN_CONTINENTE;
+      let nouContinent = this._continentFilter.find((unContinent) => (unContinent.continente === region));
       if (nouContinent) {
         nouContinent.numItems++;
       } else {
-        continentes.push({ continente: unPais.region, numItems: 1 });
-        numItems++;
+        this._continentFilter.push({ continente: region, numItems: 1 });
+        numContinentes++;
       }
+      numPaises++;
     })
     // Creamos el array de opciones para el combo (Dropdown)
-    this._continentes = new Array<IDropdownOption>();
-    continentes.forEach((unContinente, indice)=>{this._continentes.push({key: indice, text: `${unContinente.continente} (${unContinente.numItems})`})})
+    this._continentOption = new Array<IDropdownOption>();
+    this._continentOption.push({ key: -1, text: `Todos los Continentes (${numPaises})` });
+    this._continentFilter.forEach((unContinente, indice) => { this._continentOption.push({ key: indice, text: `${unContinente.continente} (${unContinente.numItems})` }) });
 
-    console.log('Array de Continentes', this._continentes);
-    return (numItems);
+    console.log('Array de Continentes', this._continentOption);
+    return (numContinentes);
   }
 
   public constructor(props: ISimpleListUIFabricProps) {
@@ -77,16 +82,15 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     this._allItems = this.props.datos.slice(0);
     this._filterName = "";
     this._getContinentes();
-    this._filterRegion = "";
-    this._filterContinent = "Europe";
     this.state = {
       datos: this._allItems,
       columns: this._procesaColumnas(this.props.columns),
       isCompactMode: false,
+      filterContinentOption: -1,
     }
   }
 
-  private _filter(): void {
+  private _filter(filterContinentOption: string | number): void {
     let datos = this._allItems;
 
     if (this._filterName)
@@ -97,19 +101,23 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
         return (false);
       })
 
-    if (this._filterContinent)
+    if (filterContinentOption > -1)
       datos = datos.filter(unPais => {
-        if (unPais.region && unPais.region.toLowerCase() == this._filterContinent.toLowerCase()) return (true);
+        if (unPais.region && unPais.region.toLowerCase() == this._continentFilter[filterContinentOption].continente.toLowerCase())
+          return (true);
+        if (!unPais.region && this._continentFilter[filterContinentOption].continente == LABEL_OPTION_SIN_CONTINENTE)
+          return (true);
         return (false);
       })
 
-    if (this._filterRegion)
-      datos = datos.filter(unPais => {
-        if (unPais.subregion && unPais.subregion.toLowerCase().indexOf(this._filterRegion.toLowerCase()) > -1) return (true);
-        return (false);
-      })
+    // if (this._filterRegion)
+    //   datos = datos.filter(unPais => {
+    //     if (unPais.subregion && unPais.subregion.toLowerCase().indexOf(this._filterRegion.toLowerCase()) > -1) return (true);
+    //     return (false);
+    //   })
 
-    this.setState({ datos })
+
+    this.setState({ datos, filterContinentOption })
 
   }
 
@@ -221,7 +229,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
 
   private _onChangeText = (text: string): void => {
     this._filterName = text;
-    this._filter();
+    this._filter(this.state.filterContinentOption);
   };
 
   public render(): JSX.Element {
@@ -243,18 +251,32 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
               />
               {/* <TextField label="Filter by name:" onChange={this._onChangeText} styles={controlStyles} /> */}
               {/* <div className={classNames.subWrapper}> */}
-              <Label htmlFor='textFieldId' styles={controlStyles}>Filter by name: </Label>
+              {/* <Label htmlFor='textFieldId' styles={controlStyles}>Filter by name: </Label> */}
               <SearchBox
                 id='textFieldId'
                 placeholder="Filter by name"
-                onFocus={() => console.log('onFocus called')}
-                onBlur={() => console.log('onBlur called')}
+                // onFocus={() => console.log('onFocus called')}
+                // onBlur={() => console.log('onBlur called')}
                 // onChange={(newValue) => console.log(`onChange called: ${newValue}`)}
                 // onSearch={this._onChangeText}
                 onChange={this._onChangeText}
                 styles={controlStyles}
               />
               {/* </div> */}
+              <Dropdown
+                // defaultSelectedKey={-1}
+                selectedKey={this.state.filterContinentOption}
+                onChange={(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
+                  console.log(`Cambiado Filtro Continente a ${item.key} (${item.text})`);
+                  console.log('_continentOption', this._continentOption);
+                  console.log('_continentFilter', this._continentFilter);
+                  this._filter(item.key);
+                }}
+                placeholder="Select an Continent"
+                options={this._continentOption}
+                styles={controlStyles}
+                style={{ width: 250 }}
+              />
               <Label styles={controlStyles}>{`Se están mostrando ${this.state.datos.length} paises.`}</Label>
             </div>
             <DetailsList
