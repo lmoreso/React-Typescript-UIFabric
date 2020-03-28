@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DetailsList, DetailsListLayoutMode, IColumn, SelectionMode, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
+import { DetailsList, /* DetailsListLayoutMode, */ IColumn, SelectionMode, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { ISimpleListUIFabricProps } from './ISimpleListUIFabricProps';
 import { copyAndSort, ISimpleListCol } from './SimpleListCommon';
@@ -12,6 +12,7 @@ import { Label } from 'office-ui-fabric-react/lib/Label';
 import { IDropdownOption, Dropdown } from 'office-ui-fabric-react/lib/Dropdown';
 
 const LABEL_OPTION_SIN_CONTINENTE = 'Sin Continente';
+const LABEL_OPTION_SIN_REGION = 'Sin Región';
 
 const classNames = mergeStyleSets({
   controlWrapper: {
@@ -37,10 +38,17 @@ interface ISimpleListUIFabricStates {
   columns: IColumn[];
   isCompactMode: boolean;
   filterContinentOption: number | string;
+  filterRegionOption: number | string;
 }
 
 interface IContinente {
   continente: string;
+  numItems: number;
+}
+
+interface IRegion {
+  continente: string;
+  region: string;
   numItems: number;
 }
 
@@ -49,31 +57,51 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
   private _allItems: any[];
   private _filterName: string;
   private _continentOption: IDropdownOption[];
-  private _continentFilter: IContinente[]
+  private _continentFilter: IContinente[];
+  private _regionOption: IDropdownOption[];
+  private _regionFilter: IRegion[];
   // private _regions: { region: string; continent: string }[];
 
   private _getContinentes(): number {
     let numContinentes: number = 0;
     let numPaises: number = 0;
     this._continentFilter = new Array<IContinente>();
+    this._regionFilter = new Array<IRegion>();
     // Se cuentan el nº de paises por cada continente
     this._allItems.forEach(unPais => {
-      let region = (unPais.region) ? unPais.region : LABEL_OPTION_SIN_CONTINENTE;
-      let nouContinent = this._continentFilter.find((unContinent) => (unContinent.continente === region));
+      numPaises++;
+      // Lista de Continentes
+      let continente = (unPais.region) ? unPais.region : LABEL_OPTION_SIN_CONTINENTE;
+      let nouContinent = this._continentFilter.find((unContinent) => (unContinent.continente === continente));
       if (nouContinent) {
         nouContinent.numItems++;
       } else {
-        this._continentFilter.push({ continente: region, numItems: 1 });
+        this._continentFilter.push({ continente: continente, numItems: 1 });
         numContinentes++;
       }
-      numPaises++;
+      // Lista de Regiones
+      let region = (unPais.subregion) ? unPais.subregion : LABEL_OPTION_SIN_REGION;
+      let nuevaRegion = this._regionFilter.find((unaRegion) => (unaRegion.continente === continente && unaRegion.region === region));
+      if (nuevaRegion) {
+        nuevaRegion.numItems++;
+      } else {
+        this._regionFilter.push({ continente: continente, region: region, numItems: 1 });
+      }
     })
-    // Creamos el array de opciones para el combo (Dropdown)
+    // Creamos el array de opciones para el combo (Dropdown) de Continentes
     this._continentOption = new Array<IDropdownOption>();
     this._continentOption.push({ key: -1, text: `Todos los Continentes (${numPaises})` });
+    this._continentFilter.sort((a, b) => (a.continente > b.continente) ? 1 : -1);
     this._continentFilter.forEach((unContinente, indice) => { this._continentOption.push({ key: indice, text: `${unContinente.continente} (${unContinente.numItems})` }) });
 
-    console.log('Array de Continentes', this._continentOption);
+    // Creamos el array de opciones para el combo (Dropdown) de Continentes
+    this._regionOption = new Array<IDropdownOption>();
+    this._regionOption.push({ key: -1, text: `Todas las Regiones (${numPaises})` });
+    this._regionFilter.sort((a, b) => (`${a.continente} - ${a.region}` > `${b.continente} - ${b.region}`) ? 1 : -1);
+    this._regionFilter.forEach((unaRegion, indice) => { this._regionOption.push({ key: indice, text: `${unaRegion.continente} - ${unaRegion.region} (${unaRegion.numItems})` }) });
+
+    console.log('Array de Continentes', this._continentFilter);
+    console.log('Array de Regiones', this._regionFilter);
     return (numContinentes);
   }
 
@@ -87,37 +115,49 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
       columns: this._procesaColumnas(this.props.columns),
       isCompactMode: false,
       filterContinentOption: -1,
+      filterRegionOption: -1,
     }
   }
 
-  private _filter(filterContinentOption: string | number): void {
+  private _filter(filterContinentOption: string | number, filterRegionOption: string | number): void {
     let datos = this._allItems;
 
-    if (this._filterName)
+    if (this._filterName) {
       datos = datos.filter(unPais => {
         if (unPais.name && unPais.name.toLowerCase().indexOf(this._filterName.toLowerCase()) > -1) return (true);
         if (unPais.nativeName && unPais.nativeName.toLowerCase().indexOf(this._filterName.toLowerCase()) > -1) return (true);
         if (unPais.translations.es && unPais.translations.es.toLowerCase().indexOf(this._filterName.toLowerCase()) > -1) return (true);
         return (false);
-      })
+      });
+    }
 
-    if (filterContinentOption > -1)
+    if (filterRegionOption > -1) {
+      datos = datos.filter(unPais => {
+        if (unPais.region && unPais.region.toLowerCase() == this._regionFilter[filterRegionOption].continente.toLowerCase()) {
+          if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
+            return (true);
+          if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
+            return (true);
+        }
+        if (!unPais.region && this._regionFilter[filterRegionOption].continente == LABEL_OPTION_SIN_CONTINENTE) {
+          if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
+            return (true);
+          if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
+            return (true);
+        }
+        return (false);
+      });
+    } else if (filterContinentOption > -1) {
       datos = datos.filter(unPais => {
         if (unPais.region && unPais.region.toLowerCase() == this._continentFilter[filterContinentOption].continente.toLowerCase())
           return (true);
         if (!unPais.region && this._continentFilter[filterContinentOption].continente == LABEL_OPTION_SIN_CONTINENTE)
           return (true);
         return (false);
-      })
+      });
+    }
 
-    // if (this._filterRegion)
-    //   datos = datos.filter(unPais => {
-    //     if (unPais.subregion && unPais.subregion.toLowerCase().indexOf(this._filterRegion.toLowerCase()) > -1) return (true);
-    //     return (false);
-    //   })
-
-
-    this.setState({ datos, filterContinentOption })
+    this.setState({ datos, filterContinentOption, filterRegionOption })
 
   }
 
@@ -219,7 +259,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
       datos: (hayQueOrdenar) ?
         copyAndSort(this.state.datos, currColumn.fieldName!, currColumn.isSortedDescending)
         :
-        this.state.datos.slice(0)
+        copyAndSort(this.state.datos, 'key', false)
     });
   };
 
@@ -229,7 +269,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
 
   private _onChangeText = (text: string): void => {
     this._filterName = text;
-    this._filter(this.state.filterContinentOption);
+    this._filter(this.state.filterContinentOption, this.state.filterRegionOption);
   };
 
   public render(): JSX.Element {
@@ -264,18 +304,24 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
               />
               {/* </div> */}
               <Dropdown
-                // defaultSelectedKey={-1}
                 selectedKey={this.state.filterContinentOption}
                 onChange={(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
-                  console.log(`Cambiado Filtro Continente a ${item.key} (${item.text})`);
-                  console.log('_continentOption', this._continentOption);
-                  console.log('_continentFilter', this._continentFilter);
-                  this._filter(item.key);
+                  this._filter(item.key, -1);
                 }}
-                placeholder="Select an Continent"
+                placeholder="Select a Continent"
                 options={this._continentOption}
                 styles={controlStyles}
-                style={{ width: 250 }}
+                style={{ width: 220 }}
+              />
+              <Dropdown
+                selectedKey={this.state.filterRegionOption}
+                onChange={(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
+                  this._filter(-1, item.key);
+                }}
+                placeholder="Select a Region"
+                options={this._regionOption}
+                styles={controlStyles}
+                style={{ width: 300 }}
               />
               <Label styles={controlStyles}>{`Se están mostrando ${this.state.datos.length} paises.`}</Label>
             </div>
@@ -283,7 +329,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
               items={this.state.datos}
               compact={this.state.isCompactMode}
               columns={this.state.columns}
-              layoutMode={DetailsListLayoutMode.fixedColumns}
+              // layoutMode={DetailsListLayoutMode.justified}
               // disableSelectionZone= {true}
               selectionMode={SelectionMode.none}
               onColumnHeaderClick={this._onColumnClick}
