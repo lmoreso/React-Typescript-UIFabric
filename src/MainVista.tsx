@@ -14,6 +14,16 @@ import { ISimpleListCol } from './SimpleListCommon';
 enum menuOptionsId { debugListTable = 1, debugListTxt, FabricList, fabricListDocExample }
 const DEF_MENU_ID: menuOptionsId = menuOptionsId.FabricList;
 const DEF_ORG_DAT: origenesDatos = origenesDatos.json;
+// const URL_FLAGS_WIKI = 'https://en.wikipedia.org/wiki/File:Flag_of_'
+// const URL_FLAGS_SEP_WIKI = '_';
+// const URL_FLAGS_EXT_WIKI = 'svg';
+// const URL_FLAGS_FLAGSHUB = 'http://flagshub.com/images/flag-of-'
+// const URL_FLAGS_SEP_FLAGSHUB = '-';
+// const URL_FLAGS_EXT_FLAGSHUB = 'png';
+const URL_FLAGS = 'http://flagshub.com/images/flag-of-';
+const URL_FLAGS_SEP = '-';
+const URL_FLAGS_EXT = 'png';
+
 
 interface IMenuOptions {
   key: menuOptionsId;
@@ -43,6 +53,8 @@ export interface IGetRestExampleState {
 }
 
 export const COLUMNS_DEF: ISimpleListCol[] = [
+  // { titulo: "Key", campo: "key", width: 10 },
+  { titulo: "Bandera", campo: "banderaUrl", width: 10, isImage: true },
   { titulo: "Siglas", campo: "alpha3Code", width: 10, campoUrl: "banderaUrl" },
   { titulo: "Nombre Inglés", campo: "name", width: 40, campoUrl: "wikiEnUrl" },
   { titulo: "Nombre Español", campo: "Pais", width: 40, campoUrl: "wikiEsUrl" },
@@ -136,7 +148,7 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
           registro.husosTooltip = (Array.isArray(registro.timezones) ? registro.timezones.join(', ') : '')
           registro.wikiEnUrl = `https://en.wikipedia.org/wiki/${registro.name}`;
           registro.wikiEsUrl = `https://es.wikipedia.org/wiki/${registro.translations.es}`;
-          registro.banderaUrl = `http://flagshub.com/images/flag-of-${registro.name.toString().replace(/ /g, "-").toLowerCase()}.png`
+          registro.banderaUrl = `${URL_FLAGS}${registro.name.toString().replace(/ /g, URL_FLAGS_SEP).toLowerCase()}.${URL_FLAGS_EXT}`
         })
         console.log(this._data[5]);
         this.setState({ numRegs: datos.length, estado: fetchStatus.Cargado });

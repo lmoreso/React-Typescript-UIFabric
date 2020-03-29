@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DetailsList, /* DetailsListLayoutMode, */ IColumn, SelectionMode, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { ISimpleListUIFabricProps } from './ISimpleListUIFabricProps';
-import { copyAndSort, ISimpleListCol } from './SimpleListCommon';
+import { copyAndSort, ISimpleListCol, copyAndSortByKey } from './SimpleListCommon';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { Toggle } from 'office-ui-fabric-react/lib/Toggle';
 import { mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
@@ -10,6 +10,8 @@ import { mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { IDropdownOption, Dropdown } from 'office-ui-fabric-react/lib/Dropdown';
+import { Image } from 'office-ui-fabric-react/lib/Image';
+
 
 const LABEL_OPTION_SIN_CONTINENTE = 'Sin Continente';
 const LABEL_OPTION_SIN_REGION = 'Sin Región';
@@ -165,12 +167,13 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     let columns: IColumn[] = new Array<IColumn>();
 
     simpleListCols.forEach((unaColumna: ISimpleListCol, indice) => {
+
       let laColumna: IColumn = {
         key: indice.toString(),
         name: unaColumna.titulo,
         fieldName: unaColumna.campo,
-        minWidth: unaColumna.width * 3,
-        // maxWidth: unPais.width * 2,
+        minWidth: unaColumna.width * 1,
+        maxWidth: unaColumna.width * 3,
         // isRowHeader: true,
         isResizable: true,
         columnActionsMode: ColumnActionsMode.clickable,
@@ -182,7 +185,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
         data: 'string',
         isPadded: true
       };
-      if (unaColumna.campoUrl || unaColumna.campoTooltip) {
+      if (unaColumna.campoUrl || unaColumna.campoTooltip || unaColumna.isImage) {
         if (unaColumna.campoUrl && unaColumna.campoTooltip) {
           laColumna.onRender = (item) => {
             return (
@@ -211,6 +214,23 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
               </TooltipHost>
             );
           }
+        } else if (unaColumna.isImage == true) {
+          laColumna.onRender = (item) => {
+            return (
+              <TooltipHost
+                content={item[unaColumna.campo]}
+                // id={this._hostId}
+                calloutProps={{ gapSpace: 0 }}
+                styles={{ root: { display: 'inline-block' } }}
+              >
+                <Image
+                  src={item[unaColumna.campo]}
+                  alt='sancamalancafumalicalipunxi'
+                  width={unaColumna.width * 4}
+                />
+              </TooltipHost>
+            );
+          }
         } else {
           laColumna.onRender = (item) => {
             return (
@@ -224,7 +244,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
                   {item[unaColumna.campo]}
                 </a>
               </TooltipHost>
-            )
+            );
           }
         }
       }
@@ -259,7 +279,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
       datos: (hayQueOrdenar) ?
         copyAndSort(this.state.datos, currColumn.fieldName!, currColumn.isSortedDescending)
         :
-        copyAndSort(this.state.datos, 'key', false)
+        copyAndSortByKey(this.state.datos, false)
     });
   };
 
