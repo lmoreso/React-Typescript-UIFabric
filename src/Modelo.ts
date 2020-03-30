@@ -17,15 +17,15 @@ export async function DescargarPaises(origen: origenesDatos): Promise<any> {
             return new Promise((resolve, reject) => {
                 fetch(URL_PAISES)
                     .then(res => {
-                        // console.log(res);
                         if (res) {
+                            console.log(res);
                             resolve(res.json());
                         } else {
                             reject(`La url ${URL_PAISES}, no ha devuelto nada.`);
                         }
                     })
                     .catch(err => {
-                        console.log(`El errror ha llegado al catch`, err);
+                        console.log(`El error ha llegado al catch`, err);
                         reject(err);
                     });
             });

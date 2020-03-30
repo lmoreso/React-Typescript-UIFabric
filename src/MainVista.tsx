@@ -13,16 +13,21 @@ import { ISimpleListCol } from './SimpleListCommon';
 
 enum menuOptionsId { debugListTable = 1, debugListTxt, FabricList, fabricListDocExample }
 const DEF_MENU_ID: menuOptionsId = menuOptionsId.FabricList;
-const DEF_ORG_DAT: origenesDatos = origenesDatos.json;
+const DEF_ORG_DAT: origenesDatos = origenesDatos.rest;
 // const URL_FLAGS_WIKI = 'https://en.wikipedia.org/wiki/File:Flag_of_'
 // const URL_FLAGS_SEP_WIKI = '_';
 // const URL_FLAGS_EXT_WIKI = 'svg';
 // const URL_FLAGS_FLAGSHUB = 'http://flagshub.com/images/flag-of-'
 // const URL_FLAGS_SEP_FLAGSHUB = '-';
 // const URL_FLAGS_EXT_FLAGSHUB = 'png';
-const URL_FLAGS = 'http://flagshub.com/images/flag-of-';
-const URL_FLAGS_SEP = '-';
-const URL_FLAGS_EXT = 'png';
+// const URL_FLAGS = 'http://flagshub.com/images/flag-of-';
+// const URL_FLAGS_SEP = '-';
+// const URL_FLAGS_EXT = 'png';
+const URL_FLAGS = 'https://restcountries.eu/data/';
+// const URL_FLAGS_SEP = '@@';
+const URL_FLAGS_EXT = 'svg';
+
+const URL_MAPS = 'https://maps.google.com/?q=';
 
 
 interface IMenuOptions {
@@ -54,14 +59,15 @@ export interface IGetRestExampleState {
 
 export const COLUMNS_DEF: ISimpleListCol[] = [
   // { titulo: "Key", campo: "key", width: 10 },
+  // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
   { titulo: "Bandera", campo: "banderaUrl", width: 10, isImage: true },
   { titulo: "Siglas", campo: "alpha3Code", width: 10, campoUrl: "banderaUrl" },
   { titulo: "Nombre Inglés", campo: "name", width: 40, campoUrl: "wikiEnUrl" },
   { titulo: "Nombre Español", campo: "Pais", width: 40, campoUrl: "wikiEsUrl" },
-  { titulo: "Nombre Nativo", campo: "nativeName", width: 40 },
-  { titulo: "Capital", campo: "capital", width: 20 },
-  { titulo: "Continente", campo: "region", width: 20 },
-  { titulo: "Región", campo: "subregion", width: 30 },
+  { titulo: "Nombre Nativo", campo: "nativeName", width: 40, campoUrl: "mapsPaisUrl"  },
+  { titulo: "Capital", campo: "capital", width: 20, campoUrl: "mapsCapitalUrl" },
+  { titulo: "Continente", campo: "region", width: 20, campoUrl: "mapsContinenteUrl" },
+  { titulo: "Región", campo: "subregion", width: 30, campoUrl: "mapsRegionUrl" },
   { titulo: "Idiomas", campo: "idiomas", width: 20 },
   { titulo: "Nº Husos", campo: "numHusos", width: 12, campoTooltip: 'husosTooltip' },
 ]
@@ -139,6 +145,7 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
     // DescargarPaises(origenesDatos.ninguno)
     DescargarPaises(origenDatos)
       .then((datos) => {
+        console.log(datos);
         this._data = datos;
         this._data.forEach((registro, indice) => {
           registro.key = indice.toString();
@@ -148,7 +155,12 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
           registro.husosTooltip = (Array.isArray(registro.timezones) ? registro.timezones.join(', ') : '')
           registro.wikiEnUrl = `https://en.wikipedia.org/wiki/${registro.name}`;
           registro.wikiEsUrl = `https://es.wikipedia.org/wiki/${registro.translations.es}`;
-          registro.banderaUrl = `${URL_FLAGS}${registro.name.toString().replace(/ /g, URL_FLAGS_SEP).toLowerCase()}.${URL_FLAGS_EXT}`
+          // registro.banderaUrl = `${URL_FLAGS}${registro.name.toString().replace(/ /g, URL_FLAGS_SEP).toLowerCase()}.${URL_FLAGS_EXT}`;
+          registro.banderaUrl = `${URL_FLAGS}${registro.alpha3Code.toString().toLowerCase()}.${URL_FLAGS_EXT}`;
+          registro.mapsPaisUrl = `${URL_MAPS}${registro.name}, country of ${registro.subregion}`;
+          registro.mapsContinenteUrl = `${URL_MAPS}${registro.region}, continent`;
+          registro.mapsRegionUrl = `${URL_MAPS}${registro.subregion}, region of ${registro.region}`;
+          registro.mapsCapitalUrl = `${URL_MAPS}${registro.capital}, city of ${registro.name}`;
         })
         console.log(this._data[5]);
         this.setState({ numRegs: datos.length, estado: fetchStatus.Cargado });
