@@ -4,11 +4,11 @@ import { Label } from 'office-ui-fabric-react/lib/Label';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 
 import { DescargarPaises, origenesDatos, URL_PAISES, JSON_PAISES } from './Modelo';
-import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from './SimpleList';
+import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from './lib/SimpleListUIfabric/SimpleList';
 import { DetailsListDocumentsExample } from './DetailListDocumentsExample';
-import { SimpleListUIFabric } from './SimpleListUIFabric';
+import { SimpleListUIFabric } from './lib/SimpleListUIfabric/SimpleListUIFabric';
 import { IColumn, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
-import { ISimpleListCol } from './SimpleListCommon';
+import { ISimpleListCol } from './lib/SimpleListUIfabric/SimpleListCommon';
 
 
 enum menuOptionsId { debugListTable = 1, debugListTxt, FabricList, fabricListDocExample }

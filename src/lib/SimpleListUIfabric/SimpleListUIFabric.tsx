@@ -6,7 +6,6 @@ import { copyAndSort, ISimpleListCol, copyAndSortByKey } from './SimpleListCommo
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { Toggle } from 'office-ui-fabric-react/lib/Toggle';
 import { mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
-// import { TextField } from 'office-ui-fabric-react/lib/TextField';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { IDropdownOption, Dropdown } from 'office-ui-fabric-react/lib/Dropdown';
@@ -107,7 +106,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     return (numContinentes);
   }
 
-  
+
   public constructor(props: ISimpleListUIFabricProps) {
     super(props);
     this._allItems = this.props.datos.slice(0);
