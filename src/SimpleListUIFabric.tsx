@@ -107,6 +107,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     return (numContinentes);
   }
 
+  
   public constructor(props: ISimpleListUIFabricProps) {
     super(props);
     this._allItems = this.props.datos.slice(0);
