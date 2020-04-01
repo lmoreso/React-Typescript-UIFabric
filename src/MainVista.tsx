@@ -60,16 +60,16 @@ export interface IGetRestExampleState {
 export const COLUMNS_DEF: ISimpleListCol[] = [
   // { titulo: "Key", campo: "key", width: 10 },
   // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
-  { titulo: "Bandera", campo: "banderaUrl", width: 10, isImage: true },
-  { titulo: "Siglas", campo: "alpha3Code", width: 10, campoUrl: "banderaUrl" },
-  { titulo: "Nombre Inglés", campo: "name", width: 40, campoUrl: "wikiEnUrl" },
-  { titulo: "Nombre Español", campo: "Pais", width: 40, campoUrl: "wikiEsUrl" },
-  { titulo: "Nombre Nativo", campo: "nativeName", width: 40, campoUrl: "mapsPaisUrl"  },
-  { titulo: "Capital", campo: "capital", width: 20, campoUrl: "mapsCapitalUrl" },
-  { titulo: "Continente", campo: "region", width: 20, campoUrl: "mapsContinenteUrl" },
-  { titulo: "Región", campo: "subregion", width: 30, campoUrl: "mapsRegionUrl" },
-  { titulo: "Idiomas", campo: "idiomas", width: 20 },
-  { titulo: "Nº Husos", campo: "numHusos", width: 12, campoTooltip: 'husosTooltip' },
+  { title: "Bandera", field: "banderaUrl", width: 10, isImage: true, order: false },
+  { title: "Siglas", field: "alpha3Code", width: 10, fieldUrl: "banderaUrl", order: true },
+  { title: "Nombre Inglés", field: "name", width: 40, fieldUrl: "wikiEnUrl", order: true },
+  { title: "Nombre Español", field: "Pais", width: 40, fieldUrl: "wikiEsUrl", order: true },
+  { title: "Nombre Nativo", field: "nativeName", width: 40, fieldUrl: "mapsPaisUrl", order: true  },
+  { title: "Capital", field: "capital", width: 20, fieldUrl: "mapsCapitalUrl", order: true },
+  { title: "Continente", field: "region", width: 20, fieldUrl: "mapsContinenteUrl", order: true },
+  { title: "Región", field: "subregion", width: 30, fieldUrl: "mapsRegionUrl", order: true },
+  { title: "Idiomas", field: "idiomas", width: 20, order: false },
+  { title: "Nº Husos", field: "numHusos", width: 12, fieldTooltip: 'husosTooltip', order: true },
 ]
 
 export const optionsComboDB: { key: number; text: string }[] = [
@@ -105,16 +105,16 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
       COLUMNS_DEF.forEach((unPais: ISimpleListCol, indice) => {
         this._dbgListRows.push({
           key: indice.toString(),
-          tituloColumna: unPais.titulo,
+          tituloColumna: unPais.title,
           anchoColumna: unPais.width,
-          nombreColumna: unPais.campo,
-          tooltipColumna: (unPais.campoTooltip) ? unPais.campoTooltip : undefined,
-          linkColumna: (unPais.campoUrl) ? unPais.campoUrl : undefined,
+          nombreColumna: unPais.field,
+          tooltipColumna: (unPais.fieldTooltip) ? unPais.fieldTooltip : undefined,
+          linkColumna: (unPais.fieldUrl) ? unPais.fieldUrl : undefined,
         });
         this._columns.push({
           key: indice.toString(),
-          name: unPais.titulo,
-          fieldName: unPais.campo,
+          name: unPais.title,
+          fieldName: unPais.field,
           minWidth: unPais.width * 3,
           // maxWidth: unPais.width * 2,
           // isRowHeader: true,
@@ -145,7 +145,7 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
     // DescargarPaises(origenesDatos.ninguno)
     DescargarPaises(origenDatos)
       .then((datos) => {
-        console.log(datos);
+        // console.log(datos);
         this._data = datos;
         this._data.forEach((registro, indice) => {
           registro.key = indice.toString();
@@ -250,9 +250,17 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
               />
               <SimpleListUIFabric
                 hidden={!this._isMenuActive(menuOptionsId.FabricList)}
-                datos={this._data}
-                titulo={`Lista de UIFabric: se han encontrado ${this._data.length} Paises`}
+                data={this._data}
+                title={`Paises, Regiones y Continentes`}
+                labelItem='Pais'
                 columns={COLUMNS_DEF}
+                fieldsTextFilter={['Paises', 'name', 'nativeName']}
+                fieldsDropdownFilter={[
+                  {labelItem: 'Continente', fields: ['region']},
+                  {labelItem: 'Región', fields: ['region', 'subregion']},
+                ]}
+                listCompactMode={true}
+                showToggleCompactMode={true}
               />
             </div>
           </div>

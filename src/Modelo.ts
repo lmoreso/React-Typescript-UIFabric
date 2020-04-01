@@ -18,14 +18,14 @@ export async function DescargarPaises(origen: origenesDatos): Promise<any> {
                 fetch(URL_PAISES)
                     .then(res => {
                         if (res) {
-                            console.log(res);
+                            // console.log(res);
                             resolve(res.json());
                         } else {
                             reject(`La url ${URL_PAISES}, no ha devuelto nada.`);
                         }
                     })
                     .catch(err => {
-                        console.log(`El error ha llegado al catch`, err);
+                        // console.log(`El error ha llegado al catch`, err);
                         reject(err);
                     });
             });

@@ -2,7 +2,6 @@ import * as React from 'react';
 import { DetailsList, /* DetailsListLayoutMode, */ IColumn, SelectionMode, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { ISimpleListUIFabricProps } from './ISimpleListUIFabricProps';
-import { copyAndSort, ISimpleListCol, copyAndSortByKey } from './SimpleListCommon';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { Toggle } from 'office-ui-fabric-react/lib/Toggle';
 import { mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
@@ -10,6 +9,7 @@ import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { IDropdownOption, Dropdown } from 'office-ui-fabric-react/lib/Dropdown';
 import { Image } from 'office-ui-fabric-react/lib/Image';
+import { copyAndSort, ISimpleListCol, copyAndSortByKey } from './SimpleListCommon';
 
 
 const LABEL_OPTION_SIN_CONTINENTE = 'Sin Continente';
@@ -56,12 +56,25 @@ interface IRegion {
 
 export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps, ISimpleListUIFabricStates> {
   private _allItems: any[];
-  private _filterName: string;
+  private _filterText: string;
   private _continentOption: IDropdownOption[];
   private _continentFilter: IContinente[];
   private _regionOption: IDropdownOption[];
   private _regionFilter: IRegion[];
-  // private _regions: { region: string; continent: string }[];
+
+  public constructor(props: ISimpleListUIFabricProps) {
+    super(props);
+    this._allItems = this.props.data.slice(0);
+    this._filterText = "";
+    this._getContinentes();
+    this.state = {
+      datos: this._allItems,
+      columns: this._procesaColumnas(this.props.columns),
+      isCompactMode: (this.props.listCompactMode) ? true : false,
+      filterContinentOption: -1,
+      filterRegionOption: -1,
+    }
+  }
 
   private _getContinentes(): number {
     let numContinentes: number = 0;
@@ -106,61 +119,46 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     return (numContinentes);
   }
 
+  private _filter(): void {
+    let data = this._allItems;
 
-  public constructor(props: ISimpleListUIFabricProps) {
-    super(props);
-    this._allItems = this.props.datos.slice(0);
-    this._filterName = "";
-    this._getContinentes();
-    this.state = {
-      datos: this._allItems,
-      columns: this._procesaColumnas(this.props.columns),
-      isCompactMode: false,
-      filterContinentOption: -1,
-      filterRegionOption: -1,
-    }
-  }
-
-  private _filter(filterContinentOption: string | number, filterRegionOption: string | number): void {
-    let datos = this._allItems;
-
-    if (this._filterName) {
-      datos = datos.filter(unPais => {
-        if (unPais.name && unPais.name.toLowerCase().indexOf(this._filterName.toLowerCase()) > -1) return (true);
-        if (unPais.nativeName && unPais.nativeName.toLowerCase().indexOf(this._filterName.toLowerCase()) > -1) return (true);
-        if (unPais.translations.es && unPais.translations.es.toLowerCase().indexOf(this._filterName.toLowerCase()) > -1) return (true);
-        return (false);
+    if (this._filterText && this._filterText.length > 0 && this.props.fieldsTextFilter && this.props.fieldsTextFilter.length > 0) {
+      data = data.filter(item => {
+        let numFileds = 0;
+        this.props.fieldsTextFilter.forEach((field) => {
+          if (item[field] && item[field].toLowerCase().indexOf(this._filterText.toLowerCase()) > -1) numFileds++;
+        });
+        return ((numFileds > 0));
       });
     }
-
-    if (filterRegionOption > -1) {
-      datos = datos.filter(unPais => {
-        if (unPais.region && unPais.region.toLowerCase() == this._regionFilter[filterRegionOption].continente.toLowerCase()) {
-          if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
-            return (true);
-          if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
-            return (true);
+      /*
+        if (filterRegionOption > -1) {
+          datos = datos.filter(unPais => {
+            if (unPais.region && unPais.region.toLowerCase() == this._regionFilter[filterRegionOption].continente.toLowerCase()) {
+              if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
+                return (true);
+              if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
+                return (true);
+            }
+            if (!unPais.region && this._regionFilter[filterRegionOption].continente == LABEL_OPTION_SIN_CONTINENTE) {
+              if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
+                return (true);
+              if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
+                return (true);
+            }
+            return (false);
+          });
+        } else if (filterContinentOption > -1) {
+          datos = datos.filter(unPais => {
+            if (unPais.region && unPais.region.toLowerCase() == this._continentFilter[filterContinentOption].continente.toLowerCase())
+              return (true);
+            if (!unPais.region && this._continentFilter[filterContinentOption].continente == LABEL_OPTION_SIN_CONTINENTE)
+              return (true);
+            return (false);
+          });
         }
-        if (!unPais.region && this._regionFilter[filterRegionOption].continente == LABEL_OPTION_SIN_CONTINENTE) {
-          if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
-            return (true);
-          if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
-            return (true);
-        }
-        return (false);
-      });
-    } else if (filterContinentOption > -1) {
-      datos = datos.filter(unPais => {
-        if (unPais.region && unPais.region.toLowerCase() == this._continentFilter[filterContinentOption].continente.toLowerCase())
-          return (true);
-        if (!unPais.region && this._continentFilter[filterContinentOption].continente == LABEL_OPTION_SIN_CONTINENTE)
-          return (true);
-        return (false);
-      });
-    }
-
-    this.setState({ datos, filterContinentOption, filterRegionOption })
-
+      */
+    this.setState({ datos: data })
   }
 
   private _procesaColumnas(simpleListCols: ISimpleListCol[]): IColumn[] {
@@ -170,8 +168,8 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
 
       let laColumna: IColumn = {
         key: indice.toString(),
-        name: unaColumna.titulo,
-        fieldName: unaColumna.campo,
+        name: unaColumna.title,
+        fieldName: unaColumna.field,
         minWidth: unaColumna.width * 1,
         maxWidth: unaColumna.width * 3,
         // isRowHeader: true,
@@ -185,32 +183,32 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
         data: 'string',
         isPadded: true
       };
-      if (unaColumna.campoUrl || unaColumna.campoTooltip || unaColumna.isImage) {
-        if (unaColumna.campoUrl && unaColumna.campoTooltip) {
+      if (unaColumna.fieldUrl || unaColumna.fieldTooltip || unaColumna.isImage) {
+        if (unaColumna.fieldUrl && unaColumna.fieldTooltip) {
           laColumna.onRender = (item) => {
             return (
               <TooltipHost
-                content={item[(unaColumna.campoTooltip) ? unaColumna.campoTooltip : 0]}
+                content={item[(unaColumna.fieldTooltip) ? unaColumna.fieldTooltip : 0]}
                 // id={this._hostId}
                 calloutProps={{ gapSpace: 0 }}
                 styles={{ root: { display: 'inline-block' } }}
               >
-                <Link hRef={item[(unaColumna.campoUrl) ? unaColumna.campoUrl : 0]} target='_blank'>
-                  {item[unaColumna.campo]}
+                <Link hRef={item[(unaColumna.fieldUrl) ? unaColumna.fieldUrl : 0]} target='_blank'>
+                  {item[unaColumna.field]}
                 </Link>
               </TooltipHost>
             );
           }
-        } else if (unaColumna.campoTooltip) {
+        } else if (unaColumna.fieldTooltip) {
           laColumna.onRender = (item) => {
             return (
               <TooltipHost
-                content={item[(unaColumna.campoTooltip) ? unaColumna.campoTooltip : 0]}
+                content={item[(unaColumna.fieldTooltip) ? unaColumna.fieldTooltip : 0]}
                 // id={this._hostId}
                 calloutProps={{ gapSpace: 0 }}
                 styles={{ root: { display: 'inline-block' } }}
               >
-                {item[unaColumna.campo]}
+                {item[unaColumna.field]}
               </TooltipHost>
             );
           }
@@ -218,13 +216,13 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
           laColumna.onRender = (item) => {
             return (
               <TooltipHost
-                content={item[unaColumna.campo]}
+                content={item[unaColumna.field]}
                 // id={this._hostId}
                 calloutProps={{ gapSpace: 0 }}
                 styles={{ root: { display: 'inline-block' } }}
               >
                 <Image
-                  src={item[unaColumna.campo]}
+                  src={item[unaColumna.field]}
                   alt='sancamalancafumalicalipunxi'
                   width={unaColumna.width * 4}
                 />
@@ -235,13 +233,13 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
           laColumna.onRender = (item) => {
             return (
               <TooltipHost
-                content={item[(unaColumna.campoUrl) ? unaColumna.campoUrl : 0]}
+                content={item[(unaColumna.fieldUrl) ? unaColumna.fieldUrl : 0]}
                 // id={this._hostId}
                 calloutProps={{ gapSpace: 0 }}
                 styles={{ root: { display: 'inline-block' } }}
               >
-                <a href={item[(unaColumna.campoUrl) ? unaColumna.campoUrl : 0]} target='_blank'>
-                  {item[unaColumna.campo]}
+                <a href={item[(unaColumna.fieldUrl) ? unaColumna.fieldUrl : 0]} target='_blank'>
+                  {item[unaColumna.field]}
                 </a>
               </TooltipHost>
             );
@@ -283,50 +281,42 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     });
   };
 
-  private _onChangeCompactMode = (ev: React.MouseEvent<HTMLElement>, checked: boolean): void => {
-    this.setState({ isCompactMode: checked });
-  };
-
-  private _onChangeText = (text: string): void => {
-    this._filterName = text;
-    this._filter(this.state.filterContinentOption, this.state.filterRegionOption);
-  };
-
   public render(): JSX.Element {
     if (this.props.hidden) {
       return (<div></div>);
     } else {
       return (
         <div>
-          <h2>{this.props.titulo}</h2>
+          <h2>{this.props.title}</h2>
           <div>
             <div className={classNames.controlWrapper}>
-              <Toggle
-                label="Enable compact mode"
-                checked={this.state.isCompactMode}
-                onChange={this._onChangeCompactMode}
-                onText="Compact"
-                offText="Normal"
-                styles={controlStyles}
-              />
-              {/* <TextField label="Filter by name:" onChange={this._onChangeText} styles={controlStyles} /> */}
-              {/* <div className={classNames.subWrapper}> */}
-              {/* <Label htmlFor='textFieldId' styles={controlStyles}>Filter by name: </Label> */}
-              <SearchBox
-                id='textFieldId'
-                placeholder="Filter by name"
-                // onFocus={() => console.log('onFocus called')}
-                // onBlur={() => console.log('onBlur called')}
-                // onChange={(newValue) => console.log(`onChange called: ${newValue}`)}
-                // onSearch={this._onChangeText}
-                onChange={this._onChangeText}
-                styles={controlStyles}
-              />
-              {/* </div> */}
+              {(!this.props.showToggleCompactMode) ? null :
+                <Toggle
+                  label="Enable compact mode"
+                  checked={this.state.isCompactMode}
+                  onChange={(ev, checked: boolean): void => {
+                    this.setState({ isCompactMode: checked });
+                  }}
+                  onText="Compact"
+                  offText="Normal"
+                  styles={controlStyles}
+                />
+              }
+              {(!(this.props.fieldsTextFilter && this.props.fieldsTextFilter.length > 0)) ? null :
+                <SearchBox
+                  placeholder="Filter by name"
+                  // onSearch={(text: string): void => {
+                  onChange={(text: string): void => {
+                    this._filterText = text;
+                    this._filter();
+                  }}
+                  styles={controlStyles}
+                />
+              }
               <Dropdown
                 selectedKey={this.state.filterContinentOption}
                 onChange={(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
-                  this._filter(item.key, -1);
+                  this.setState({ filterContinentOption: item.key });
                 }}
                 placeholder="Select a Continent"
                 options={this._continentOption}
@@ -336,7 +326,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
               <Dropdown
                 selectedKey={this.state.filterRegionOption}
                 onChange={(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
-                  this._filter(-1, item.key);
+                  this.setState({ filterRegionOption: item.key });
                 }}
                 placeholder="Select a Region"
                 options={this._regionOption}

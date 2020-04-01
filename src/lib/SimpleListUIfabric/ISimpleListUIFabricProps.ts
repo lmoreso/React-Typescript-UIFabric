@@ -2,7 +2,12 @@ import { ISimpleListCol } from './SimpleListCommon';
 
 export interface ISimpleListUIFabricProps {
   hidden: boolean;
-  datos: any[];
+  data: any[];
   columns: ISimpleListCol[];
-  titulo: string;
+  title: string;
+  labelItem: string;
+  fieldsTextFilter: string[];
+  fieldsDropdownFilter?: {labelItem: string; fields: string[]}[];
+  listCompactMode?: boolean;
+  showToggleCompactMode?: boolean;
 }
