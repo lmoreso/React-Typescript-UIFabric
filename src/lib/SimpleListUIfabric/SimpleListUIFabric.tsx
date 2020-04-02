@@ -42,23 +42,16 @@ interface ISimpleListUIFabricStates {
   filterRegionOption: number | string;
 }
 
-interface IContinente {
-  continente: string;
-  numItems: number;
-}
-
 interface IRegion {
   continente: string;
   region: string;
   numItems: number;
 }
 
-
 export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps, ISimpleListUIFabricStates> {
   private _allItems: any[];
   private _filterText: string;
-  private _continentOption: IDropdownOption[];
-  private _continentFilter: IContinente[];
+  private _dropdownOptionList: IDropdownOption[];
   private _regionOption: IDropdownOption[];
   private _regionFilter: IRegion[];
 
@@ -67,33 +60,61 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     this._allItems = this.props.data.slice(0);
     this._filterText = "";
     this._getContinentes();
+    this._makeDropdownList();
     this.state = {
       datos: this._allItems,
-      columns: this._procesaColumnas(this.props.columns),
+      columns: this._makeColumns(this.props.columns),
       isCompactMode: (this.props.listCompactMode) ? true : false,
       filterContinentOption: -1,
       filterRegionOption: -1,
     }
   }
 
+  private _makeDropdownList(): number {
+    let numItems: number = 0;
+    let numGroups: number = 0;
+
+    if (this.props.fieldDropdownFilter && this.props.fieldDropdownFilter.field.length > 0) {
+      let groupedItems: { value: string; numOcurrences: number }[] = new Array<{ value: string; numOcurrences: number }>();
+      let field = this.props.fieldDropdownFilter.field;
+      let valueIfNull = this.props.fieldDropdownFilter.valueIfNull;
+      // Calculamos la lista de Items agrupados
+      this._allItems.forEach(aRow => {
+        numItems++;
+        let value = (aRow[field]) ? aRow[field] : valueIfNull;
+        let newValue = groupedItems.find((aGroup) => (aGroup.value === value));
+        if (newValue) {
+          newValue.numOcurrences++;
+        } else {
+          groupedItems.push({ value, numOcurrences: 1 });
+          numGroups++;
+        }
+      })
+      // Ordenamos la lista de Items agrupados
+      groupedItems.sort((a, b) => (a[field] > b[field]) ? 1 : -1);
+      // Creamos la lista de opciones para el combo
+      this._dropdownOptionList = new Array<IDropdownOption>();
+      // Añadimos opción al principio para no filtrar, que informará del numero de Items (si se informa la props.fieldDropdownFilter.valueNoFilter)
+      if (this.props.fieldDropdownFilter.valueNoFilter)
+        this._dropdownOptionList.push({ key: -1, text: `${this.props.fieldDropdownFilter.valueNoFilter} (${numItems})` });
+      // Añadimos el resto de grupos al combo
+      groupedItems.forEach((agroupedItem, indice) => {
+        this._dropdownOptionList.push({ key: indice, text: `${agroupedItem.value} (${agroupedItem.numOcurrences})` })
+      });
+
+    }
+    return (numGroups);
+  }
+
   private _getContinentes(): number {
     let numContinentes: number = 0;
     let numPaises: number = 0;
-    this._continentFilter = new Array<IContinente>();
     this._regionFilter = new Array<IRegion>();
     // Se cuentan el nº de paises por cada continente
     this._allItems.forEach(unPais => {
       numPaises++;
-      // Lista de Continentes
-      let continente = (unPais.region) ? unPais.region : LABEL_OPTION_SIN_CONTINENTE;
-      let nouContinent = this._continentFilter.find((unContinent) => (unContinent.continente === continente));
-      if (nouContinent) {
-        nouContinent.numItems++;
-      } else {
-        this._continentFilter.push({ continente: continente, numItems: 1 });
-        numContinentes++;
-      }
       // Lista de Regiones
+      let continente = (unPais.region) ? unPais.region : LABEL_OPTION_SIN_CONTINENTE;
       let region = (unPais.subregion) ? unPais.subregion : LABEL_OPTION_SIN_REGION;
       let nuevaRegion = this._regionFilter.find((unaRegion) => (unaRegion.continente === continente && unaRegion.region === region));
       if (nuevaRegion) {
@@ -102,11 +123,6 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
         this._regionFilter.push({ continente: continente, region: region, numItems: 1 });
       }
     })
-    // Creamos el array de opciones para el combo (Dropdown) de Continentes
-    this._continentOption = new Array<IDropdownOption>();
-    this._continentOption.push({ key: -1, text: `Todos los Continentes (${numPaises})` });
-    this._continentFilter.sort((a, b) => (a.continente > b.continente) ? 1 : -1);
-    this._continentFilter.forEach((unContinente, indice) => { this._continentOption.push({ key: indice, text: `${unContinente.continente} (${unContinente.numItems})` }) });
 
     // Creamos el array de opciones para el combo (Dropdown) de Continentes
     this._regionOption = new Array<IDropdownOption>();
@@ -114,7 +130,6 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     this._regionFilter.sort((a, b) => (`${a.continente} - ${a.region}` > `${b.continente} - ${b.region}`) ? 1 : -1);
     this._regionFilter.forEach((unaRegion, indice) => { this._regionOption.push({ key: indice, text: `${unaRegion.continente} - ${unaRegion.region} (${unaRegion.numItems})` }) });
 
-    console.log('Array de Continentes', this._continentFilter);
     console.log('Array de Regiones', this._regionFilter);
     return (numContinentes);
   }
@@ -131,47 +146,47 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
         return ((numFileds > 0));
       });
     }
-      /*
-        if (filterRegionOption > -1) {
-          datos = datos.filter(unPais => {
-            if (unPais.region && unPais.region.toLowerCase() == this._regionFilter[filterRegionOption].continente.toLowerCase()) {
-              if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
-                return (true);
-              if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
-                return (true);
-            }
-            if (!unPais.region && this._regionFilter[filterRegionOption].continente == LABEL_OPTION_SIN_CONTINENTE) {
-              if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
-                return (true);
-              if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
-                return (true);
-            }
-            return (false);
-          });
-        } else if (filterContinentOption > -1) {
-          datos = datos.filter(unPais => {
-            if (unPais.region && unPais.region.toLowerCase() == this._continentFilter[filterContinentOption].continente.toLowerCase())
+    /*
+      if (filterRegionOption > -1) {
+        datos = datos.filter(unPais => {
+          if (unPais.region && unPais.region.toLowerCase() == this._regionFilter[filterRegionOption].continente.toLowerCase()) {
+            if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
               return (true);
-            if (!unPais.region && this._continentFilter[filterContinentOption].continente == LABEL_OPTION_SIN_CONTINENTE)
+            if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
               return (true);
-            return (false);
-          });
-        }
-      */
+          }
+          if (!unPais.region && this._regionFilter[filterRegionOption].continente == LABEL_OPTION_SIN_CONTINENTE) {
+            if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
+              return (true);
+            if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
+              return (true);
+          }
+          return (false);
+        });
+      } else if (filterContinentOption > -1) {
+        datos = datos.filter(unPais => {
+          if (unPais.region && unPais.region.toLowerCase() == this._continentFilter[filterContinentOption].continente.toLowerCase())
+            return (true);
+          if (!unPais.region && this._continentFilter[filterContinentOption].continente == LABEL_OPTION_SIN_CONTINENTE)
+            return (true);
+          return (false);
+        });
+      }
+    */
     this.setState({ datos: data })
   }
 
-  private _procesaColumnas(simpleListCols: ISimpleListCol[]): IColumn[] {
+  private _makeColumns(simpleListCols: ISimpleListCol[]): IColumn[] {
     let columns: IColumn[] = new Array<IColumn>();
 
-    simpleListCols.forEach((unaColumna: ISimpleListCol, indice) => {
+    simpleListCols.forEach((aColumn: ISimpleListCol, indice) => {
 
-      let laColumna: IColumn = {
+      let theColumn: IColumn = {
         key: indice.toString(),
-        name: unaColumna.title,
-        fieldName: unaColumna.field,
-        minWidth: unaColumna.width * 1,
-        maxWidth: unaColumna.width * 3,
+        name: aColumn.title,
+        fieldName: aColumn.field,
+        minWidth: aColumn.width * 1,
+        maxWidth: aColumn.width * 3,
         // isRowHeader: true,
         isResizable: true,
         columnActionsMode: ColumnActionsMode.clickable,
@@ -183,70 +198,70 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
         data: 'string',
         isPadded: true
       };
-      if (unaColumna.fieldUrl || unaColumna.fieldTooltip || unaColumna.isImage) {
-        if (unaColumna.fieldUrl && unaColumna.fieldTooltip) {
-          laColumna.onRender = (item) => {
+      if (aColumn.fieldUrl || aColumn.fieldTooltip || aColumn.isImage) {
+        if (aColumn.fieldUrl && aColumn.fieldTooltip) {
+          theColumn.onRender = (item) => {
             return (
               <TooltipHost
-                content={item[(unaColumna.fieldTooltip) ? unaColumna.fieldTooltip : 0]}
+                content={item[(aColumn.fieldTooltip) ? aColumn.fieldTooltip : 0]}
                 // id={this._hostId}
                 calloutProps={{ gapSpace: 0 }}
                 styles={{ root: { display: 'inline-block' } }}
               >
-                <Link hRef={item[(unaColumna.fieldUrl) ? unaColumna.fieldUrl : 0]} target='_blank'>
-                  {item[unaColumna.field]}
+                <Link hRef={item[(aColumn.fieldUrl) ? aColumn.fieldUrl : 0]} target='_blank'>
+                  {item[aColumn.field]}
                 </Link>
               </TooltipHost>
             );
           }
-        } else if (unaColumna.fieldTooltip) {
-          laColumna.onRender = (item) => {
+        } else if (aColumn.fieldTooltip) {
+          theColumn.onRender = (item) => {
             return (
               <TooltipHost
-                content={item[(unaColumna.fieldTooltip) ? unaColumna.fieldTooltip : 0]}
+                content={item[(aColumn.fieldTooltip) ? aColumn.fieldTooltip : 0]}
                 // id={this._hostId}
                 calloutProps={{ gapSpace: 0 }}
                 styles={{ root: { display: 'inline-block' } }}
               >
-                {item[unaColumna.field]}
+                {item[aColumn.field]}
               </TooltipHost>
             );
           }
-        } else if (unaColumna.isImage == true) {
-          laColumna.onRender = (item) => {
+        } else if (aColumn.isImage == true) {
+          theColumn.onRender = (item) => {
             return (
               <TooltipHost
-                content={item[unaColumna.field]}
+                content={item[aColumn.field]}
                 // id={this._hostId}
                 calloutProps={{ gapSpace: 0 }}
                 styles={{ root: { display: 'inline-block' } }}
               >
                 <Image
-                  src={item[unaColumna.field]}
+                  src={item[aColumn.field]}
                   alt='sancamalancafumalicalipunxi'
-                  width={unaColumna.width * 4}
+                  width={aColumn.width * 4}
                 />
               </TooltipHost>
             );
           }
         } else {
-          laColumna.onRender = (item) => {
+          theColumn.onRender = (item) => {
             return (
               <TooltipHost
-                content={item[(unaColumna.fieldUrl) ? unaColumna.fieldUrl : 0]}
+                content={item[(aColumn.fieldUrl) ? aColumn.fieldUrl : 0]}
                 // id={this._hostId}
                 calloutProps={{ gapSpace: 0 }}
                 styles={{ root: { display: 'inline-block' } }}
               >
-                <a href={item[(unaColumna.fieldUrl) ? unaColumna.fieldUrl : 0]} target='_blank'>
-                  {item[unaColumna.field]}
+                <a href={item[(aColumn.fieldUrl) ? aColumn.fieldUrl : 0]} target='_blank'>
+                  {item[aColumn.field]}
                 </a>
               </TooltipHost>
             );
           }
         }
       }
-      columns.push(laColumna);
+      columns.push(theColumn);
     });
 
     return (columns);
@@ -319,21 +334,11 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
                   this.setState({ filterContinentOption: item.key });
                 }}
                 placeholder="Select a Continent"
-                options={this._continentOption}
+                options={this._dropdownOptionList}
                 styles={controlStyles}
                 style={{ width: 220 }}
               />
-              <Dropdown
-                selectedKey={this.state.filterRegionOption}
-                onChange={(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
-                  this.setState({ filterRegionOption: item.key });
-                }}
-                placeholder="Select a Region"
-                options={this._regionOption}
-                styles={controlStyles}
-                style={{ width: 300 }}
-              />
-              <Label styles={controlStyles}>{`Se están mostrando ${this.state.datos.length} paises.`}</Label>
+              <Label styles={controlStyles}>{`Se están mostrando ${this.state.datos.length} ${this.props.labelItems}.`}</Label>
             </div>
             <DetailsList
               items={this.state.datos}

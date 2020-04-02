@@ -253,12 +253,14 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
                 data={this._data}
                 title={`Paises, Regiones y Continentes`}
                 labelItem='Pais'
+                labelItems='Paises'
                 columns={COLUMNS_DEF}
                 fieldsTextFilter={['Paises', 'name', 'nativeName']}
-                fieldsDropdownFilter={[
-                  {labelItem: 'Continente', fields: ['region']},
-                  {labelItem: 'Región', fields: ['region', 'subregion']},
-                ]}
+                fieldDropdownFilter={{valueIfNull: 'Sin Continente', field: 'region', valueNoFilter: 'Todos los Continentes'}}
+                // fieldsDropdownFilter={[
+                //   {valueIfNull: 'Sin Continente', fields: 'region'},
+                //   {valueIfNull: 'Sin Región', fields: 'subregion'},
+                // ]}
                 listCompactMode={true}
                 showToggleCompactMode={true}
               />

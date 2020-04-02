@@ -6,8 +6,10 @@ export interface ISimpleListUIFabricProps {
   columns: ISimpleListCol[];
   title: string;
   labelItem: string;
+  labelItems: string;
   fieldsTextFilter: string[];
-  fieldsDropdownFilter?: {labelItem: string; fields: string[]}[];
+  fieldDropdownFilter: {valueIfNull: string; field: string; valueNoFilter: string}; // en construcción
+  // fieldsDropdownFilter?: {valueIfNull: string; fields: string}[];  // en construcción
   listCompactMode?: boolean;
   showToggleCompactMode?: boolean;
 }
