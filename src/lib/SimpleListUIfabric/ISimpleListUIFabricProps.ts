@@ -12,4 +12,5 @@ export interface ISimpleListUIFabricProps {
   // fieldsDropdownFilter?: {valueIfNull: string; fields: string}[];  // en construcción
   listCompactMode?: boolean;
   showToggleCompactMode?: boolean;
+  fixedHeader?: boolean;
 }
