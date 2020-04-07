@@ -1,15 +1,15 @@
 import * as React from 'react';
+// Fluent UI imports
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
-
-import { DescargarPaises, origenesDatos, URL_PAISES, JSON_PAISES } from './Modelo';
-import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from './lib/SimpleListUIfabric/SimpleList';
-import { DetailsListDocumentsExample } from './DetailListDocumentsExample';
-import { SimpleListUIFabric } from './lib/SimpleListUIfabric/SimpleListUIFabric';
 import { IColumn, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
 import { ISimpleListCol } from './lib/SimpleListUIfabric/SimpleListCommon';
 
+import { DescargarPaises, origenesDatos, URL_PAISES, JSON_PAISES } from './RestCountriesExample/Modelo';
+import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from './lib/SimpleListUIfabric/SimpleList';
+import { DetailsListDocumentsExample } from './FluentUiExamples/DetailListDocumentsExample';
+import { SimpleListUIFabric } from './lib/SimpleListUIfabric/SimpleListUIFabric';
 
 enum menuOptionsId { debugListTable = 1, debugListTxt, FabricList, fabricListDocExample }
 const DEF_MENU_ID: menuOptionsId = menuOptionsId.FabricList;
@@ -271,4 +271,5 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
     }
   }
 }
+
 

@@ -2,7 +2,7 @@ import * as React from 'react';
 import './App.css';
 import logo from './logo.svg';
 import { initializeIcons } from '@uifabric/icons';
-import { GetRestExample } from './MainVista';
+import { GetRestExample } from './MainView';
 import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
 
 interface IAppStates {

@@ -11,6 +11,7 @@ export interface IDebugListConfig {
   tooltipColumna?: string;
 }
 
+
 export interface IDebugListRenderProps {
   list: DebugList;
   datos: any[];

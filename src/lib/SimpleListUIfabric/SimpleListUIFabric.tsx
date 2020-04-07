@@ -11,10 +11,6 @@ import { IDropdownOption, Dropdown } from 'office-ui-fabric-react/lib/Dropdown';
 import { Image } from 'office-ui-fabric-react/lib/Image';
 import { copyAndSort, ISimpleListCol, copyAndSortByKey } from './SimpleListCommon';
 
-
-const LABEL_OPTION_SIN_CONTINENTE = 'Sin Continente';
-const LABEL_OPTION_SIN_REGION = 'Sin Región';
-
 const classNames = mergeStyleSets({
   controlWrapper: {
     display: 'flex',
@@ -42,24 +38,15 @@ interface ISimpleListUIFabricStates {
   filterRegionOption: number | string;
 }
 
-interface IRegion {
-  continente: string;
-  region: string;
-  numItems: number;
-}
-
 export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps, ISimpleListUIFabricStates> {
   private _allItems: any[];
   private _filterText: string;
   private _dropdownOptionList: IDropdownOption[];
-  private _regionOption: IDropdownOption[];
-  private _regionFilter: IRegion[];
 
   public constructor(props: ISimpleListUIFabricProps) {
     super(props);
     this._allItems = this.props.data.slice(0);
     this._filterText = "";
-    this._getContinentes();
     this._makeDropdownList();
     this.state = {
       datos: this._allItems,
@@ -104,34 +91,6 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
 
     }
     return (numGroups);
-  }
-
-  private _getContinentes(): number {
-    let numContinentes: number = 0;
-    let numPaises: number = 0;
-    this._regionFilter = new Array<IRegion>();
-    // Se cuentan el nº de paises por cada continente
-    this._allItems.forEach(unPais => {
-      numPaises++;
-      // Lista de Regiones
-      let continente = (unPais.region) ? unPais.region : LABEL_OPTION_SIN_CONTINENTE;
-      let region = (unPais.subregion) ? unPais.subregion : LABEL_OPTION_SIN_REGION;
-      let nuevaRegion = this._regionFilter.find((unaRegion) => (unaRegion.continente === continente && unaRegion.region === region));
-      if (nuevaRegion) {
-        nuevaRegion.numItems++;
-      } else {
-        this._regionFilter.push({ continente: continente, region: region, numItems: 1 });
-      }
-    })
-
-    // Creamos el array de opciones para el combo (Dropdown) de Continentes
-    this._regionOption = new Array<IDropdownOption>();
-    this._regionOption.push({ key: -1, text: `Todas las Regiones (${numPaises})` });
-    this._regionFilter.sort((a, b) => (`${a.continente} - ${a.region}` > `${b.continente} - ${b.region}`) ? 1 : -1);
-    this._regionFilter.forEach((unaRegion, indice) => { this._regionOption.push({ key: indice, text: `${unaRegion.continente} - ${unaRegion.region} (${unaRegion.numItems})` }) });
-
-    console.log('Array de Regiones', this._regionFilter);
-    return (numContinentes);
   }
 
   private _filter(): void {
