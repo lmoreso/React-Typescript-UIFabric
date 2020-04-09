@@ -11,6 +11,11 @@ interface IAppStates {
 
 }
 
+const REACT_URL = 'https://reactjs.org/';
+const TYPESCRIPT_URL = 'https://www.typescriptlang.org/docs/home.html';
+const FLUENT_UI_URL = 'https://developer.microsoft.com/en-us/fluentui#/controls/web';
+const UI_FABRIC_URL = 'https://developer.microsoft.com/en-us/office/blogs/ui-fabric-is-evolving-into-fluent-ui';
+
 class App extends React.Component<{}, IAppStates> {
   // private _labelId = useId('labelElement');
 
@@ -28,7 +33,9 @@ class App extends React.Component<{}, IAppStates> {
             <Sticky stickyPosition={StickyPositionType.Header}>
               <header className="App-header">
                 <img src={logo} className="App-logo" alt="logo" />
-                <span className="App-title">Exercices about React, Typescript & UIFabric </span>
+                <span className="App-title">
+                  Exercices about <a className="App-title" href={REACT_URL} target='_blank'>React</a>, <a className="App-title" href={TYPESCRIPT_URL} target='_blank'>Typescript</a> & <a className="App-title" href={FLUENT_UI_URL} target='_blank'>Fluent UI</a> (<a className="App-title" href={UI_FABRIC_URL} target='_blank'> UIFabric</a>) 
+                </span>
               </header>
             </Sticky>
             <div>

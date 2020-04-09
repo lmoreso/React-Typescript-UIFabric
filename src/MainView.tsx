@@ -8,14 +8,14 @@ import { ISimpleListCol } from './lib/SimpleListUIfabric/SimpleListCommon';
 // import { ScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
 import { Sticky, /* StickyPositionType */ } from 'office-ui-fabric-react/lib/Sticky';
 
-
 // Aplicattion imports
 import { DescargarPaises, origenesDatos, URL_PAISES, JSON_PAISES } from './RestCountriesExample/Modelo';
 import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from './lib/SimpleListUIfabric/SimpleList';
 import { DetailsListDocumentsExample } from './FluentUiExamples/DetailListDocumentsExample';
 import { SimpleListUIFabric } from './lib/SimpleListUIfabric/SimpleListUIFabric';
+import { ScrollablePaneDetailsListExample } from './FluentUiExamples/ScrollablePaneExample';
 
-enum menuOptionsId { debugListTable = 1, debugListTxt, FabricList, fabricListDocExample }
+enum menuOptionsId { debugListTable = 1, debugListTxt, FabricList, fabricListDocExample, scrollablePaneExample }
 const DEF_MENU_ID: menuOptionsId = menuOptionsId.FabricList;
 const DEF_ORG_DAT: origenesDatos = origenesDatos.rest;
 // const URL_FLAGS_WIKI = 'https://en.wikipedia.org/wiki/File:Flag_of_'
@@ -33,18 +33,22 @@ const URL_FLAGS_EXT = 'svg';
 
 const URL_MAPS = 'https://maps.google.com/?q=';
 
-
 interface IMenuOptions {
   key: menuOptionsId;
   name: string;
   loadCountries: boolean;
+  title: string;
 }
 
 const menuOptions: IMenuOptions[] = [
-  { key: menuOptionsId.debugListTable, name: 'Tabla HTML de DebugList', loadCountries: true },
-  { key: menuOptionsId.debugListTxt, name: 'Texto "tabulado" de DebugList', loadCountries: true },
-  { key: menuOptionsId.FabricList, name: 'Lista de UI Fabric', loadCountries: true },
-  { key: menuOptionsId.fabricListDocExample, name: 'Ejemplo de Lista de UI Fabric', loadCountries: false },
+  {
+    key: menuOptionsId.debugListTable, name: 'Tabla HTML de DebugList', loadCountries: true,
+    title: 'Paises, Regiones y Continentes'
+  },
+  { key: menuOptionsId.debugListTxt, name: 'Texto "tabulado" de DebugList', loadCountries: true, title: 'Paises, Regiones y Continentes' },
+  { key: menuOptionsId.FabricList, name: 'Lista de UI Fabric', loadCountries: true, title: 'Paises, Regiones y Continentes' },
+  { key: menuOptionsId.fabricListDocExample, name: 'Ejemplo de Lista de UI Fabric', loadCountries: false, title: 'Ejemplo de Lista de UI Fabric' },
+  { key: menuOptionsId.scrollablePaneExample, name: 'Ejemplo de Scrollablepane de UI Fabric', loadCountries: false, title: 'Ejemplo de Scrollablepane de UI Fabric' },
 ]
 
 export interface IGetDataExampleProps {
@@ -226,8 +230,11 @@ export class MainView extends React.Component<IGetDataExampleProps, IGetRestExam
 
                 />
               </div>
+              <div style={{ fontSize: 'large', display: 'flex', justifyContent: 'center', padding: '4px', alignSelf: 'center', backgroundColor: 'rgba(220, 220, 220)', width: '100%' }}>
+                <span >{this._getActiveMenuOption().title}</span>
+              </div>
             </Sticky>
-            <div style={{ padding: '5px', alignSelf: 'center' }}>
+            <div style={{ padding: '5px', alignSelf: 'center', justifyContent: 'center' }}>
 
               {/* this._getActiveMenuOption().loadCountries ?
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', alignSelf: 'center', width: '100%' }}>
@@ -256,23 +263,32 @@ export class MainView extends React.Component<IGetDataExampleProps, IGetRestExam
               <DetailsListDocumentsExample
                 hidden={!this._isMenuActive(menuOptionsId.fabricListDocExample)}
               />
-              <SimpleListUIFabric
-                hidden={!this._isMenuActive(menuOptionsId.FabricList)}
-                data={this._data}
-                title={`Paises, Regiones y Continentes`}
-                labelItem='Pais'
-                labelItems='Paises'
-                columns={COLUMNS_DEF}
-                fieldsTextFilter={['Paises', 'name', 'nativeName']}
-                fieldDropdownFilter={{ valueIfNull: 'Sin Continente', field: 'region', valueNoFilter: 'Todos los Continentes' }}
-                // fieldsDropdownFilter={[
-                //   {valueIfNull: 'Sin Continente', fields: 'region'},
-                //   {valueIfNull: 'Sin Región', fields: 'subregion'},
-                // ]}
-                listCompactMode={true}
-                showToggleCompactMode={true}
-                fixedHeader={true}
-              />
+
+              {(this._isMenuActive(menuOptionsId.scrollablePaneExample)) ? <ScrollablePaneDetailsListExample /> : null}
+
+              {(!this._isMenuActive(menuOptionsId.FabricList)) ? null :
+                <div>
+                  {/* <Sticky ><span style={{ backgroundColor: 'rgba(255, 255, 255)', margin: '0', padding: '10px', fontSize: 'large', width: '100%' }}>Paises, Regiones y Continentes</span></Sticky> */}
+                  <SimpleListUIFabric
+                    // hidden={!this._isMenuActive(menuOptionsId.FabricList)}
+                    hidden={false}
+                    data={this._data}
+                    labelItem='Pais'
+                    labelItems='Paises'
+                    columns={COLUMNS_DEF}
+                    fieldsTextFilter={['Paises', 'name', 'nativeName']}
+                    fieldDropdownFilter={{ valueIfNull: 'Sin Continente', field: 'region', valueNoFilter: 'Todos los Continentes' }}
+                    // title={`Paises, Regiones y Continentes`}
+                    // fieldsDropdownFilter={[
+                    //   {valueIfNull: 'Sin Continente', fields: 'region'},
+                    //   {valueIfNull: 'Sin Región', fields: 'subregion'},
+                    // ]}
+                    listCompactMode={true}
+                    showToggleCompactMode={false}
+                    fixedHeader={false}
+                  />
+                </div>
+              }
             </div>
           </div>
         </div>

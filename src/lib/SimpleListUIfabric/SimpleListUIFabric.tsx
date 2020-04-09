@@ -9,6 +9,7 @@ import { Label } from 'office-ui-fabric-react/lib/Label';
 import { IDropdownOption, Dropdown } from 'office-ui-fabric-react/lib/Dropdown';
 import { Image } from 'office-ui-fabric-react/lib/Image';
 import { Sticky, /* StickyPositionType */ } from 'office-ui-fabric-react/lib/Sticky';
+// import { ScrollablePane, /* ScrollbarVisibility */ } from 'office-ui-fabric-react/lib/ScrollablePane';
 
 import { copyAndSort, ISimpleListCol, copyAndSortByKey } from './SimpleListCommon';
 import { ISimpleListUIFabricProps } from './ISimpleListUIFabricProps';
@@ -17,7 +18,8 @@ const classNames = mergeStyleSets({
   controlWrapper: {
     display: 'flex',
     flexWrap: 'wrap',
-    alignItems: 'center'
+    alignItems: 'center',
+    padding: '15px'
   },
   subWrapper: {
     display: 'flex',
@@ -50,6 +52,9 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     this._allItems = this.props.data.slice(0);
     this._filterText = "";
     this._makeDropdownList();
+
+    this._renderHeader = this._renderHeader.bind(this);
+
     this.state = {
       datos: this._allItems,
       columns: this._makeColumns(this.props.columns),
@@ -257,53 +262,56 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     });
   };
 
+  private _renderHeader(): JSX.Element {
+    return (
+      <div style={{ backgroundColor: 'rgba(255, 255, 255)' }}>
+        <div className={classNames.controlWrapper}>
+          <Toggle
+            hidden={!this.props.showToggleCompactMode}
+            label="Enable compact mode"
+            checked={this.state.isCompactMode}
+            onChange={(ev, checked: boolean): void => {
+              this.setState({ isCompactMode: checked });
+            }}
+            onText="Compact"
+            offText="Normal"
+            styles={controlStyles}
+          />
+          {(!(this.props.fieldsTextFilter && this.props.fieldsTextFilter.length > 0)) ? null :
+            <SearchBox
+              placeholder="Filter by name"
+              // onSearch={(text: string): void => {
+              onChange={(text: string): void => {
+                this._filterText = text;
+                this._filter();
+              }}
+              styles={controlStyles}
+            />
+          }
+          <Dropdown
+            selectedKey={this.state.filterContinentOption}
+            onChange={(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
+              this.setState({ filterContinentOption: item.key });
+            }}
+            placeholder="Select a Continent"
+            options={this._dropdownOptionList}
+            styles={controlStyles}
+            style={{ width: 220 }}
+          />
+          <Label styles={controlStyles}>{`Se están mostrando ${this.state.datos.length} ${this.props.labelItems}.`}</Label>
+        </div>
+      </div>
+    );
+  }
+
   public render(): JSX.Element {
     if (this.props.hidden) {
       return (<div></div>);
     } else {
       return (
         <div >
-          <Sticky>
-            <div style={{ backgroundColor: 'rgba(220, 220, 220)' }}>
-              <h3>{this.props.title}</h3>
-              <div className={classNames.controlWrapper}>
-                {(!this.props.showToggleCompactMode) ? null :
-                  <Toggle
-                    label="Enable compact mode"
-                    checked={this.state.isCompactMode}
-                    onChange={(ev, checked: boolean): void => {
-                      this.setState({ isCompactMode: checked });
-                    }}
-                    onText="Compact"
-                    offText="Normal"
-                    styles={controlStyles}
-                  />
-                }
-                {(!(this.props.fieldsTextFilter && this.props.fieldsTextFilter.length > 0)) ? null :
-                  <SearchBox
-                    placeholder="Filter by name"
-                    // onSearch={(text: string): void => {
-                    onChange={(text: string): void => {
-                      this._filterText = text;
-                      this._filter();
-                    }}
-                    styles={controlStyles}
-                  />
-                }
-                <Dropdown
-                  selectedKey={this.state.filterContinentOption}
-                  onChange={(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
-                    this.setState({ filterContinentOption: item.key });
-                  }}
-                  placeholder="Select a Continent"
-                  options={this._dropdownOptionList}
-                  styles={controlStyles}
-                  style={{ width: 220 }}
-                />
-                <Label styles={controlStyles}>{`Se están mostrando ${this.state.datos.length} ${this.props.labelItems}.`}</Label>
-              </div>
-            </div>
-          </Sticky>
+          {(this.props.fixedHeader) ? <Sticky> <this._renderHeader /> </Sticky> : <this._renderHeader />}
+
           <DetailsList
             items={this.state.datos}
             compact={this.state.isCompactMode}

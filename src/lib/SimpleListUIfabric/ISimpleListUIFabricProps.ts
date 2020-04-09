@@ -4,7 +4,6 @@ export interface ISimpleListUIFabricProps {
   hidden: boolean;
   data: any[];
   columns: ISimpleListCol[];
-  title: string;
   labelItem: string;
   labelItems: string;
   fieldsTextFilter: string[];
