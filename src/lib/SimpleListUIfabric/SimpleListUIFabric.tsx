@@ -38,61 +38,64 @@ interface ISimpleListUIFabricStates {
   datos: any[];
   columns: IColumn[];
   isCompactMode: boolean;
-  filterContinentOption: number | string;
-  filterRegionOption: number | string;
+  filterGroupedOption: number | string;
 }
 
+const ALL_ITEMS = -1;
 export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps, ISimpleListUIFabricStates> {
   private _allItems: any[];
+  private _ItemsFilteredByText: any[];
   private _filterText: string;
+  private _groupedItems: { value: string; numOcurrences: number }[];
   private _dropdownOptionList: IDropdownOption[];
 
   public constructor(props: ISimpleListUIFabricProps) {
     super(props);
     this._allItems = this.props.data.slice(0);
     this._filterText = "";
-    this._makeDropdownList();
 
     this._renderHeader = this._renderHeader.bind(this);
+    this._filterByGroup = this._filterByGroup.bind(this);
 
     this.state = {
       datos: this._allItems,
       columns: this._makeColumns(this.props.columns),
       isCompactMode: (this.props.listCompactMode) ? true : false,
-      filterContinentOption: -1,
-      filterRegionOption: -1,
+      filterGroupedOption: ALL_ITEMS,
     }
+
+    this._filterByText(false);
   }
 
-  private _makeDropdownList(): number {
+  private _makeDropdownList(data: any[]): number {
     let numItems: number = 0;
     let numGroups: number = 0;
 
     if (this.props.fieldDropdownFilter && this.props.fieldDropdownFilter.field.length > 0) {
-      let groupedItems: { value: string; numOcurrences: number }[] = new Array<{ value: string; numOcurrences: number }>();
+      this._groupedItems = new Array<{ value: string; numOcurrences: number }>();
       let field = this.props.fieldDropdownFilter.field;
       let valueIfNull = this.props.fieldDropdownFilter.valueIfNull;
       // Calculamos la lista de Items agrupados
-      this._allItems.forEach(aRow => {
+      data.forEach(aRow => {
         numItems++;
         let value = (aRow[field]) ? aRow[field] : valueIfNull;
-        let newValue = groupedItems.find((aGroup) => (aGroup.value === value));
+        let newValue = this._groupedItems.find((aGroup) => (aGroup.value === value));
         if (newValue) {
           newValue.numOcurrences++;
         } else {
-          groupedItems.push({ value, numOcurrences: 1 });
+          this._groupedItems.push({ value, numOcurrences: 1 });
           numGroups++;
         }
       })
       // Ordenamos la lista de Items agrupados
-      groupedItems.sort((a, b) => (a[field] > b[field]) ? 1 : -1);
+      this._groupedItems.sort((a, b) => (a.value > b.value) ? 1 : -1);
       // Creamos la lista de opciones para el combo
       this._dropdownOptionList = new Array<IDropdownOption>();
       // Añadimos opción al principio para no filtrar, que informará del numero de Items (si se informa la props.fieldDropdownFilter.valueNoFilter)
       if (this.props.fieldDropdownFilter.valueNoFilter)
-        this._dropdownOptionList.push({ key: -1, text: `${this.props.fieldDropdownFilter.valueNoFilter} (${numItems})` });
+        this._dropdownOptionList.push({ key: ALL_ITEMS, text: `${this.props.fieldDropdownFilter.valueNoFilter} (${numItems})` });
       // Añadimos el resto de grupos al combo
-      groupedItems.forEach((agroupedItem, indice) => {
+      this._groupedItems.forEach((agroupedItem, indice) => {
         this._dropdownOptionList.push({ key: indice, text: `${agroupedItem.value} (${agroupedItem.numOcurrences})` })
       });
 
@@ -100,7 +103,28 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     return (numGroups);
   }
 
-  private _filter(): void {
+  private _filterByGroup(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void {
+    let data = this._ItemsFilteredByText;
+    if (item.key != ALL_ITEMS) {
+      let field = this.props.fieldDropdownFilter.field;
+      let fieldValue = (this._groupedItems[item.key].value == this.props.fieldDropdownFilter.valueIfNull) ?
+        '' : this._groupedItems[item.key].value;
+      // console.log('fieldValue', fieldValue);
+      data = data.filter(item => {
+        // console.log(item[field]);
+        return(item[field] == fieldValue);
+
+        // if (item[field] && item[field].toLowerCase() === fieldValue)
+        //   return (true);
+        // if (!item[field] && this.props.fieldDropdownFilter.valueIfNull === fieldValue)
+        //   return (true);
+        // return (false);
+      });
+    }
+    this.setState({ datos: data, filterGroupedOption: item.key });
+  }
+
+  private _filterByText(refreshState: boolean = true): void {
     let data = this._allItems;
 
     if (this._filterText && this._filterText.length > 0 && this.props.fieldsTextFilter && this.props.fieldsTextFilter.length > 0) {
@@ -112,34 +136,10 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
         return ((numFileds > 0));
       });
     }
-    /*
-      if (filterRegionOption > -1) {
-        datos = datos.filter(unPais => {
-          if (unPais.region && unPais.region.toLowerCase() == this._regionFilter[filterRegionOption].continente.toLowerCase()) {
-            if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
-              return (true);
-            if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
-              return (true);
-          }
-          if (!unPais.region && this._regionFilter[filterRegionOption].continente == LABEL_OPTION_SIN_CONTINENTE) {
-            if (unPais.subregion && unPais.subregion.toLowerCase() == this._regionFilter[filterRegionOption].region.toLowerCase())
-              return (true);
-            if (!unPais.subregion && this._regionFilter[filterRegionOption].region == LABEL_OPTION_SIN_REGION)
-              return (true);
-          }
-          return (false);
-        });
-      } else if (filterContinentOption > -1) {
-        datos = datos.filter(unPais => {
-          if (unPais.region && unPais.region.toLowerCase() == this._continentFilter[filterContinentOption].continente.toLowerCase())
-            return (true);
-          if (!unPais.region && this._continentFilter[filterContinentOption].continente == LABEL_OPTION_SIN_CONTINENTE)
-            return (true);
-          return (false);
-        });
-      }
-    */
-    this.setState({ datos: data })
+    this._ItemsFilteredByText = data.slice(0);
+    this._makeDropdownList(data);
+
+    if (refreshState) this.setState({ datos: data, filterGroupedOption: ALL_ITEMS })
   }
 
   private _makeColumns(simpleListCols: ISimpleListCol[]): IColumn[] {
@@ -266,39 +266,42 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     return (
       <div style={{ backgroundColor: 'rgba(255, 255, 255)' }}>
         <div className={classNames.controlWrapper}>
-          <Toggle
-            hidden={!this.props.showToggleCompactMode}
-            label="Enable compact mode"
-            checked={this.state.isCompactMode}
-            onChange={(ev, checked: boolean): void => {
-              this.setState({ isCompactMode: checked });
-            }}
-            onText="Compact"
-            offText="Normal"
-            styles={controlStyles}
-          />
+          {(!(this.props.showToggleCompactMode)) ? null :
+            <Toggle
+              hidden={!this.props.showToggleCompactMode}
+              label="Enable compact mode"
+              checked={this.state.isCompactMode}
+              onChange={(ev, checked: boolean): void => {
+                this.setState({ isCompactMode: checked });
+              }}
+              onText="Compact"
+              offText="Normal"
+              styles={controlStyles}
+            />
+          }
           {(!(this.props.fieldsTextFilter && this.props.fieldsTextFilter.length > 0)) ? null :
             <SearchBox
               placeholder="Filter by name"
               // onSearch={(text: string): void => {
               onChange={(text: string): void => {
                 this._filterText = text;
-                this._filter();
+                this._filterByText();
               }}
               styles={controlStyles}
             />
           }
-          <Dropdown
-            selectedKey={this.state.filterContinentOption}
-            onChange={(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
-              this.setState({ filterContinentOption: item.key });
-            }}
-            placeholder="Select a Continent"
-            options={this._dropdownOptionList}
-            styles={controlStyles}
-            style={{ width: 220 }}
-          />
-          <Label styles={controlStyles}>{`Se están mostrando ${this.state.datos.length} ${this.props.labelItems}.`}</Label>
+          {(!(this.props.fieldDropdownFilter)) ? null :
+            <Dropdown
+              selectedKey={this.state.filterGroupedOption}
+              onChange={this._filterByGroup}
+              options={this._dropdownOptionList}
+              styles={controlStyles}
+              style={{ width: 220 }}
+            />
+          }
+          {(!this.props.showLabel) ? null :
+            <Label styles={controlStyles}>{`${this.state.datos.length} ${this.props.labelItems}.`}</Label>
+          }
         </div>
       </div>
     );
@@ -311,7 +314,6 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
       return (
         <div >
           {(this.props.fixedHeader) ? <Sticky> <this._renderHeader /> </Sticky> : <this._renderHeader />}
-
           <DetailsList
             items={this.state.datos}
             compact={this.state.isCompactMode}

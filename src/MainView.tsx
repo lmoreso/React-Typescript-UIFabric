@@ -268,7 +268,6 @@ export class MainView extends React.Component<IGetDataExampleProps, IGetRestExam
 
               {(!this._isMenuActive(menuOptionsId.FabricList)) ? null :
                 <div>
-                  {/* <Sticky ><span style={{ backgroundColor: 'rgba(255, 255, 255)', margin: '0', padding: '10px', fontSize: 'large', width: '100%' }}>Paises, Regiones y Continentes</span></Sticky> */}
                   <SimpleListUIFabric
                     // hidden={!this._isMenuActive(menuOptionsId.FabricList)}
                     hidden={false}
@@ -278,14 +277,10 @@ export class MainView extends React.Component<IGetDataExampleProps, IGetRestExam
                     columns={COLUMNS_DEF}
                     fieldsTextFilter={['Paises', 'name', 'nativeName']}
                     fieldDropdownFilter={{ valueIfNull: 'Sin Continente', field: 'region', valueNoFilter: 'Todos los Continentes' }}
-                    // title={`Paises, Regiones y Continentes`}
-                    // fieldsDropdownFilter={[
-                    //   {valueIfNull: 'Sin Continente', fields: 'region'},
-                    //   {valueIfNull: 'Sin Región', fields: 'subregion'},
-                    // ]}
                     listCompactMode={true}
                     showToggleCompactMode={false}
                     fixedHeader={false}
+                    showLabel={false}
                   />
                 </div>
               }
