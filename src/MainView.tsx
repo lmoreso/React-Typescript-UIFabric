@@ -1,37 +1,17 @@
 import * as React from 'react';
 // Fluent UI imports
-import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
-import { IColumn, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
-import { ISimpleListCol } from './lib/SimpleListUIfabric/SimpleListCommon';
 // import { ScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
 import { Sticky, /* StickyPositionType */ } from 'office-ui-fabric-react/lib/Sticky';
 
 // Aplicattion imports
-import { DescargarPaises, origenesDatos, URL_PAISES, JSON_PAISES } from './RestCountriesExample/Modelo';
-import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from './lib/SimpleListUIfabric/SimpleList';
 import { DetailsListDocumentsExample } from './FluentUiExamples/DetailListDocumentsExample';
-import { SimpleListUIFabric } from './lib/SimpleListUIfabric/SimpleListUIFabric';
 import { ScrollablePaneDetailsListExample } from './FluentUiExamples/ScrollablePaneExample';
+import { RestCountriesExample } from './RestCountriesExample/RestCountriesExample';
 
-enum menuOptionsId { debugListTable = 1, debugListTxt, FabricList, fabricListDocExample, scrollablePaneExample }
-const DEF_MENU_ID: menuOptionsId = menuOptionsId.FabricList;
-const DEF_ORG_DAT: origenesDatos = origenesDatos.rest;
-// const URL_FLAGS_WIKI = 'https://en.wikipedia.org/wiki/File:Flag_of_'
-// const URL_FLAGS_SEP_WIKI = '_';
-// const URL_FLAGS_EXT_WIKI = 'svg';
-// const URL_FLAGS_FLAGSHUB = 'http://flagshub.com/images/flag-of-'
-// const URL_FLAGS_SEP_FLAGSHUB = '-';
-// const URL_FLAGS_EXT_FLAGSHUB = 'png';
-// const URL_FLAGS = 'http://flagshub.com/images/flag-of-';
-// const URL_FLAGS_SEP = '-';
-// const URL_FLAGS_EXT = 'png';
-const URL_FLAGS = 'https://restcountries.eu/data/';
-// const URL_FLAGS_SEP = '@@';
-const URL_FLAGS_EXT = 'svg';
-
-const URL_MAPS = 'https://maps.google.com/?q=';
+enum menuOptionsId { restCountriesUIFabric = 1, restCountriesHtml, fabricListDocExample, scrollablePaneExample }
+const DEF_MENU_ID: menuOptionsId = menuOptionsId.restCountriesUIFabric;
 
 interface IMenuOptions {
   key: menuOptionsId;
@@ -41,57 +21,19 @@ interface IMenuOptions {
 }
 
 const menuOptions: IMenuOptions[] = [
-  {
-    key: menuOptionsId.debugListTable, name: 'Tabla HTML de DebugList', loadCountries: true,
-    title: 'Paises, Regiones y Continentes'
-  },
-  { key: menuOptionsId.debugListTxt, name: 'Texto "tabulado" de DebugList', loadCountries: true, title: 'Paises, Regiones y Continentes' },
-  { key: menuOptionsId.FabricList, name: 'Lista de UI Fabric', loadCountries: true, title: 'Paises, Regiones y Continentes' },
+  { key: menuOptionsId.restCountriesUIFabric, name: 'Paises y Banderas del Mundo (UIFabric versión)', loadCountries: true, title: 'Paises y Banderas del Mundo (UIFabric versión)' },
+  { key: menuOptionsId.restCountriesHtml, name: 'Paises y Banderas del Mundo (HTML versión)', loadCountries: true, title: 'Paises y Banderas del Mundo (HTML versión)' },
   { key: menuOptionsId.fabricListDocExample, name: 'Ejemplo de Lista de UI Fabric', loadCountries: false, title: 'Ejemplo de Lista de UI Fabric' },
   { key: menuOptionsId.scrollablePaneExample, name: 'Ejemplo de Scrollablepane de UI Fabric', loadCountries: false, title: 'Ejemplo de Scrollablepane de UI Fabric' },
 ]
 
-export interface IGetDataExampleProps {
-
-};
-
-enum fetchStatus { Cargando, Cargado, Error }
-
-export interface IGetRestExampleState {
-  numRegs: number;
-  estado: fetchStatus;
-  mensaje: string;
+interface IMainViewStates {
   activeMenuOptionId: menuOptionsId;
-  origenDatos: origenesDatos;
 }
 
-export const COLUMNS_DEF: ISimpleListCol[] = [
-  // { titulo: "Key", campo: "key", width: 10 },
-  // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
-  { title: "Bandera", field: "banderaUrl", width: 10, isImage: true, order: false },
-  { title: "Siglas", field: "alpha3Code", width: 10, fieldUrl: "banderaUrl", order: true },
-  { title: "Nombre Inglés", field: "name", width: 40, fieldUrl: "wikiEnUrl", order: true },
-  { title: "Nombre Español", field: "Pais", width: 40, fieldUrl: "wikiEsUrl", order: true },
-  { title: "Nombre Nativo", field: "nativeName", width: 40, fieldUrl: "mapsPaisUrl", order: true },
-  { title: "Capital", field: "capital", width: 20, fieldUrl: "mapsCapitalUrl", order: true },
-  { title: "Continente", field: "region", width: 20, fieldUrl: "mapsContinenteUrl", order: true },
-  { title: "Región", field: "subregion", width: 30, fieldUrl: "mapsRegionUrl", order: true },
-  { title: "Idiomas", field: "idiomas", width: 20, order: false },
-  { title: "Nº Husos", field: "numHusos", width: 12, fieldTooltip: 'husosTooltip', order: true },
-]
+export interface IMainViewProps { };
 
-export const optionsComboDB: { key: number; text: string }[] = [
-  { key: origenesDatos.ninguno, text: 'Ninguno' },
-  { key: origenesDatos.rest, text: `URL (${URL_PAISES})` },
-  { key: origenesDatos.json, text: `Archivo JSON (${JSON_PAISES})` },
-  { key: origenesDatos.jsonret, text: `Archivo JSON (con retraso añadido)` },
-];
-
-export class MainView extends React.Component<IGetDataExampleProps, IGetRestExampleState> {
-  private _data: any[];
-  private _dbgListRows: IDebugListConfig[];
-  private _dbgList: DebugList;
-  private _columns: IColumn[];
+export class MainView extends React.Component<IMainViewProps, IMainViewStates> {
   private _isMenuActive = (menuOptionId: menuOptionsId): boolean => (this.state.activeMenuOptionId === menuOptionId);
   private _getActiveMenuOption = (): IMenuOptions => {
     let menuOption = menuOptions.find((value: IMenuOptions, index, obj) => (this._isMenuActive(value.key)));
@@ -100,45 +42,11 @@ export class MainView extends React.Component<IGetDataExampleProps, IGetRestExam
   }
   private _optionsComboMenu: { key: number; text: string }[];
 
-  public constructor(props: IGetDataExampleProps) {
+  public constructor(props: IMainViewProps) {
     super(props);
 
     // Inicializar estados
-    this.state = { numRegs: 0, estado: fetchStatus.Cargando, mensaje: '', activeMenuOptionId: DEF_MENU_ID, origenDatos: DEF_ORG_DAT }
-
-    // Inicializar las columnas para el DebugList y para el DetailList
-    if (this._getActiveMenuOption().loadCountries) {
-      this._dbgListRows = new Array<IDebugListConfig>();
-      this._columns = new Array<IColumn>();
-      COLUMNS_DEF.forEach((unPais: ISimpleListCol, indice) => {
-        this._dbgListRows.push({
-          key: indice.toString(),
-          tituloColumna: unPais.title,
-          anchoColumna: unPais.width,
-          nombreColumna: unPais.field,
-          tooltipColumna: (unPais.fieldTooltip) ? unPais.fieldTooltip : undefined,
-          linkColumna: (unPais.fieldUrl) ? unPais.fieldUrl : undefined,
-        });
-        this._columns.push({
-          key: indice.toString(),
-          name: unPais.title,
-          fieldName: unPais.field,
-          minWidth: unPais.width * 3,
-          // maxWidth: unPais.width * 2,
-          // isRowHeader: true,
-          isResizable: true,
-          columnActionsMode: ColumnActionsMode.clickable,
-          // isSorted: true,
-          // isSortedDescending: false,
-          // sortAscendingAriaLabel: 'Sorted A to Z',
-          // sortDescendingAriaLabel: 'Sorted Z to A',
-          // onColumnClick: this._onColumnClick,
-          data: 'string',
-          isPadded: true
-        });
-      })
-      this._dbgList = new DebugList("Lista de Paises (se han encontrado %n paises)", this._dbgListRows)
-    }
+    this.state = { activeMenuOptionId: DEF_MENU_ID }
 
     // Rellenar opciones para el combo de las opciones de menú
     this._optionsComboMenu = new Array();
@@ -146,45 +54,6 @@ export class MainView extends React.Component<IGetDataExampleProps, IGetRestExam
       this._optionsComboMenu.push({ key: unMenu.key, text: unMenu.name })
     }))
 
-  }
-
-  private _descargarPaises(origenDatos: origenesDatos) {
-    this.setState({ estado: fetchStatus.Cargando, origenDatos: origenDatos });
-    // DescargarPaises(origenesDatos.ninguno)
-    DescargarPaises(origenDatos)
-      .then((datos) => {
-        // console.log(datos);
-        this._data = datos;
-        this._data.forEach((registro, indice) => {
-          registro.key = indice.toString();
-          registro.Pais = registro.translations.es;
-          registro.numHusos = registro.timezones.length;
-          registro.idiomas = (Array.isArray(registro.languages)) ? registro.languages.join(', ') : registro.languages;
-          registro.husosTooltip = (Array.isArray(registro.timezones) ? registro.timezones.join(', ') : '')
-          registro.wikiEnUrl = `https://en.wikipedia.org/wiki/${registro.name}`;
-          registro.wikiEsUrl = `https://es.wikipedia.org/wiki/${registro.translations.es}`;
-          // registro.banderaUrl = `${URL_FLAGS}${registro.name.toString().replace(/ /g, URL_FLAGS_SEP).toLowerCase()}.${URL_FLAGS_EXT}`;
-          registro.banderaUrl = `${URL_FLAGS}${registro.alpha3Code.toString().toLowerCase()}.${URL_FLAGS_EXT}`;
-          registro.mapsPaisUrl = `${URL_MAPS}${registro.name}, country of ${registro.subregion}`;
-          registro.mapsContinenteUrl = `${URL_MAPS}${registro.region}, continent`;
-          registro.mapsRegionUrl = `${URL_MAPS}${registro.subregion}, region of ${registro.region}`;
-          registro.mapsCapitalUrl = `${URL_MAPS}${registro.capital}, city of ${registro.name}`;
-        })
-        console.log(this._data[5]);
-        this.setState({ numRegs: datos.length, estado: fetchStatus.Cargado });
-      })
-      .catch((err) => {
-        // console.log(`Error en la vista: ${err}`);
-        this.setState({ numRegs: 0, estado: fetchStatus.Error, mensaje: err });
-      });
-  }
-
-  public componentDidMount() {
-    if (this._getActiveMenuOption().loadCountries) {
-      this._descargarPaises(this.state.origenDatos);
-    } else {
-      this.setState({ estado: fetchStatus.Cargado, });
-    }
   }
 
   private _onChangeComboMenu = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
@@ -198,98 +67,51 @@ export class MainView extends React.Component<IGetDataExampleProps, IGetRestExam
     };
    */
   public render(): JSX.Element {
-    console.log('RENDER:', 'this.state.estado', this.state.estado, 'this.state.activeMenuOptionId', this.state.activeMenuOptionId, 'this.state.origenDatos', this.state.origenDatos);
-    if (this._getActiveMenuOption().loadCountries && this.state.estado == fetchStatus.Cargando) {
-      return (
-        <div>
-          <Label>Cargando ...</Label>
-          <Spinner size={SpinnerSize.large} />
-        </div>
-      );
-    } else if (this._getActiveMenuOption().loadCountries && this.state.estado == fetchStatus.Error) {
-      return (
-        <div>
-          <h1>Se ha producido un error:</h1>
-          <p>{this.state.mensaje}</p>
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
-            <Sticky >
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', alignSelf: 'center', backgroundColor: 'rgba(150, 150, 150)', width: '100%' }}>
-                <Label style={{ padding: '5px', paddingTop: '10px' }}> Selecciona una opción: </Label>
-                <Dropdown
-                  // defaultSelectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
-                  selectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
-                  onChange={this._onChangeComboMenu}
-                  placeholder="Select an option"
-                  options={this._optionsComboMenu}
-                  styles={{ dropdown: { width: 300, padding: '5px' } }}
 
-                />
-              </div>
-              <div style={{ fontSize: 'large', display: 'flex', justifyContent: 'center', padding: '4px', alignSelf: 'center', backgroundColor: 'rgba(220, 220, 220)', width: '100%' }}>
-                <span >{this._getActiveMenuOption().title}</span>
-              </div>
-            </Sticky>
-            <div style={{ padding: '5px', alignSelf: 'center', justifyContent: 'center' }}>
+    return (
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
+          <Sticky >
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', alignSelf: 'center', backgroundColor: 'rgba(150, 150, 150)', width: '100%' }}>
+              <Label style={{ padding: '5px', paddingTop: '10px' }}> Selecciona una opción: </Label>
+              <Dropdown
+                // defaultSelectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
+                selectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
+                onChange={this._onChangeComboMenu}
+                placeholder="Select an option"
+                options={this._optionsComboMenu}
+                styles={{ dropdown: { width: 400, padding: '5px' } }}
 
-              {/* this._getActiveMenuOption().loadCountries ?
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', alignSelf: 'center', width: '100%' }}>
-                  <Label style={{ padding: '5px', paddingTop: '10px' }}> Selecciona un Origen de Datos: </Label>
-                  <Dropdown
-                    options={optionsComboDB}
-                    selectedKey={this.state.origenDatos}
-                    styles={{ dropdown: { width: 300, padding: '5px' } }}
-                    onChange={this._onChangeComboOrigenDatos}
-                  />
-                </div>
-                :
-                null
-               */}
-
-              <DebugListRenderTxt
-                list={this._dbgList}
-                datos={this._data}
-                hidden={!this._isMenuActive(menuOptionsId.debugListTxt)}
               />
-              <DebugListRenderTable
-                list={this._dbgList}
-                datos={this._data}
-                hidden={!this._isMenuActive(menuOptionsId.debugListTable)}
-              />
-              <DetailsListDocumentsExample
-                hidden={!this._isMenuActive(menuOptionsId.fabricListDocExample)}
-              />
-
-              {(this._isMenuActive(menuOptionsId.scrollablePaneExample)) ? <ScrollablePaneDetailsListExample /> : null}
-
-              {(!this._isMenuActive(menuOptionsId.FabricList)) ? null :
-                <div>
-                  <SimpleListUIFabric
-                    // hidden={!this._isMenuActive(menuOptionsId.FabricList)}
-                    hidden={false}
-                    data={this._data}
-                    labelItem='Pais'
-                    labelItems='Paises'
-                    columns={COLUMNS_DEF}
-                    fieldsTextFilter={['Paises', 'name', 'nativeName']}
-                    fieldDropdownFilter={{ valueIfNull: 'Sin Continente', field: 'region', valueNoFilter: 'Todos los Continentes' }}
-                    listCompactMode={true}
-                    showToggleCompactMode={false}
-                    fixedHeader={false}
-                    showLabel={false}
-                  />
-                </div>
-              }
             </div>
+            <div style={{ fontSize: 'large', display: 'flex', justifyContent: 'center', padding: '4px', alignSelf: 'center', backgroundColor: 'rgba(220, 220, 220)', width: '100%' }}>
+              <span >{this._getActiveMenuOption().title}</span>
+            </div>
+          </Sticky>
+          <div style={{ padding: '5px', alignSelf: 'center', justifyContent: 'center' }}>
+
+            <DetailsListDocumentsExample
+              hidden={!this._isMenuActive(menuOptionsId.fabricListDocExample)}
+            />
+
+            {(this._isMenuActive(menuOptionsId.scrollablePaneExample)) ? <ScrollablePaneDetailsListExample /> : null}
+
+            {(!this._isMenuActive(menuOptionsId.restCountriesUIFabric)) ? null :
+              <RestCountriesExample />
+            }
+
+            {(!this._isMenuActive(menuOptionsId.restCountriesHtml)) ? null :
+              <RestCountriesExample
+                showAsHtmlTable={true}
+              />
+            }
+
           </div>
         </div>
-      );
-    }
+      </div>
+    );
   }
 }
+
 
 
