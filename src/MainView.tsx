@@ -1,17 +1,21 @@
 import * as React from 'react';
+// Fluent UI imports
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
-
-import { DescargarPaises, origenesDatos, URL_PAISES, JSON_PAISES } from './Modelo';
-import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from './SimpleList';
-import { DetailsListDocumentsExample } from './DetailListDocumentsExample';
-import { SimpleListUIFabric } from './SimpleListUIFabric';
 import { IColumn, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
-import { ISimpleListCol } from './SimpleListCommon';
+import { ISimpleListCol } from './lib/SimpleListUIfabric/SimpleListCommon';
+// import { ScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
+import { Sticky, /* StickyPositionType */ } from 'office-ui-fabric-react/lib/Sticky';
 
+// Aplicattion imports
+import { DescargarPaises, origenesDatos, URL_PAISES, JSON_PAISES } from './RestCountriesExample/Modelo';
+import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from './lib/SimpleListUIfabric/SimpleList';
+import { DetailsListDocumentsExample } from './FluentUiExamples/DetailListDocumentsExample';
+import { SimpleListUIFabric } from './lib/SimpleListUIfabric/SimpleListUIFabric';
+import { ScrollablePaneDetailsListExample } from './FluentUiExamples/ScrollablePaneExample';
 
-enum menuOptionsId { debugListTable = 1, debugListTxt, FabricList, fabricListDocExample }
+enum menuOptionsId { debugListTable = 1, debugListTxt, FabricList, fabricListDocExample, scrollablePaneExample }
 const DEF_MENU_ID: menuOptionsId = menuOptionsId.FabricList;
 const DEF_ORG_DAT: origenesDatos = origenesDatos.rest;
 // const URL_FLAGS_WIKI = 'https://en.wikipedia.org/wiki/File:Flag_of_'
@@ -29,18 +33,22 @@ const URL_FLAGS_EXT = 'svg';
 
 const URL_MAPS = 'https://maps.google.com/?q=';
 
-
 interface IMenuOptions {
   key: menuOptionsId;
   name: string;
   loadCountries: boolean;
+  title: string;
 }
 
 const menuOptions: IMenuOptions[] = [
-  { key: menuOptionsId.debugListTable, name: 'Tabla HTML de DebugList', loadCountries: true },
-  { key: menuOptionsId.debugListTxt, name: 'Texto "tabulado" de DebugList', loadCountries: true },
-  { key: menuOptionsId.FabricList, name: 'Lista de UI Fabric', loadCountries: true },
-  { key: menuOptionsId.fabricListDocExample, name: 'Ejemplo de Lista de UI Fabric', loadCountries: false },
+  {
+    key: menuOptionsId.debugListTable, name: 'Tabla HTML de DebugList', loadCountries: true,
+    title: 'Paises, Regiones y Continentes'
+  },
+  { key: menuOptionsId.debugListTxt, name: 'Texto "tabulado" de DebugList', loadCountries: true, title: 'Paises, Regiones y Continentes' },
+  { key: menuOptionsId.FabricList, name: 'Lista de UI Fabric', loadCountries: true, title: 'Paises, Regiones y Continentes' },
+  { key: menuOptionsId.fabricListDocExample, name: 'Ejemplo de Lista de UI Fabric', loadCountries: false, title: 'Ejemplo de Lista de UI Fabric' },
+  { key: menuOptionsId.scrollablePaneExample, name: 'Ejemplo de Scrollablepane de UI Fabric', loadCountries: false, title: 'Ejemplo de Scrollablepane de UI Fabric' },
 ]
 
 export interface IGetDataExampleProps {
@@ -60,16 +68,16 @@ export interface IGetRestExampleState {
 export const COLUMNS_DEF: ISimpleListCol[] = [
   // { titulo: "Key", campo: "key", width: 10 },
   // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
-  { titulo: "Bandera", campo: "banderaUrl", width: 10, isImage: true },
-  { titulo: "Siglas", campo: "alpha3Code", width: 10, campoUrl: "banderaUrl" },
-  { titulo: "Nombre Inglés", campo: "name", width: 40, campoUrl: "wikiEnUrl" },
-  { titulo: "Nombre Español", campo: "Pais", width: 40, campoUrl: "wikiEsUrl" },
-  { titulo: "Nombre Nativo", campo: "nativeName", width: 40, campoUrl: "mapsPaisUrl"  },
-  { titulo: "Capital", campo: "capital", width: 20, campoUrl: "mapsCapitalUrl" },
-  { titulo: "Continente", campo: "region", width: 20, campoUrl: "mapsContinenteUrl" },
-  { titulo: "Región", campo: "subregion", width: 30, campoUrl: "mapsRegionUrl" },
-  { titulo: "Idiomas", campo: "idiomas", width: 20 },
-  { titulo: "Nº Husos", campo: "numHusos", width: 12, campoTooltip: 'husosTooltip' },
+  { title: "Bandera", field: "banderaUrl", width: 10, isImage: true, order: false },
+  { title: "Siglas", field: "alpha3Code", width: 10, fieldUrl: "banderaUrl", order: true },
+  { title: "Nombre Inglés", field: "name", width: 40, fieldUrl: "wikiEnUrl", order: true },
+  { title: "Nombre Español", field: "Pais", width: 40, fieldUrl: "wikiEsUrl", order: true },
+  { title: "Nombre Nativo", field: "nativeName", width: 40, fieldUrl: "mapsPaisUrl", order: true },
+  { title: "Capital", field: "capital", width: 20, fieldUrl: "mapsCapitalUrl", order: true },
+  { title: "Continente", field: "region", width: 20, fieldUrl: "mapsContinenteUrl", order: true },
+  { title: "Región", field: "subregion", width: 30, fieldUrl: "mapsRegionUrl", order: true },
+  { title: "Idiomas", field: "idiomas", width: 20, order: false },
+  { title: "Nº Husos", field: "numHusos", width: 12, fieldTooltip: 'husosTooltip', order: true },
 ]
 
 export const optionsComboDB: { key: number; text: string }[] = [
@@ -79,7 +87,7 @@ export const optionsComboDB: { key: number; text: string }[] = [
   { key: origenesDatos.jsonret, text: `Archivo JSON (con retraso añadido)` },
 ];
 
-export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRestExampleState> {
+export class MainView extends React.Component<IGetDataExampleProps, IGetRestExampleState> {
   private _data: any[];
   private _dbgListRows: IDebugListConfig[];
   private _dbgList: DebugList;
@@ -105,16 +113,16 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
       COLUMNS_DEF.forEach((unPais: ISimpleListCol, indice) => {
         this._dbgListRows.push({
           key: indice.toString(),
-          tituloColumna: unPais.titulo,
+          tituloColumna: unPais.title,
           anchoColumna: unPais.width,
-          nombreColumna: unPais.campo,
-          tooltipColumna: (unPais.campoTooltip) ? unPais.campoTooltip : undefined,
-          linkColumna: (unPais.campoUrl) ? unPais.campoUrl : undefined,
+          nombreColumna: unPais.field,
+          tooltipColumna: (unPais.fieldTooltip) ? unPais.fieldTooltip : undefined,
+          linkColumna: (unPais.fieldUrl) ? unPais.fieldUrl : undefined,
         });
         this._columns.push({
           key: indice.toString(),
-          name: unPais.titulo,
-          fieldName: unPais.campo,
+          name: unPais.title,
+          fieldName: unPais.field,
           minWidth: unPais.width * 3,
           // maxWidth: unPais.width * 2,
           // isRowHeader: true,
@@ -145,7 +153,7 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
     // DescargarPaises(origenesDatos.ninguno)
     DescargarPaises(origenDatos)
       .then((datos) => {
-        console.log(datos);
+        // console.log(datos);
         this._data = datos;
         this._data.forEach((registro, indice) => {
           registro.key = indice.toString();
@@ -183,12 +191,12 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
     this.setState({ activeMenuOptionId: item.key as menuOptionsId });
   };
 
-  private _onChangeComboOrigenDatos = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
-    console.log(`Cambiado origen de datos a ${item.key} (${item.text})`)
-    this.setState({ estado: fetchStatus.Cargando });
-    this._descargarPaises(item.key as origenesDatos);
-  };
-
+  /*   private _onChangeComboOrigenDatos = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void => {
+      console.log(`Cambiado origen de datos a ${item.key} (${item.text})`)
+      this.setState({ estado: fetchStatus.Cargando });
+      this._descargarPaises(item.key as origenesDatos);
+    };
+   */
   public render(): JSX.Element {
     console.log('RENDER:', 'this.state.estado', this.state.estado, 'this.state.activeMenuOptionId', this.state.activeMenuOptionId, 'this.state.origenDatos', this.state.origenDatos);
     if (this._getActiveMenuOption().loadCountries && this.state.estado == fetchStatus.Cargando) {
@@ -209,20 +217,26 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
       return (
         <div>
           <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', alignSelf: 'center', backgroundColor: 'rgba(150, 150, 150,.5)', width: '100%' }}>
-              <Label style={{ padding: '5px', paddingTop: '10px' }}> Selecciona una opción: </Label>
-              <Dropdown
-                // defaultSelectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
-                selectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
-                onChange={this._onChangeComboMenu}
-                placeholder="Select an option"
-                options={this._optionsComboMenu}
-                styles={{ dropdown: { width: 300, padding: '5px' } }}
+            <Sticky >
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', alignSelf: 'center', backgroundColor: 'rgba(150, 150, 150)', width: '100%' }}>
+                <Label style={{ padding: '5px', paddingTop: '10px' }}> Selecciona una opción: </Label>
+                <Dropdown
+                  // defaultSelectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
+                  selectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
+                  onChange={this._onChangeComboMenu}
+                  placeholder="Select an option"
+                  options={this._optionsComboMenu}
+                  styles={{ dropdown: { width: 300, padding: '5px' } }}
 
-              />
-            </div>
-            <div style={{ padding: '5px', alignSelf: 'center' }}>
-              {this._getActiveMenuOption().loadCountries ?
+                />
+              </div>
+              <div style={{ fontSize: 'large', display: 'flex', justifyContent: 'center', padding: '4px', alignSelf: 'center', backgroundColor: 'rgba(220, 220, 220)', width: '100%' }}>
+                <span >{this._getActiveMenuOption().title}</span>
+              </div>
+            </Sticky>
+            <div style={{ padding: '5px', alignSelf: 'center', justifyContent: 'center' }}>
+
+              {/* this._getActiveMenuOption().loadCountries ?
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', alignSelf: 'center', width: '100%' }}>
                   <Label style={{ padding: '5px', paddingTop: '10px' }}> Selecciona un Origen de Datos: </Label>
                   <Dropdown
@@ -234,7 +248,8 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
                 </div>
                 :
                 null
-              }
+               */}
+
               <DebugListRenderTxt
                 list={this._dbgList}
                 datos={this._data}
@@ -248,12 +263,27 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
               <DetailsListDocumentsExample
                 hidden={!this._isMenuActive(menuOptionsId.fabricListDocExample)}
               />
-              <SimpleListUIFabric
-                hidden={!this._isMenuActive(menuOptionsId.FabricList)}
-                datos={this._data}
-                titulo={`Lista de UIFabric: se han encontrado ${this._data.length} Paises`}
-                columns={COLUMNS_DEF}
-              />
+
+              {(this._isMenuActive(menuOptionsId.scrollablePaneExample)) ? <ScrollablePaneDetailsListExample /> : null}
+
+              {(!this._isMenuActive(menuOptionsId.FabricList)) ? null :
+                <div>
+                  <SimpleListUIFabric
+                    // hidden={!this._isMenuActive(menuOptionsId.FabricList)}
+                    hidden={false}
+                    data={this._data}
+                    labelItem='Pais'
+                    labelItems='Paises'
+                    columns={COLUMNS_DEF}
+                    fieldsTextFilter={['Paises', 'name', 'nativeName']}
+                    fieldDropdownFilter={{ valueIfNull: 'Sin Continente', field: 'region', valueNoFilter: 'Todos los Continentes' }}
+                    listCompactMode={true}
+                    showToggleCompactMode={false}
+                    fixedHeader={false}
+                    showLabel={false}
+                  />
+                </div>
+              }
             </div>
           </div>
         </div>
@@ -261,4 +291,5 @@ export class GetRestExample extends React.Component<IGetDataExampleProps, IGetRe
     }
   }
 }
+
 
