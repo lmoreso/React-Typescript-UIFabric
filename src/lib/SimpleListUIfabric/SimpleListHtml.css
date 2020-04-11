@@ -1,0 +1,22 @@
+
+.Table-header {
+  font-size: 0.9em;
+  color: white;
+  text-align: left;
+}
+.Table-header-cell {
+  background: #3f3f3f;
+  padding: 2px 4px 2px 4px;
+}
+
+.Table-row {
+  font-size: 0.8em;
+  text-align: left;
+}
+
+.Table-cell {
+  /* border-bottom-style: solid;
+  border-bottom-color: lightsteelblue;
+  border-bottom-width: 1px; */
+  vertical-align: middle;
+}

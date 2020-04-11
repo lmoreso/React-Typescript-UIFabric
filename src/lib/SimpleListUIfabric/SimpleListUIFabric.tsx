@@ -151,8 +151,8 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
         key: indice.toString(),
         name: aColumn.title,
         fieldName: aColumn.field,
-        minWidth: aColumn.width * 1,
-        maxWidth: aColumn.width * 3,
+        minWidth: aColumn.width,
+        // maxWidth: aColumn.width,
         // isRowHeader: true,
         isResizable: true,
         columnActionsMode: ColumnActionsMode.clickable,
@@ -204,8 +204,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
               >
                 <Image
                   src={item[aColumn.field]}
-                  alt='sancamalancafumalicalipunxi'
-                  width={aColumn.width * 4}
+                  width={aColumn.width}
                 />
               </TooltipHost>
             );

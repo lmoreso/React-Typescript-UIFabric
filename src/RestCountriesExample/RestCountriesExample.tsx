@@ -27,16 +27,16 @@ const DATA_SOURCE_DEF = dataSources.fromURL;
 const COLUMNS_DEF: ISimpleListCol[] = [
   // { titulo: "Key", campo: "key", width: 10 },
   // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
-  { title: "Bandera", field: "banderaUrl", width: 10, isImage: true, order: false },
-  { title: "Siglas", field: "alpha3Code", width: 10, fieldUrl: "banderaUrl", order: true },
-  { title: "Nombre Inglés", field: "name", width: 40, fieldUrl: "wikiEnUrl", order: true },
-  { title: "Nombre Español", field: "Pais", width: 40, fieldUrl: "wikiEsUrl", order: true },
-  { title: "Nombre Nativo", field: "nativeName", width: 40, fieldUrl: "mapsPaisUrl", order: true },
-  { title: "Capital", field: "capital", width: 20, fieldUrl: "mapsCapitalUrl", order: true },
-  { title: "Continente", field: "region", width: 20, fieldUrl: "mapsContinenteUrl", order: true },
-  { title: "Región", field: "subregion", width: 30, fieldUrl: "mapsRegionUrl", order: true },
-  { title: "Idiomas", field: "idiomas", width: 20, order: false },
-  { title: "Nº Husos", field: "numHusos", width: 12, fieldTooltip: 'husosTooltip', order: true },
+  { title: "Bandera", field: "banderaUrl", width: 35, isImage: true, order: false },
+  { title: "Siglas", field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", order: true },
+  { title: "Nombre Nativo", field: "nativeName", width: 150, fieldUrl: "mapsPaisUrl", order: true },
+  { title: "Nombre Inglés", field: "name", width: 150, fieldUrl: "wikiEnUrl", order: true },
+  { title: "Nombre Español", field: "Pais", width: 150, fieldUrl: "wikiEsUrl", order: true },
+  { title: "Capital", field: "capital", width: 120, fieldUrl: "mapsCapitalUrl", order: true },
+  { title: "Continente", field: "region", width: 100, fieldUrl: "mapsContinenteUrl", order: true },
+  { title: "Región", field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", order: true },
+  { title: "Idiomas", field: "idiomas", width: 100, order: false },
+  { title: "Nº Husos", field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', order: true },
 ]
 
 interface IRestCountriesExampleStates {
