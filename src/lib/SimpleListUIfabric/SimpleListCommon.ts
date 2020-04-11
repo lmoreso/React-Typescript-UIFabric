@@ -1,3 +1,11 @@
+export interface ISimpleListProps {
+    hidden: boolean;
+    data: any[];
+    columns: ISimpleListCol[];
+    labelItem: string;
+    labelItems: string;
+  }
+  
 export interface ISimpleListCol {
     title: string;
     field: string;
@@ -6,6 +14,11 @@ export interface ISimpleListCol {
     fieldUrl?: string;
     isImage?: boolean;
     order?: boolean;
+}
+
+export interface groupedItem {
+    value: string; 
+    numOcurrences: number;
 }
 
 export function copyAndSort<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {

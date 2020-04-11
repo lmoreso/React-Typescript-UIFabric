@@ -1,16 +1,12 @@
-import { ISimpleListCol } from './SimpleListCommon';
+import { ISimpleListProps } from './SimpleListCommon';
 
-export interface ISimpleListUIFabricProps {
-  hidden: boolean;
-  data: any[];
-  columns: ISimpleListCol[];
-  labelItem: string;
-  labelItems: string;
+export interface ISimpleListUIFabricProps extends ISimpleListProps {
   fieldsTextFilter: string[];
-  fieldDropdownFilter: {valueIfNull: string; field: string; valueNoFilter: string}; 
-  // fieldsDropdownFilter?: {valueIfNull: string; fields: string}[];  // en construcción
+  fieldDropdownFilter: { valueIfNull: string; field: string; valueNoFilter: string };
   listCompactMode?: boolean;
   showToggleCompactMode?: boolean;
   fixedHeader?: boolean;
   showLabel?: boolean;
 }
+
+

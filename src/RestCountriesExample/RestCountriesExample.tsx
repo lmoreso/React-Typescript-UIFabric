@@ -7,6 +7,7 @@ import { IColumn, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsLi
 import { ISimpleListCol } from '../lib/SimpleListUIfabric/SimpleListCommon';
 import { SimpleListUIFabric } from '../lib/SimpleListUIfabric/SimpleListUIFabric';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
+import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 // import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from '../lib/SimpleListUIfabric/SimpleList';
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
@@ -169,22 +170,14 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
       );
     } else if (this.props.showAsHtmlTable) {
       return (
-        <div>
-          <span>EN CONSTRUCCIÓN ... </span>
-          {/* 
-          <DebugListRenderTxt
-            list={this._dbgList}
-            datos={this._data}
-            hidden={!this._isMenuActive(menuOptionsId.debugListTxt)}
-          />
-          <DebugListRenderTable
-            list={this._dbgList}
-            datos={this._data}
-            hidden={!this._isMenuActive(menuOptionsId.debugListTable)}
-          />
-        */}
-        </div>
-      )
+        <SimpleListHtml
+          hidden={false}
+          data={this._data}
+          labelItem='Pais'
+          labelItems='Paises'
+          columns={COLUMNS_DEF}
+        />
+       )
     } else {
       return (
         <SimpleListUIFabric

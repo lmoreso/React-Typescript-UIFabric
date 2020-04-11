@@ -11,7 +11,7 @@ import { Image } from 'office-ui-fabric-react/lib/Image';
 import { Sticky, /* StickyPositionType */ } from 'office-ui-fabric-react/lib/Sticky';
 // import { ScrollablePane, /* ScrollbarVisibility */ } from 'office-ui-fabric-react/lib/ScrollablePane';
 
-import { copyAndSort, ISimpleListCol, copyAndSortByKey } from './SimpleListCommon';
+import { copyAndSort, ISimpleListCol, copyAndSortByKey, groupedItem } from './SimpleListCommon';
 import { ISimpleListUIFabricProps } from './ISimpleListUIFabricProps';
 
 const classNames = mergeStyleSets({
@@ -46,7 +46,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
   private _allItems: any[];
   private _ItemsFilteredByText: any[];
   private _filterText: string;
-  private _groupedItems: { value: string; numOcurrences: number }[];
+  private _groupedItems: groupedItem[];
   private _dropdownOptionList: IDropdownOption[];
 
   public constructor(props: ISimpleListUIFabricProps) {
@@ -72,7 +72,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     let numGroups: number = 0;
 
     if (this.props.fieldDropdownFilter && this.props.fieldDropdownFilter.field.length > 0) {
-      this._groupedItems = new Array<{ value: string; numOcurrences: number }>();
+      this._groupedItems = new Array<groupedItem>();
       let field = this.props.fieldDropdownFilter.field;
       let valueIfNull = this.props.fieldDropdownFilter.valueIfNull;
       // Calculamos la lista de Items agrupados
@@ -81,7 +81,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
         let value = (aRow[field]) ? aRow[field] : valueIfNull;
         let newValue = this._groupedItems.find((aGroup) => (aGroup.value === value));
         if (newValue) {
-          newValue.numOcurrences++;
+          newValue.numOcurrences!++;
         } else {
           this._groupedItems.push({ value, numOcurrences: 1 });
           numGroups++;
