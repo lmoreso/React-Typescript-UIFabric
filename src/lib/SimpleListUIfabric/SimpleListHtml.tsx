@@ -53,12 +53,18 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                     {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
                       if (aColumn.fieldUrl) {
                         return (
-                          <td key={`${dato.key}_${indice.toString()}`} >
+                          <td key={`${dato.key}_${indice.toString()}`}>
                             <a href={dato[aColumn.fieldUrl]} target="_blank">
-                              <span title={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : ''}>
+                              <span title={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : dato[aColumn.fieldUrl]}>
                                 {Array.isArray(dato[aColumn.field]) ? dato[aColumn.field].join(', ') : dato[aColumn.field]}
                               </span>
                             </a>
+                          </td>
+                        );
+                      } else if (aColumn.isImage) {
+                        return (
+                          <td key={`${dato.key}_${indice.toString()}`} >
+                            <img src={dato[aColumn.field]} width={aColumn.width * 3} alt={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : dato[aColumn.field]}/>
                           </td>
                         );
                       } else {
