@@ -4,7 +4,7 @@ import { Label } from 'office-ui-fabric-react/lib/Label';
 import { IColumn, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
 
 // Aplicattion imports
-import { ISimpleListCol } from '../lib/SimpleListUIfabric/SimpleListCommon';
+import { ISimpleListCol } from '../lib/SimpleListUIfabric/ISimpleListProps';
 import { SimpleListUIFabric } from '../lib/SimpleListUIfabric/SimpleListUIFabric';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';

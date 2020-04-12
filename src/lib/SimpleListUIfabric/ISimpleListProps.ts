@@ -6,8 +6,18 @@ export interface ISimpleListProps {
     labelItems: string;
     listCompactMode?: boolean;
     fieldsTextFilter?: string[];
+    fieldDropdownFilter?: { valueIfNull: string; field: string; valueNoFilter: string };
+    showToggleCompactMode?: boolean;
+    showLabel?: boolean;
+  }
+
+export interface ISimpleListStates {
+    datos: any[];
+    isCompactMode: boolean;
+    filterGroupedItem: string;
+    filterText: string;
 }
-  
+
 export interface ISimpleListCol {
     title: string;
     field: string;
@@ -19,7 +29,7 @@ export interface ISimpleListCol {
 }
 
 export interface IGroupedItem {
-    value: string; 
+    value: string;
     numOcurrences: number;
 }
 

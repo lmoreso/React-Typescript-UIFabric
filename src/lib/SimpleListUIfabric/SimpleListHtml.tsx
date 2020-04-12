@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { ISimpleListHtmlProps } from './ISimpleListHtmlProps';
-import { ISimpleListCol } from './SimpleListCommon';
+import { ISimpleListCol } from './ISimpleListProps';
 import './SimpleListHtml.css';
 
 const BACKGROUND_COLOR_DEF = 'DimGray';

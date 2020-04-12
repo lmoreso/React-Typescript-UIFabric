@@ -11,7 +11,7 @@ import { Image } from 'office-ui-fabric-react/lib/Image';
 import { Sticky, /* StickyPositionType */ } from 'office-ui-fabric-react/lib/Sticky';
 // import { ScrollablePane, /* ScrollbarVisibility */ } from 'office-ui-fabric-react/lib/ScrollablePane';
 
-import { copyAndSort, ISimpleListCol, copyAndSortByKey, IGroupedItem } from './SimpleListCommon';
+import { copyAndSort, ISimpleListCol, copyAndSortByKey, IGroupedItem } from './ISimpleListProps';
 import { ISimpleListUIFabricProps } from './ISimpleListUIFabricProps';
 
 const classNames = mergeStyleSets({

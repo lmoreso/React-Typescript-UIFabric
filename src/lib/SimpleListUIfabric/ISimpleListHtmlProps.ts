@@ -1,4 +1,4 @@
-import { ISimpleListProps } from './SimpleListCommon';
+import { ISimpleListProps } from './ISimpleListProps';
 
 export interface ISimpleListHtmlProps extends ISimpleListProps {
     backgroundColorHeader?: string;

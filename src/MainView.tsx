@@ -11,7 +11,7 @@ import { ScrollablePaneDetailsListExample } from './FluentUiExamples/ScrollableP
 import { RestCountriesExample } from './RestCountriesExample/RestCountriesExample';
 
 enum menuOptionsId { restCountriesUIFabric = 1, restCountriesHtml, fabricListDocExample, scrollablePaneExample }
-const DEF_MENU_ID: menuOptionsId = menuOptionsId.restCountriesUIFabric;
+const DEF_MENU_ID: menuOptionsId = menuOptionsId.restCountriesHtml;
 
 interface IMenuOptions {
   key: menuOptionsId;
