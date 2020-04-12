@@ -178,6 +178,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
           columns={COLUMNS_DEF}
           listCompactMode={true}
           // backgroundColorHeader='blue'
+          fieldsTextFilter={['Paises', 'name', 'nativeName']}
         />
        )
     } else {

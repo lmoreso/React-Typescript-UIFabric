@@ -5,6 +5,7 @@ export interface ISimpleListProps {
     labelItem: string;
     labelItems: string;
     listCompactMode?: boolean;
+    fieldsTextFilter?: string[];
 }
   
 export interface ISimpleListCol {
@@ -17,7 +18,7 @@ export interface ISimpleListCol {
     order?: boolean;
 }
 
-export interface groupedItem {
+export interface IGroupedItem {
     value: string; 
     numOcurrences: number;
 }

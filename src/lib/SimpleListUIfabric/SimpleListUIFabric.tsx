@@ -11,7 +11,7 @@ import { Image } from 'office-ui-fabric-react/lib/Image';
 import { Sticky, /* StickyPositionType */ } from 'office-ui-fabric-react/lib/Sticky';
 // import { ScrollablePane, /* ScrollbarVisibility */ } from 'office-ui-fabric-react/lib/ScrollablePane';
 
-import { copyAndSort, ISimpleListCol, copyAndSortByKey, groupedItem } from './SimpleListCommon';
+import { copyAndSort, ISimpleListCol, copyAndSortByKey, IGroupedItem } from './SimpleListCommon';
 import { ISimpleListUIFabricProps } from './ISimpleListUIFabricProps';
 
 const classNames = mergeStyleSets({
@@ -39,20 +39,19 @@ interface ISimpleListUIFabricStates {
   columns: IColumn[];
   isCompactMode: boolean;
   filterGroupedOption: number | string;
+  filterText: string;
 }
 
 const ALL_ITEMS = -1;
 export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps, ISimpleListUIFabricStates> {
   private _allItems: any[];
   private _ItemsFilteredByText: any[];
-  private _filterText: string;
-  private _groupedItems: groupedItem[];
+  private _groupedItems: IGroupedItem[];
   private _dropdownOptionList: IDropdownOption[];
 
   public constructor(props: ISimpleListUIFabricProps) {
     super(props);
     this._allItems = this.props.data.slice(0);
-    this._filterText = "";
 
     this._renderHeader = this._renderHeader.bind(this);
     this._filterByGroup = this._filterByGroup.bind(this);
@@ -62,9 +61,10 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
       columns: this._makeColumns(this.props.columns),
       isCompactMode: (this.props.listCompactMode) ? true : false,
       filterGroupedOption: ALL_ITEMS,
+      filterText: '',
     }
 
-    this._filterByText(false);
+    this._filterByText(this.state.filterText, false);
   }
 
   private _makeDropdownList(data: any[]): number {
@@ -72,7 +72,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     let numGroups: number = 0;
 
     if (this.props.fieldDropdownFilter && this.props.fieldDropdownFilter.field.length > 0) {
-      this._groupedItems = new Array<groupedItem>();
+      this._groupedItems = new Array<IGroupedItem>();
       let field = this.props.fieldDropdownFilter.field;
       let valueIfNull = this.props.fieldDropdownFilter.valueIfNull;
       // Calculamos la lista de Items agrupados
@@ -104,34 +104,36 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
   }
 
   private _filterByGroup(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void {
-    let data = this._ItemsFilteredByText;
-    if (item.key != ALL_ITEMS) {
-      let field = this.props.fieldDropdownFilter.field;
-      let fieldValue = (this._groupedItems[item.key].value == this.props.fieldDropdownFilter.valueIfNull) ?
-        '' : this._groupedItems[item.key].value;
-      // console.log('fieldValue', fieldValue);
-      data = data.filter(item => {
-        // console.log(item[field]);
-        return(item[field] == fieldValue);
-
-        // if (item[field] && item[field].toLowerCase() === fieldValue)
-        //   return (true);
-        // if (!item[field] && this.props.fieldDropdownFilter.valueIfNull === fieldValue)
-        //   return (true);
-        // return (false);
-      });
-    }
-    this.setState({ datos: data, filterGroupedOption: item.key });
+    if (this.props.fieldDropdownFilter) {
+      let data = this._ItemsFilteredByText;    
+      if (item.key != ALL_ITEMS) {
+        let field = this.props.fieldDropdownFilter.field;
+        let fieldValue = (this._groupedItems[item.key].value == this.props.fieldDropdownFilter.valueIfNull) ?
+          '' : this._groupedItems[item.key].value;
+        // console.log('fieldValue', fieldValue);
+        data = data.filter(item => {
+          // console.log(item[field]);
+          return(item[field] == fieldValue);
+  
+          // if (item[field] && item[field].toLowerCase() === fieldValue)
+          //   return (true);
+          // if (!item[field] && this.props.fieldDropdownFilter.valueIfNull === fieldValue)
+          //   return (true);
+          // return (false);
+        });
+      }
+      this.setState({ datos: data, filterGroupedOption: item.key });
+      }
   }
 
-  private _filterByText(refreshState: boolean = true): void {
+  private _filterByText(filterText: string, refreshState: boolean = true): void {
     let data = this._allItems;
 
-    if (this._filterText && this._filterText.length > 0 && this.props.fieldsTextFilter && this.props.fieldsTextFilter.length > 0) {
+    if (filterText && filterText.length > 0 && this.props.fieldsTextFilter && this.props.fieldsTextFilter.length > 0) {
       data = data.filter(item => {
         let numFileds = 0;
-        this.props.fieldsTextFilter.forEach((field) => {
-          if (item[field] && item[field].toLowerCase().indexOf(this._filterText.toLowerCase()) > -1) numFileds++;
+        this.props.fieldsTextFilter!.forEach((field) => {
+          if (item[field] && item[field].toLowerCase().indexOf(filterText.toLowerCase()) > -1) numFileds++;
         });
         return ((numFileds > 0));
       });
@@ -139,7 +141,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     this._ItemsFilteredByText = data.slice(0);
     this._makeDropdownList(data);
 
-    if (refreshState) this.setState({ datos: data, filterGroupedOption: ALL_ITEMS })
+    if (refreshState) this.setState({ datos: data, filterGroupedOption: ALL_ITEMS, filterText: filterText })
   }
 
   private _makeColumns(simpleListCols: ISimpleListCol[]): IColumn[] {
@@ -283,8 +285,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
               placeholder="Filter by name"
               // onSearch={(text: string): void => {
               onChange={(text: string): void => {
-                this._filterText = text;
-                this._filterByText();
+                this._filterByText(text);
               }}
               styles={controlStyles}
             />
