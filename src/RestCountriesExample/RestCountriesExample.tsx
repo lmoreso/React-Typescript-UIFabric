@@ -176,6 +176,8 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
           labelItem='Pais'
           labelItems='Paises'
           columns={COLUMNS_DEF}
+          listCompactMode={true}
+          // backgroundColorHeader='blue'
         />
        )
     } else {

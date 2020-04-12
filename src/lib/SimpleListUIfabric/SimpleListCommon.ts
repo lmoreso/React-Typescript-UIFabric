@@ -4,7 +4,8 @@ export interface ISimpleListProps {
     columns: ISimpleListCol[];
     labelItem: string;
     labelItems: string;
-  }
+    listCompactMode?: boolean;
+}
   
 export interface ISimpleListCol {
     title: string;
