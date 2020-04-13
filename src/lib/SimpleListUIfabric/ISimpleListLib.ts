@@ -77,10 +77,10 @@ export class SimpleList {
         this._ItemsFilteredByText = data.slice(0);
 
         state = {
-            dataFiltered: this._allItems,
+            dataFiltered: this._ItemsFilteredByText,
             filterGroupedItem: '',
             filterText: filterText,
-            groupedItems: this._makeGroupedList(this._allItems),
+            groupedItems: this._makeGroupedList(this._ItemsFilteredByText),
         }
         return (state);
     }
