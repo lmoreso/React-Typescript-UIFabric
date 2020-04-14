@@ -1,9 +1,24 @@
 
+.Control-wrapper {
+  background-color: white;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 10px;
+}
+
+.Control-styles {
+  margin: 2px 2px 2px 2px;
+  vertical-align: middle;
+}
+
 .Table-header {
   font-size: 0.9em;
   color: white;
   text-align: left;
 }
+
 .Table-header-cell {
   padding: 2px 4px 2px 4px;
 }

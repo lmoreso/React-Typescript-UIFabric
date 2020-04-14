@@ -14,6 +14,7 @@ export interface ISimpleListStates {
     groupedItems: IGroupedItem[];
     filterGroupedItem: string;
     filterText: string;
+    numItemsFilteredByText: number;
 }
 
 export interface ISimpleListCol {
@@ -58,6 +59,7 @@ export class SimpleList {
             filterGroupedItem: '',
             filterText: '',
             groupedItems: this._makeGroupedList(this._allItems),
+            numItemsFilteredByText: this._allItems.length,
         }
         return (state);
     }
@@ -81,6 +83,7 @@ export class SimpleList {
             filterGroupedItem: '',
             filterText: filterText,
             groupedItems: this._makeGroupedList(this._ItemsFilteredByText),
+            numItemsFilteredByText: this._ItemsFilteredByText.length,
         }
         return (state);
     }

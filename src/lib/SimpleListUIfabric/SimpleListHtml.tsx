@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { ISimpleListHtmlProps } from './ISimpleListHtmlProps';
-import { ISimpleListCol, ISimpleListStates, SimpleList } from './ISimpleListLib';
+import { ISimpleListCol, ISimpleListStates, SimpleList, ALL_ITEMS_GROUPED_KEY } from './ISimpleListLib';
 import './SimpleListHtml.css';
 
 const BACKGROUND_COLOR_DEF = 'DimGray';
@@ -10,6 +10,8 @@ interface ISimpleListHtmlStates {
   dataFiltered: any[];
   filterText: string;
   filterGroupedItem: string;
+  isCompactMode: boolean;
+  numItemsFilteredByText: number;
 }
 
 export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpleListHtmlStates> {
@@ -23,17 +25,20 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     this._simpleList = new SimpleList(props);
     this._listStates = this._simpleList.initState(this._listStates);
     // this._listStates = this._simpleList.filterByText('z', this._listStates);
-    this._listStates = this._simpleList.filterByGroup('Asia', this._listStates);
+    this._listStates = this._simpleList.filterByGroup('Oceania', this._listStates);
 
     this.state = {
       dataFiltered: this._listStates.dataFiltered,
       filterText: this._listStates.filterText,
       filterGroupedItem: this._listStates.filterGroupedItem,
+      isCompactMode: (this.props.listCompactMode) ? true : false,
+      numItemsFilteredByText: this._listStates.numItemsFilteredByText,
     }
 
     this._renderHeader = this._renderHeader.bind(this);
     this._onChangeFilterText = this._onChangeFilterText.bind(this);
     this._onChangeGroupText = this._onChangeGroupText.bind(this);
+    this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
   }
 
   private _onChangeGroupText(event: React.ChangeEvent<HTMLSelectElement>): void {
@@ -50,33 +55,61 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
       dataFiltered: this._listStates.dataFiltered,
       filterText: this._listStates.filterText,
       filterGroupedItem: this._listStates.filterGroupedItem,
+      numItemsFilteredByText: this._listStates.numItemsFilteredByText,
+    });
+  }
+
+  private _onChangeCheckBoxCompactMode(event: React.ChangeEvent<HTMLInputElement>): void {
+    this.setState({
+      isCompactMode: event.target.checked,
     });
   }
 
   private _renderHeader(): JSX.Element {
     // console.log(this._listStates);
     return (
-      <div>
-        <p>{`Filtro Texto Activo: '${this._listStates.filterText}'`}</p>
+      <div className='Control-wrapper' >
+        {/* <p>{`Filtro Texto Activo: '${this._listStates.filterText}'`}</p>
         <p>{`Se han encontrado ${this._listStates.groupedItems.length} Grupos:`}</p>
         {this._listStates.groupedItems.map(aGroup => { return (<span>{`${aGroup.value} (${aGroup.numOcurrences}) - `}</span>) })}
         <p>{`Filtro Grupo Activo: '${this._listStates.filterGroupedItem}'`}</p>
-        <p>{`Nº de paises encontrados: ${this._listStates.dataFiltered.length}`}</p>
-        <label>
-          Filtrar:
-          <input type="text" value={this.state.filterText} onChange={this._onChangeFilterText} />
+        <p>{`Nº de paises encontrados: ${this._listStates.dataFiltered.length}`}</p> */}
+
+        {(!this.props.showToggleCompactMode) ? null :
+          <label className='Control-styles'>
+            Muestra la lista en modo 'Compacto'
+            <input
+              name="ToggleCompactMode"
+              type="checkbox"
+              checked={this.state.isCompactMode}
+              onChange={this._onChangeCheckBoxCompactMode}
+            />
+          </label>
+        }
+        <label className='Control-styles'>
+          Filtrar por Nombre:
+          <input className='Control-styles' type="text" value={this.state.filterText} onChange={this._onChangeFilterText} />
         </label>
-        <label>
-          Pick your favorite flavor:
-          <select value={this.state.filterGroupedItem} onChange={this._onChangeGroupText}>
-            <option value={ (this.props.fieldDropdownFilter) ? this.props.fieldDropdownFilter.valueNoFilter : undefined}>
-              {`${this.props.fieldDropdownFilter!.valueNoFilter} (${this.state.dataFiltered.length} ${this.props.labelItems})`}
+        <label className='Control-styles'>
+          Filtrar por Continente:
+          <select className='Control-styles' value={this.state.filterGroupedItem} onChange={this._onChangeGroupText}>
+            <option key={ALL_ITEMS_GROUPED_KEY} value={(this.props.fieldDropdownFilter) ? this.props.fieldDropdownFilter.valueNoFilter : undefined}>
+              {`${this.props.fieldDropdownFilter!.valueNoFilter} (${this.state.numItemsFilteredByText} ${this.props.labelItems})`}
             </option>
-            {this._listStates.groupedItems.map(aGroup => {
-              return (<option value={aGroup.value}>{`${aGroup.value} (${aGroup.numOcurrences} ${this.props.labelItems})`}</option>)
+            {this._listStates.groupedItems.map((aGroup, index) => {
+              return (
+                <option key={index} value={aGroup.value}>
+                  {`${aGroup.value} (${aGroup.numOcurrences} ${this.props.labelItems})`}
+                </option>
+              )
             })}
           </select>
         </label>
+        {(!this.props.showLabel) ? null :
+            <label className='Control-styles'>
+              {`${this.state.dataFiltered.length} ${this.props.labelItems}.`}
+            </label>
+          }
       </div>
     );
   }
@@ -90,11 +123,11 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
       styleCellHeader.backgroundColor = (this.props.backgroundColorHeader) ? this.props.backgroundColorHeader : BACKGROUND_COLOR_DEF;
 
-      if (!this.props.listCompactMode) {
+      if (!this.state.isCompactMode) {
         styleCell.borderBottomColor = styleCellHeader.backgroundColor;
         styleCell.borderBottomStyle = "solid";
         styleCell.borderBottomWidth = "1px"
-        styleCell.padding = "4px";
+        styleCell.padding = "8px";
       }
       /* border-bottom-style: solid;
        border-bottom-color: lightsteelblue;
