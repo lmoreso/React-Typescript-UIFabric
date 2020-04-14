@@ -18,6 +18,7 @@ export interface ISimpleListStates {
 }
 
 export interface ISimpleListCol {
+    key?: string;
     title: string;
     field: string;
     width: number;
@@ -25,6 +26,8 @@ export interface ISimpleListCol {
     fieldUrl?: string;
     isImage?: boolean;
     order?: boolean;
+    isSorted?: boolean;
+    isSortedDescending?: boolean;
 }
 
 export interface IGroupedItem {
@@ -37,9 +40,22 @@ export function copyAndSort<T>(items: T[], columnKey: string, isSortedDescending
     return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
 }
 
+function sortByColumn<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
+    const key = columnKey as keyof T;
+    items.sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
+    return items;
+}
+
+
 export function copyAndSortByKey<T>(items: T[], isSortedDescending?: boolean): T[] {
     const key = 'key';
     return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[key]) < parseInt(b[key]) : parseInt(a[key]) > parseInt(b[key])) ? 1 : -1));
+}
+
+function sortByKey<T>(items: T[], isSortedDescending?: boolean): T[] {
+    const key = 'key';
+    items.sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[key]) < parseInt(b[key]) : parseInt(a[key]) > parseInt(b[key])) ? 1 : -1));
+    return items;
 }
 
 export class SimpleList {
@@ -51,10 +67,14 @@ export class SimpleList {
         this.props = props;
         this._allItems = props.data.slice(0);
         this._ItemsFilteredByText = this._allItems.slice(0);
+
+        this.props.columns.forEach((aColumn: ISimpleListCol, indice) => {
+            aColumn.key = indice.toString();
+        });
     }
 
-    public initState(state: ISimpleListStates): ISimpleListStates {
-        state = {
+    public initState(): ISimpleListStates {
+        let state: ISimpleListStates = {
             dataFiltered: this._allItems,
             filterGroupedItem: '',
             filterText: '',
@@ -64,7 +84,35 @@ export class SimpleList {
         return (state);
     }
 
-    public filterByText(filterText: string, state: ISimpleListStates): ISimpleListStates {
+    public orderByColumn(keyColumn: string, dataFiltered: any[]): void {
+        let hayQueOrdenar: boolean = false;
+        let currColumn: ISimpleListCol;
+        this.props.columns.forEach((aColumn: ISimpleListCol) => {
+            if (aColumn.key === keyColumn) {
+                hayQueOrdenar = true;
+                currColumn = aColumn;
+                if (!aColumn.isSorted) {
+                    aColumn.isSorted = true;
+                    aColumn.isSortedDescending = false
+                } else if (!aColumn.isSortedDescending) {
+                    aColumn.isSortedDescending = true
+                } else {
+                    aColumn.isSorted = false;
+                    hayQueOrdenar = false;
+                }
+            } else {
+                aColumn.isSorted = false;
+                aColumn.isSortedDescending = true;
+            }
+        });
+
+        if (hayQueOrdenar)
+            sortByColumn(dataFiltered, currColumn!.field, currColumn!.isSortedDescending)
+        else
+            sortByKey(dataFiltered, false)
+    }
+
+    public filterByText(filterText: string): ISimpleListStates {
         let data = this._allItems;
 
         if (filterText && filterText.length > 0 && this.props.fieldsTextFilter && this.props.fieldsTextFilter.length > 0) {
@@ -78,7 +126,7 @@ export class SimpleList {
         }
         this._ItemsFilteredByText = data.slice(0);
 
-        state = {
+        let state: ISimpleListStates = {
             dataFiltered: this._ItemsFilteredByText,
             filterGroupedItem: '',
             filterText: filterText,
@@ -113,11 +161,11 @@ export class SimpleList {
         return (newGroupedItem);
     }
 
-    public filterByGroup(filterGroupedItem: string, state: ISimpleListStates): ISimpleListStates {
+    public filterByGroup(filterGroupedItem: string, state: ISimpleListStates): void {
         if (this.props.fieldDropdownFilter) {
             let data = this._ItemsFilteredByText;
             let fieldValue = (filterGroupedItem == this.props.fieldDropdownFilter.valueIfNull) ? '' : filterGroupedItem;
-            
+
             if (filterGroupedItem != this.props.fieldDropdownFilter.valueNoFilter) {
                 let field = this.props.fieldDropdownFilter.field;
                 data = data.filter(anItem => {
@@ -127,8 +175,6 @@ export class SimpleList {
             state.dataFiltered = data;
             state.filterGroupedItem = filterGroupedItem;
         }
-        
-        return (state);
     }
 
 }
