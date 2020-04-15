@@ -1,4 +1,3 @@
-
 .Control-wrapper {
   background-color: white;
   display: flex;
@@ -6,6 +5,8 @@
   align-items: center;
   justify-content: space-evenly;
   padding: 10px;
+  /* position: sticky;
+  top: 145px; */
 }
 
 .Control-styles {
@@ -17,6 +18,7 @@
   font-size: 0.9em;
   color: white;
   text-align: left;
+  /* border: 2px red solid; */
 }
 
 .Table-header-cell {

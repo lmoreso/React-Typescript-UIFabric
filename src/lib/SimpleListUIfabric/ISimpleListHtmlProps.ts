@@ -6,6 +6,7 @@ export interface ISimpleListHtmlProps extends ISimpleListProps {
     showToggleCompactMode?: boolean;
     showLabel?: boolean;
     backgroundColorHeader?: string;
+    heightInPx?: number;
 }
 
 

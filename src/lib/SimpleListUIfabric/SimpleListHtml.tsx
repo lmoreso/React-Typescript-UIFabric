@@ -44,7 +44,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
   private _onChangeGroupText(event: React.ChangeEvent<HTMLSelectElement>): void {
     this._simpleList.filterByGroup(event.target.value, this._listStates);
-    this.props.columns.forEach((aColumn: ISimpleListCol) => {aColumn.isSorted = false; aColumn.isSortedDescending = true});
+    this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
     this.setState({
       dataFiltered: this._listStates.dataFiltered,
       filterGroupedItem: this._listStates.filterGroupedItem,
@@ -53,7 +53,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
   private _onChangeFilterText(event: React.ChangeEvent<HTMLInputElement>): void {
     this._listStates = this._simpleList.filterByText(event.target.value);
-    this.props.columns.forEach((aColumn: ISimpleListCol) => {aColumn.isSorted = false; aColumn.isSortedDescending = true});
+    this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
     this.setState({
       dataFiltered: this._listStates.dataFiltered,
       filterText: this._listStates.filterText,
@@ -103,8 +103,8 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
         <label className='Control-styles'>
           Filtrar por Continente:
           <select className='Control-styles' value={this.state.filterGroupedItem} onChange={this._onChangeGroupText}>
-            <option key={ALL_ITEMS_GROUPED_KEY} value={(this.props.fieldDropdownFilter) ? this.props.fieldDropdownFilter.valueNoFilter : undefined}>
-              {`${this.props.fieldDropdownFilter!.valueNoFilter} (${this.state.numItemsFilteredByText} ${this.props.labelItems})`}
+            <option key={ALL_ITEMS_GROUPED_KEY} value={(this.props.fieldsDropdownFilter) ? this.props.fieldsDropdownFilter.valueNoFilter : undefined}>
+              {`${this.props.fieldsDropdownFilter!.valueNoFilter} (${this.state.numItemsFilteredByText} ${this.props.labelItems})`}
             </option>
             {this._listStates.groupedItems.map((aGroup, index) => {
               return (
@@ -130,6 +130,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     } else {
       let styleCellHeader: React.CSSProperties = {};
       let styleCell: React.CSSProperties = {};
+      let styleTableContainer: React.CSSProperties = {};
 
       styleCellHeader.backgroundColor = (this.props.backgroundColorHeader) ? this.props.backgroundColorHeader : BACKGROUND_COLOR_DEF;
 
@@ -139,74 +140,89 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
         styleCell.borderBottomWidth = "1px"
         styleCell.padding = "8px";
       }
-      /* border-bottom-style: solid;
-       border-bottom-color: lightsteelblue;
-       border-bottom-width: 1px; */
+      
+      styleTableContainer.borderColor = (this.props.backgroundColorHeader) ? this.props.backgroundColorHeader : BACKGROUND_COLOR_DEF;
+      styleTableContainer.borderStyle = 'solid';
+      styleTableContainer.borderWidth = '1px';
+
+      if (this.props.heightInPx && this.props.heightInPx > 0) {
+        let heightInPx = (this.props.heightInPx < 500) ? 500 : this.props.heightInPx;
+        styleTableContainer.overflowY = 'scroll';
+        styleTableContainer.height = `${heightInPx}px`;
+        styleTableContainer.maxHeight = `${heightInPx}px`;
+      }
+      
       return (
-        <div >
+        <div>
           <this._renderHeader />
-          <table>
-            <thead>
-              <tr className='Table-header' key={'-1'}>
-                {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
-                  let iconOrder: string = '';
-                  if (aColumn.isSorted) {
-                    iconOrder = (aColumn.isSortedDescending) ? String.fromCharCode(8595) : String.fromCharCode(8593) ;
-                  }
-                  let styleCH = { ...styleCellHeader };
-                  styleCH.width = aColumn.width;
+          <div style={styleTableContainer}>
+            <table>
+              <thead>
+                <tr className='Table-header' key={'-1'}>
+                  {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
+                    let iconOrder: string = '';
+                    if (aColumn.canSort && aColumn.isSorted) {
+                      iconOrder = (aColumn.isSortedDescending) ? String.fromCharCode(8595) : String.fromCharCode(8593);
+                    }
+                    let styleCH = { ...styleCellHeader };
+                    styleCH.width = aColumn.width;
+                    return (
+                      <th
+                        onClick={(!aColumn.canSort) ? undefined : (event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>) => {
+                          this._onClickHeaderColumn(aColumn.key!);
+                        }}
+                        style={styleCH} className='Table-header-cell'
+                        // key={`-1_${indice.toString()}`}
+                        key={aColumn.key}
+                        title={(!aColumn.canSort) ?
+                          `La columna '${aColumn.title}' no se puede ordenar`
+                          :
+                          `Clica para ordenar la lista por '${aColumn.title}'`
+                        }
+                      >
+                        {`${aColumn.title}  ${iconOrder}`}
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.dataFiltered.map((dato: any) => {
                   return (
-                    <th 
-                      onClick={(event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>)=>{
-                        this._onClickHeaderColumn(aColumn.key!);
-                      }}
-                      style={styleCH} className='Table-header-cell'
-                      // key={`-1_${indice.toString()}`}
-                      key={aColumn.key}
-                      title={`Clica en la celda para ordenar la lista por '${aColumn.title}'`}
-                    >
-                      {`${aColumn.title}  ${iconOrder}` }    
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.dataFiltered.map((dato: any) => {
-                return (
-                  <tr key={dato.key} className='Table-row'>
-                    {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
-                      if (aColumn.fieldUrl) {
-                        return (
-                          <td key={`${dato.key}_${indice.toString()}`} className='Table-cell' style={styleCell}>
-                            <a href={dato[aColumn.fieldUrl]} target="_blank">
-                              <span title={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : dato[aColumn.fieldUrl]}>
+                    <tr key={dato.key} className='Table-row'>
+                      {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
+                        if (aColumn.fieldUrl) {
+                          return (
+                            <td key={`${dato.key}_${indice.toString()}`} className='Table-cell' style={styleCell}>
+                              <a href={dato[aColumn.fieldUrl]} target="_blank">
+                                <span title={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : dato[aColumn.fieldUrl]}>
+                                  {Array.isArray(dato[aColumn.field]) ? dato[aColumn.field].join(', ') : dato[aColumn.field]}
+                                </span>
+                              </a>
+                            </td>
+                          );
+                        } else if (aColumn.isImage) {
+                          return (
+                            <td key={`${dato.key}_${indice.toString()}`} className='Table-cell' style={styleCell} >
+                              <img src={dato[aColumn.field]} width={aColumn.width} alt={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : dato[aColumn.field]} />
+                            </td>
+                          );
+                        } else {
+                          return (
+                            <td key={`${dato.key}_${indice.toString()}`} className='Table-cell' style={styleCell} >
+                              <span title={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : ''}>
                                 {Array.isArray(dato[aColumn.field]) ? dato[aColumn.field].join(', ') : dato[aColumn.field]}
                               </span>
-                            </a>
-                          </td>
-                        );
-                      } else if (aColumn.isImage) {
-                        return (
-                          <td key={`${dato.key}_${indice.toString()}`} className='Table-cell' style={styleCell} >
-                            <img src={dato[aColumn.field]} width={aColumn.width} alt={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : dato[aColumn.field]} />
-                          </td>
-                        );
-                      } else {
-                        return (
-                          <td key={`${dato.key}_${indice.toString()}`} className='Table-cell' style={styleCell} >
-                            <span title={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : ''}>
-                              {Array.isArray(dato[aColumn.field]) ? dato[aColumn.field].join(', ') : dato[aColumn.field]}
-                            </span>
-                          </td>
-                        );
-                      }
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                            </td>
+                          );
+                        }
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       );
     }

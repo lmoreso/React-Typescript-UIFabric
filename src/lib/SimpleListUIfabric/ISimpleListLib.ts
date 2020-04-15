@@ -4,7 +4,7 @@ export interface ISimpleListProps {
     labelItem: string;
     labelItems: string;
     fieldsTextFilter?: string[];
-    fieldDropdownFilter?: { valueIfNull: string; field: string; valueNoFilter: string };
+    fieldsDropdownFilter?: { valueIfNull: string; field: string; valueNoFilter: string };
 }
 
 export const ALL_ITEMS_GROUPED_KEY = -1;
@@ -25,7 +25,7 @@ export interface ISimpleListCol {
     fieldTooltip?: string;
     fieldUrl?: string;
     isImage?: boolean;
-    order?: boolean;
+    canSort?: boolean;
     isSorted?: boolean;
     isSortedDescending?: boolean;
 }
@@ -140,9 +140,9 @@ export class SimpleList {
         // let numGroups: number = 0;
         let newGroupedItem = new Array<IGroupedItem>();
 
-        if (this.props.fieldDropdownFilter && this.props.fieldDropdownFilter.field.length > 0) {
-            let field = this.props.fieldDropdownFilter.field;
-            let valueIfNull = this.props.fieldDropdownFilter.valueIfNull;
+        if (this.props.fieldsDropdownFilter && this.props.fieldsDropdownFilter.field.length > 0) {
+            let field = this.props.fieldsDropdownFilter.field;
+            let valueIfNull = this.props.fieldsDropdownFilter.valueIfNull;
             // Calculamos la lista de Items agrupados
             data.forEach(aRow => {
                 let value = (aRow[field]) ? aRow[field] : valueIfNull;
@@ -162,12 +162,12 @@ export class SimpleList {
     }
 
     public filterByGroup(filterGroupedItem: string, state: ISimpleListStates): void {
-        if (this.props.fieldDropdownFilter) {
+        if (this.props.fieldsDropdownFilter) {
             let data = this._ItemsFilteredByText;
-            let fieldValue = (filterGroupedItem == this.props.fieldDropdownFilter.valueIfNull) ? '' : filterGroupedItem;
+            let fieldValue = (filterGroupedItem == this.props.fieldsDropdownFilter.valueIfNull) ? '' : filterGroupedItem;
 
-            if (filterGroupedItem != this.props.fieldDropdownFilter.valueNoFilter) {
-                let field = this.props.fieldDropdownFilter.field;
+            if (filterGroupedItem != this.props.fieldsDropdownFilter.valueNoFilter) {
+                let field = this.props.fieldsDropdownFilter.field;
                 data = data.filter(anItem => {
                     return (anItem[field] == fieldValue);
                 });
