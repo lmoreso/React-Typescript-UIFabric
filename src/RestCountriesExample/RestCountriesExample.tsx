@@ -27,16 +27,16 @@ const DATA_SOURCE_DEF = dataSources.fromURL;
 const COLUMNS_DEF: ISimpleListCol[] = [
   // { titulo: "Key", campo: "key", width: 10 },
   // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
-  { title: "Bandera", field: "banderaUrl", width: 35, isImage: true, canSort: false },
-  { title: "Siglas", field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSort: true },
-  { title: "Nombre Nativo", field: "nativeName", width: 150, fieldUrl: "mapsPaisUrl", canSort: true },
-  { title: "Nombre Inglés", field: "name", width: 150, fieldUrl: "wikiEnUrl", canSort: true },
-  { title: "Nombre Español", field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSort: true },
-  { title: "Capital", field: "capital", width: 120, fieldUrl: "mapsCapitalUrl", canSort: true },
-  { title: "Continente", field: "region", width: 100, fieldUrl: "mapsContinenteUrl", canSort: true },
-  { title: "Región", field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", canSort: true },
-  { title: "Idiomas", field: "idiomas", width: 100, canSort: false },
-  { title: "Nº Husos", field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSort: true },
+  { title: "Bandera", field: "banderaUrl", width: 35, isImage: true },
+  { title: "Siglas", field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true },
+  { title: "Nombre Nativo", field: "nativeName", width: 150, fieldUrl: "mapsPaisUrl", canSortAndFilter: true },
+  { title: "Nombre Inglés", field: "name", width: 150, fieldUrl: "wikiEnUrl", canSortAndFilter: true },
+  { title: "Nombre Español", field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSortAndFilter: true },
+  { title: "Capital", field: "capital", width: 120, fieldUrl: "mapsCapitalUrl", canSortAndFilter: true },
+  { title: "Continente", field: "region", width: 100, fieldUrl: "mapsContinenteUrl", canSortAndFilter: true, canGroup: true },
+  { title: "Región", field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", canSortAndFilter: true, canGroup: true },
+  { title: "Idiomas", field: "idiomas", width: 100, canSortAndFilter: false },
+  { title: "Nº Husos", field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true },
 ]
 
 interface IRestCountriesExampleStates {
@@ -47,6 +47,7 @@ interface IRestCountriesExampleStates {
 }
 
 export enum languages { es, fr, en };
+
 export interface IRestCountriesExampleProps {
   language?: languages;
   showAsHtmlTable?: boolean;

@@ -25,9 +25,10 @@ export interface ISimpleListCol {
     fieldTooltip?: string;
     fieldUrl?: string;
     isImage?: boolean;
-    canSort?: boolean;
+    canSortAndFilter?: boolean;
     isSorted?: boolean;
     isSortedDescending?: boolean;
+    canGroup?: boolean;
 }
 
 export interface IGroupedItem {
@@ -62,6 +63,10 @@ export class SimpleList {
     private _allItems: any[];
     private _ItemsFilteredByText: any[];
     private props: ISimpleListProps;
+    private _state: ISimpleListStates;
+    public get state() {
+        return this._state
+    };
 
     public constructor(props: ISimpleListProps) {
         this.props = props;
@@ -71,20 +76,17 @@ export class SimpleList {
         this.props.columns.forEach((aColumn: ISimpleListCol, indice) => {
             aColumn.key = indice.toString();
         });
-    }
 
-    public initState(): ISimpleListStates {
-        let state: ISimpleListStates = {
+        this._state = {
             dataFiltered: this._allItems,
             filterGroupedItem: '',
             filterText: '',
             groupedItems: this._makeGroupedList(this._allItems),
             numItemsFilteredByText: this._allItems.length,
         }
-        return (state);
     }
 
-    public orderByColumn(keyColumn: string, dataFiltered: any[]): void {
+    public orderByColumn(keyColumn: string): void {
         let hayQueOrdenar: boolean = false;
         let currColumn: ISimpleListCol;
         this.props.columns.forEach((aColumn: ISimpleListCol) => {
@@ -107,12 +109,12 @@ export class SimpleList {
         });
 
         if (hayQueOrdenar)
-            sortByColumn(dataFiltered, currColumn!.field, currColumn!.isSortedDescending)
+            sortByColumn(this._state.dataFiltered, currColumn!.field, currColumn!.isSortedDescending)
         else
-            sortByKey(dataFiltered, false)
+            sortByKey(this._state.dataFiltered, false)
     }
 
-    public filterByText(filterText: string): ISimpleListStates {
+    public filterByText(filterText: string): void {
         let data = this._allItems;
 
         if (filterText && filterText.length > 0 && this.props.fieldsTextFilter && this.props.fieldsTextFilter.length > 0) {
@@ -126,14 +128,13 @@ export class SimpleList {
         }
         this._ItemsFilteredByText = data.slice(0);
 
-        let state: ISimpleListStates = {
+        this._state = {
             dataFiltered: this._ItemsFilteredByText,
             filterGroupedItem: '',
             filterText: filterText,
             groupedItems: this._makeGroupedList(this._ItemsFilteredByText),
             numItemsFilteredByText: this._ItemsFilteredByText.length,
         }
-        return (state);
     }
 
     private _makeGroupedList(data: any[]): IGroupedItem[] {
@@ -161,7 +162,7 @@ export class SimpleList {
         return (newGroupedItem);
     }
 
-    public filterByGroup(filterGroupedItem: string, state: ISimpleListStates): void {
+    public filterByGroup(filterGroupedItem: string): void {
         if (this.props.fieldsDropdownFilter) {
             let data = this._ItemsFilteredByText;
             let fieldValue = (filterGroupedItem == this.props.fieldsDropdownFilter.valueIfNull) ? '' : filterGroupedItem;
@@ -172,8 +173,8 @@ export class SimpleList {
                     return (anItem[field] == fieldValue);
                 });
             }
-            state.dataFiltered = data;
-            state.filterGroupedItem = filterGroupedItem;
+            this._state.dataFiltered = data;
+            this._state.filterGroupedItem = filterGroupedItem;
         }
     }
 

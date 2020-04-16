@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { ISimpleListHtmlProps } from './ISimpleListHtmlProps';
-import { ISimpleListCol, ISimpleListStates, SimpleList, ALL_ITEMS_GROUPED_KEY } from './ISimpleListLib';
+import { ISimpleListCol, SimpleList, ALL_ITEMS_GROUPED_KEY } from './ISimpleListLib';
 import './SimpleListHtml.css';
 
 const BACKGROUND_COLOR_DEF = 'DimGray';
@@ -15,7 +15,6 @@ interface ISimpleListHtmlStates {
 }
 
 export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpleListHtmlStates> {
-  private _listStates: ISimpleListStates;
   private _simpleList: SimpleList;
 
   public constructor(props: ISimpleListHtmlProps) {
@@ -23,16 +22,15 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
 
     this._simpleList = new SimpleList(props);
-    this._listStates = this._simpleList.initState();
     // this._listStates = this._simpleList.filterByText('z', this._listStates);
-    this._simpleList.filterByGroup('Oceania', this._listStates);
-    this._simpleList.orderByColumn('7', this._listStates.dataFiltered);
+    this._simpleList.filterByGroup('Oceania');
+    this._simpleList.orderByColumn('7');
     this.state = {
-      dataFiltered: this._listStates.dataFiltered,
-      filterText: this._listStates.filterText,
-      filterGroupedItem: this._listStates.filterGroupedItem,
+      dataFiltered: this._simpleList.state.dataFiltered,
+      filterText: this._simpleList.state.filterText,
+      filterGroupedItem: this._simpleList.state.filterGroupedItem,
       isCompactMode: (this.props.listCompactMode) ? true : false,
-      numItemsFilteredByText: this._listStates.numItemsFilteredByText,
+      numItemsFilteredByText: this._simpleList.state.numItemsFilteredByText,
     }
 
     this._renderHeader = this._renderHeader.bind(this);
@@ -43,29 +41,29 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
   }
 
   private _onChangeGroupText(event: React.ChangeEvent<HTMLSelectElement>): void {
-    this._simpleList.filterByGroup(event.target.value, this._listStates);
+    this._simpleList.filterByGroup(event.target.value);
     this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
     this.setState({
-      dataFiltered: this._listStates.dataFiltered,
-      filterGroupedItem: this._listStates.filterGroupedItem,
+      dataFiltered: this._simpleList.state.dataFiltered,
+      filterGroupedItem: this._simpleList.state.filterGroupedItem,
     });
   }
 
   private _onChangeFilterText(event: React.ChangeEvent<HTMLInputElement>): void {
-    this._listStates = this._simpleList.filterByText(event.target.value);
+    this._simpleList.filterByText(event.target.value);
     this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
     this.setState({
-      dataFiltered: this._listStates.dataFiltered,
-      filterText: this._listStates.filterText,
-      filterGroupedItem: this._listStates.filterGroupedItem,
-      numItemsFilteredByText: this._listStates.numItemsFilteredByText,
+      dataFiltered: this._simpleList.state.dataFiltered,
+      filterText: this._simpleList.state.filterText,
+      filterGroupedItem: this._simpleList.state.filterGroupedItem,
+      numItemsFilteredByText: this._simpleList.state.numItemsFilteredByText,
     });
   }
 
   private _onClickHeaderColumn(columnKey: string): void {
-    this._simpleList.orderByColumn(columnKey, this._listStates.dataFiltered);
+    this._simpleList.orderByColumn(columnKey);
     this.setState({
-      dataFiltered: this._listStates.dataFiltered,
+      dataFiltered: this._simpleList.state.dataFiltered,
     });
   }
 
@@ -106,7 +104,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
             <option key={ALL_ITEMS_GROUPED_KEY} value={(this.props.fieldsDropdownFilter) ? this.props.fieldsDropdownFilter.valueNoFilter : undefined}>
               {`${this.props.fieldsDropdownFilter!.valueNoFilter} (${this.state.numItemsFilteredByText} ${this.props.labelItems})`}
             </option>
-            {this._listStates.groupedItems.map((aGroup, index) => {
+            {this._simpleList.state.groupedItems.map((aGroup, index) => {
               return (
                 <option key={index} value={aGroup.value}>
                   {`${aGroup.value} (${aGroup.numOcurrences} ${this.props.labelItems})`}
@@ -161,20 +159,20 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                 <tr className='Table-header' key={'-1'}>
                   {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
                     let iconOrder: string = '';
-                    if (aColumn.canSort && aColumn.isSorted) {
+                    if (aColumn.canSortAndFilter && aColumn.isSorted) {
                       iconOrder = (aColumn.isSortedDescending) ? String.fromCharCode(8595) : String.fromCharCode(8593);
                     }
                     let styleCH = { ...styleCellHeader };
                     styleCH.width = aColumn.width;
                     return (
                       <th
-                        onClick={(!aColumn.canSort) ? undefined : (event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>) => {
+                        onClick={(!aColumn.canSortAndFilter) ? undefined : (event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>) => {
                           this._onClickHeaderColumn(aColumn.key!);
                         }}
                         style={styleCH} className='Table-header-cell'
                         // key={`-1_${indice.toString()}`}
                         key={aColumn.key}
-                        title={(!aColumn.canSort) ?
+                        title={(!aColumn.canSortAndFilter) ?
                           `La columna '${aColumn.title}' no se puede ordenar`
                           :
                           `Clica para ordenar la lista por '${aColumn.title}'`
