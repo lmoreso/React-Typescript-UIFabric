@@ -9,12 +9,28 @@ export interface ISimpleListProps {
 
 export const ALL_ITEMS_GROUPED_KEY = -1;
 
+export enum filterByTextActions {startBy='startBy', contains='contains', finishBy='finishBy'}
+
+export interface filterByTextActionLabel {
+    action: filterByTextActions;
+    title: string;
+}
+
+export const filterByTextActionsLabels: filterByTextActionLabel[] = [
+    {action: filterByTextActions.startBy, title: 'Starts by'},
+    {action: filterByTextActions.contains, title: 'Contains'},
+    {action: filterByTextActions.finishBy, title: 'Finish by'},
+]
+
 export interface ISimpleListStates {
     dataFiltered: any[];
     groupedItems: IGroupedItem[];
-    filterGroupedItem: string;
+    filterGroupedText: string;
     filterText: string;
     numItemsFilteredByText: number;
+    groupableFields: ISimpleListCol[];
+    filterableFields: ISimpleListCol[];
+    filterByTextAction: filterByTextActions;
 }
 
 export interface ISimpleListCol {
@@ -79,11 +95,19 @@ export class SimpleList {
 
         this._state = {
             dataFiltered: this._allItems,
-            filterGroupedItem: '',
+            filterGroupedText: '',
             filterText: '',
             groupedItems: this._makeGroupedList(this._allItems),
             numItemsFilteredByText: this._allItems.length,
+            groupableFields: [],
+            filterableFields: [],
+            filterByTextAction: filterByTextActions.startBy,
         }
+
+        this.props.columns.forEach((aColumn: ISimpleListCol) => {
+            if (aColumn.canGroup) this._state.groupableFields.push(aColumn);
+            if (aColumn.canSortAndFilter) this._state.filterableFields.push(aColumn);            
+        });
     }
 
     public orderByColumn(keyColumn: string): void {
@@ -130,10 +154,13 @@ export class SimpleList {
 
         this._state = {
             dataFiltered: this._ItemsFilteredByText,
-            filterGroupedItem: '',
+            filterGroupedText: '',
             filterText: filterText,
             groupedItems: this._makeGroupedList(this._ItemsFilteredByText),
             numItemsFilteredByText: this._ItemsFilteredByText.length,
+            groupableFields: this._state.groupableFields,
+            filterableFields: this._state.filterableFields,
+            filterByTextAction: this._state.filterByTextAction,
         }
     }
 
@@ -174,7 +201,7 @@ export class SimpleList {
                 });
             }
             this._state.dataFiltered = data;
-            this._state.filterGroupedItem = filterGroupedItem;
+            this._state.filterGroupedText = filterGroupedItem;
         }
     }
 

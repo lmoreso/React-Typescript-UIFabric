@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { ISimpleListHtmlProps } from './ISimpleListHtmlProps';
-import { ISimpleListCol, SimpleList, ALL_ITEMS_GROUPED_KEY } from './ISimpleListLib';
+import { ISimpleListCol, SimpleList, ALL_ITEMS_GROUPED_KEY, filterByTextActions, filterByTextActionLabel, filterByTextActionsLabels } from './ISimpleListLib';
 import './SimpleListHtml.css';
 
 const BACKGROUND_COLOR_DEF = 'DimGray';
@@ -9,9 +9,12 @@ const BACKGROUND_COLOR_DEF = 'DimGray';
 interface ISimpleListHtmlStates {
   dataFiltered: any[];
   filterText: string;
-  filterGroupedItem: string;
+  filterGroupedText: string;
   isCompactMode: boolean;
   numItemsFilteredByText: number;
+  fieldFilterByGroup: string;
+  fieldFilterByText: string;
+  filterByTextAction: filterByTextActions;
 }
 
 export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpleListHtmlStates> {
@@ -28,9 +31,12 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     this.state = {
       dataFiltered: this._simpleList.state.dataFiltered,
       filterText: this._simpleList.state.filterText,
-      filterGroupedItem: this._simpleList.state.filterGroupedItem,
+      filterGroupedText: this._simpleList.state.filterGroupedText,
       isCompactMode: (this.props.listCompactMode) ? true : false,
       numItemsFilteredByText: this._simpleList.state.numItemsFilteredByText,
+      fieldFilterByGroup: (this._simpleList.state.groupableFields.length > 0) ? this._simpleList.state.groupableFields[0].field : '',
+      fieldFilterByText: (this._simpleList.state.filterableFields.length > 0) ? this._simpleList.state.filterableFields[0].field : '',
+      filterByTextAction: this._simpleList.state.filterByTextAction,
     }
 
     this._renderHeader = this._renderHeader.bind(this);
@@ -38,6 +44,9 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     this._onChangeGroupText = this._onChangeGroupText.bind(this);
     this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
     this._onClickHeaderColumn = this._onClickHeaderColumn.bind(this);
+    this._onChangeGroupField = this._onChangeGroupField.bind(this);
+    this._onChangeFilterByTextField = this._onChangeFilterByTextField.bind(this);
+    this._onChangeFilterByTextAction = this._onChangeFilterByTextAction.bind(this);
   }
 
   private _onChangeGroupText(event: React.ChangeEvent<HTMLSelectElement>): void {
@@ -45,7 +54,25 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,
-      filterGroupedItem: this._simpleList.state.filterGroupedItem,
+      filterGroupedText: this._simpleList.state.filterGroupedText,
+    });
+  }
+
+  private _onChangeGroupField(event: React.ChangeEvent<HTMLSelectElement>): void {
+    this.setState({
+      fieldFilterByGroup: event.target.value,
+    });
+  }
+
+  private _onChangeFilterByTextAction(event: React.ChangeEvent<HTMLSelectElement>): void {
+    this.setState({
+      filterByTextAction: event.target.value as filterByTextActions,
+    });
+  }
+
+  private _onChangeFilterByTextField(event: React.ChangeEvent<HTMLSelectElement>): void {
+    this.setState({
+      fieldFilterByText: event.target.value,
     });
   }
 
@@ -55,7 +82,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,
       filterText: this._simpleList.state.filterText,
-      filterGroupedItem: this._simpleList.state.filterGroupedItem,
+      filterGroupedText: this._simpleList.state.filterGroupedText,
       numItemsFilteredByText: this._simpleList.state.numItemsFilteredByText,
     });
   }
@@ -95,24 +122,60 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
           </label>
         }
         <label className='Control-styles'>
-          Filtrar por Nombre:
-          <input className='Control-styles' type="text" value={this.state.filterText} onChange={this._onChangeFilterText} />
-        </label>
-        <label className='Control-styles'>
-          Filtrar por Continente:
-          <select className='Control-styles' value={this.state.filterGroupedItem} onChange={this._onChangeGroupText}>
-            <option key={ALL_ITEMS_GROUPED_KEY} value={(this.props.fieldsDropdownFilter) ? this.props.fieldsDropdownFilter.valueNoFilter : undefined}>
-              {`${this.props.fieldsDropdownFilter!.valueNoFilter} (${this.state.numItemsFilteredByText} ${this.props.labelItems})`}
-            </option>
-            {this._simpleList.state.groupedItems.map((aGroup, index) => {
+          {/* Combo de Campos Filtrables */}
+          <select className='Control-styles' value={this.state.fieldFilterByText} onChange={this._onChangeFilterByTextField}>
+            {this._simpleList.state.filterableFields.map((aField: ISimpleListCol, index) => {
               return (
-                <option key={index} value={aGroup.value}>
-                  {`${aGroup.value} (${aGroup.numOcurrences} ${this.props.labelItems})`}
+                <option key={index} value={aField.field}>
+                  {`${aField.title}`}
                 </option>
               )
             })}
           </select>
+          {/* Combo de operación de filtro */}
+          <select className='Control-styles' value={this.state.filterByTextAction} onChange={this._onChangeFilterByTextAction}>
+            {filterByTextActionsLabels.map((anAction: filterByTextActionLabel, index) => {
+              return (
+                <option key={index} value={anAction.action}>
+                  {`${anAction.title}`}
+                </option>
+              )
+            })}
+          </select>
+
+          <input className='Control-styles' type="text" value={this.state.filterText} onChange={this._onChangeFilterText} />
         </label>
+
+        {(this._simpleList.state.groupableFields.length <= 0) ? null :
+          <label className='Control-styles'>
+            {/* Combo de Campos Agrupables */}
+            <select className='Control-styles' value={this.state.fieldFilterByGroup} onChange={this._onChangeGroupField}>
+              {this._simpleList.state.groupableFields.map((aField: ISimpleListCol, index) => {
+                return (
+                  <option key={index} value={aField.field}>
+                    {`Filtrar por ${aField.title}`}
+                  </option>
+                )
+              })}
+            </select>
+
+            {/* Combo del Grupo Activo */}
+            <select className='Control-styles' value={this.state.filterGroupedText} onChange={this._onChangeGroupText}>
+              <option key={ALL_ITEMS_GROUPED_KEY} value={(this.props.fieldsDropdownFilter) ? this.props.fieldsDropdownFilter.valueNoFilter : undefined}>
+                {`${this.props.fieldsDropdownFilter!.valueNoFilter} (${this.state.numItemsFilteredByText} ${this.props.labelItems})`}
+              </option>
+              {this._simpleList.state.groupedItems.map((aGroup, index) => {
+                return (
+                  <option key={index} value={aGroup.value}>
+                    {`${aGroup.value} (${aGroup.numOcurrences} ${this.props.labelItems})`}
+                  </option>
+                )
+              })}
+            </select>
+          </label>
+
+        }
+
         {(!this.props.showLabel) ? null :
           <label className='Control-styles'>
             {`${this.state.dataFiltered.length} ${this.props.labelItems}.`}
@@ -138,7 +201,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
         styleCell.borderBottomWidth = "1px"
         styleCell.padding = "8px";
       }
-      
+
       styleTableContainer.borderColor = (this.props.backgroundColorHeader) ? this.props.backgroundColorHeader : BACKGROUND_COLOR_DEF;
       styleTableContainer.borderStyle = 'solid';
       styleTableContainer.borderWidth = '1px';
@@ -149,7 +212,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
         styleTableContainer.height = `${heightInPx}px`;
         styleTableContainer.maxHeight = `${heightInPx}px`;
       }
-      
+
       return (
         <div>
           <this._renderHeader />
