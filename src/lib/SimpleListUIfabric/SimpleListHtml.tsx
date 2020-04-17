@@ -15,6 +15,7 @@ interface ISimpleListHtmlStates {
   filterByGroupField: string;
   filterByTextField: string;
   filterByTextAction: filterByTextActions;
+  requireFilterText: boolean;
 }
 
 export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpleListHtmlStates> {
@@ -37,6 +38,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
       filterByGroupField: (this._simpleList.state.groupableFields.length > 0) ? this._simpleList.state.groupableFields[0].field : '',
       filterByTextField: (this._simpleList.state.filterableFields.length > 0) ? this._simpleList.state.filterableFields[0].field : '',
       filterByTextAction: this._simpleList.state.filterByTextAction,
+      requireFilterText: this._simpleList.state.requireFilterText,
     }
 
     this._renderHeader = this._renderHeader.bind(this);
@@ -82,6 +84,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
       numItemsFilteredByText: this._simpleList.state.numItemsFilteredByText,
       filterByTextAction: this._simpleList.state.filterByTextAction,
       filterByTextField: this._simpleList.state.filterByTextField,
+      requireFilterText: this._simpleList.state.requireFilterText,
     });
   }
 
@@ -151,7 +154,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
             </select>
             
             {/* Texto a filtrar */}
-            <input className='Control-styles' type="text" value={this.state.filterText} onChange={this._onChangeFilterText} />
+            <input disabled={!this.state.requireFilterText} className='Control-styles' type="text" value={this.state.filterText} onChange={this._onChangeFilterText} />
           </label>
         }
 

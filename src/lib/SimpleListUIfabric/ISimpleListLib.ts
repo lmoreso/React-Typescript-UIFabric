@@ -11,70 +11,108 @@ export const ALL_ITEMS_GROUPED_KEY = -1;
 
 export enum filterByTextActions {
     startBy = 'startBy', contains = 'contains', finishBy = 'finishBy',
-    greater = 'greater', greaterOrEqual = 'greaterOrEqual', equal = 'equal', smallerOrEqual = 'smallerOrEqual', smaller = 'smaller',
-    nullValue = 'nullValue'
+    greater = 'greater', greaterOrEqual = 'greaterOrEqual', equal = 'equal',
+    smallerOrEqual = 'smallerOrEqual', smaller = 'smaller', nullValue = 'nullValue',
+    notNull = 'notNull',
 }
 
 export interface filterByTextActionLabel {
     action: filterByTextActions;
     title: string;
-    filterFunction: (item: any, textFilter: string, field: string) => boolean;
+    filterFunction: (item: any, textFilter: string, field: string, isNumeric: boolean) => boolean;
+    notRequireText?: boolean;
 }
-
-const defaultFilterFunction = (item: any, textFilter: string, field: string): boolean =>
-    (item[field] && item[field].toLowerCase().indexOf(textFilter.toLowerCase()) > -1) ? true : false;
 
 export const filterByTextActionsLabels: filterByTextActionLabel[] = [
     {
         action: filterByTextActions.startBy, title: 'Starts by',
-        filterFunction: (item: any, textFilter: string, field: string): boolean =>
-            (item[field] && item[field].toLowerCase().indexOf(textFilter.toLowerCase()) == 0) ? true : false,
+        filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean =>
+            (item[field] && item[field].toString().trim().toLowerCase().indexOf(textFilter.toLowerCase()) == 0) ? true : false,
     },
     {
         action: filterByTextActions.contains, title: 'Contains',
-        filterFunction: defaultFilterFunction,
+        filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean =>
+            (item[field] && item[field].toString().trim().toLowerCase().indexOf(textFilter.toLowerCase()) > -1) ? true : false,
     },
     {
         action: filterByTextActions.finishBy, title: 'Finish by',
-        filterFunction: (item: any, textFilter: string, field: string): boolean =>
-            (item[field] && item[field].toLowerCase().indexOf(textFilter.toLowerCase()) > -1) ? true : false,
+        filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean =>
+            (!item[field] || textFilter.length <= 0) ? false : (item[field].toString().trim().slice(-textFilter.length) == textFilter) ? true : false,
     },
     {
         action: filterByTextActions.greater, title: '>',
-        filterFunction: (item: any, textFilter: string, field: string): boolean =>
-            (item[field] && item[field].toLowerCase().indexOf(textFilter.toLowerCase()) > -1) ? true : false,
+        filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
+            let numberFilter: number = parseInt(textFilter);
+            if (isNaN(numberFilter) || !isNumeric) {
+                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() > textFilter.toLowerCase()) ? true : false);
+            }  else {
+                return( (item[field] && parseInt(item[field]) > numberFilter) ? true : false);
+            }
+        },
     },
     {
         action: filterByTextActions.greaterOrEqual, title: '>=',
-        filterFunction: (item: any, textFilter: string, field: string): boolean =>
-            (item[field] && item[field].toLowerCase().indexOf(textFilter.toLowerCase()) > -1) ? true : false,
+        filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
+            let numberFilter: number = parseInt(textFilter);
+            if (isNaN(numberFilter) || !isNumeric) {
+                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() >= textFilter.toLowerCase()) ? true : false);
+            }  else {
+                return( (item[field] && parseInt(item[field]) >= numberFilter) ? true : false);
+            }
+        },
     },
     {
         action: filterByTextActions.equal, title: '=',
-        filterFunction: (item: any, textFilter: string, field: string): boolean =>
-            (item[field] && item[field].toLowerCase().indexOf(textFilter.toLowerCase()) > -1) ? true : false,
+        filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
+            let numberFilter: number = parseInt(textFilter);
+            if (isNaN(numberFilter) || !isNumeric) {
+                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() == textFilter.toLowerCase()) ? true : false);
+            }  else {
+                return( (item[field] && parseInt(item[field]) == numberFilter) ? true : false);
+            }
+        },
     },
     {
         action: filterByTextActions.smallerOrEqual, title: '<=',
-        filterFunction: (item: any, textFilter: string, field: string): boolean =>
-            (item[field] && item[field].toLowerCase().indexOf(textFilter.toLowerCase()) > -1) ? true : false,
+        filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
+            let numberFilter: number = parseInt(textFilter);
+            if (isNaN(numberFilter) || !isNumeric) {
+                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() <= textFilter.toLowerCase()) ? true : false);
+            }  else {
+                return( (item[field] && parseInt(item[field]) <= numberFilter) ? true : false);
+            }
+        },
     },
     {
         action: filterByTextActions.smaller, title: '<',
-        filterFunction: (item: any, textFilter: string, field: string): boolean =>
-            (item[field] && item[field].toLowerCase().indexOf(textFilter.toLowerCase()) > -1) ? true : false,
+        filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
+            let numberFilter: number = parseInt(textFilter);
+            if (isNaN(numberFilter) || !isNumeric) {
+                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() < textFilter.toLowerCase()) ? true : false);
+            }  else {
+                return( (item[field] && parseInt(item[field]) < numberFilter) ? true : false);
+            }
+        },
     },
     {
         action: filterByTextActions.nullValue, title: 'Is Null',
-        filterFunction: (item: any, textFilter: string, field: string): boolean =>
-            (item[field] == null || item[field] == '') ? true : false,
+        notRequireText: true,
+        filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean =>
+            (item[field] == null || item[field].toString().trim() == '') ? true : false,
+    },
+    {
+        action: filterByTextActions.notNull, title: 'Is Not Null',
+        notRequireText: true,
+        filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean =>
+            (item[field] && item[field].toString().trim().length > 0) ? true : false,
     },
 ]
 
-function getFilterFunction(action: filterByTextActions): (item: any, textFilter: string, field: string) => boolean {
-    let theActionLabel = filterByTextActionsLabels.find((anActionLabel) => (action === anActionLabel.action) ? true : false)
+export const DEF_FILTER_BY_TEXT_ACTION_LABEL = filterByTextActionsLabels[1];
 
-    return ((theActionLabel) ? theActionLabel.filterFunction : defaultFilterFunction);
+function getFilterByTextActionLabel(action: filterByTextActions): filterByTextActionLabel {
+    let theActionLabel = filterByTextActionsLabels.find((anActionLabel) => (action === anActionLabel.action) ? true : false);
+    return ((theActionLabel) ? theActionLabel : DEF_FILTER_BY_TEXT_ACTION_LABEL);
 };
 
 export interface ISimpleListCol {
@@ -89,6 +127,7 @@ export interface ISimpleListCol {
     isSorted?: boolean;
     isSortedDescending?: boolean;
     canGroup?: boolean;
+    isNumeric?: boolean;
 }
 
 export interface IGroupedItem {
@@ -101,7 +140,7 @@ export function copyAndSort<T>(items: T[], columnKey: string, isSortedDescending
     return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
 }
 
-function sortByColumn<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
+function sortByText<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
     const key = columnKey as keyof T;
     items.sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
     return items;
@@ -113,9 +152,8 @@ export function copyAndSortByKey<T>(items: T[], isSortedDescending?: boolean): T
     return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[key]) < parseInt(b[key]) : parseInt(a[key]) > parseInt(b[key])) ? 1 : -1));
 }
 
-function sortByKey<T>(items: T[], isSortedDescending?: boolean): T[] {
-    const key = 'key';
-    items.sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[key]) < parseInt(b[key]) : parseInt(a[key]) > parseInt(b[key])) ? 1 : -1));
+function sortByNumber<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
+    items.sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[columnKey]) < parseInt(b[columnKey]) : parseInt(a[columnKey]) > parseInt(b[columnKey])) ? 1 : -1));
     return items;
 }
 
@@ -129,6 +167,7 @@ export interface ISimpleListStates {
     filterByTextAction: filterByTextActions;
     filterByTextField: string;
     numItemsFilteredByText: number;
+    requireFilterText: boolean;
 }
 
 export class SimpleList {
@@ -157,8 +196,9 @@ export class SimpleList {
             numItemsFilteredByText: this._allItems.length,
             groupableFields: [],
             filterableFields: [],
-            filterByTextAction: filterByTextActions.startBy,
+            filterByTextAction: DEF_FILTER_BY_TEXT_ACTION_LABEL.action,
             filterByTextField: '',
+            requireFilterText: (DEF_FILTER_BY_TEXT_ACTION_LABEL.notRequireText) ? false : true,
         }
 
         this.props.columns.forEach((aColumn: ISimpleListCol) => {
@@ -169,11 +209,10 @@ export class SimpleList {
 
     public orderByColumn(keyColumn: string): void {
         let hayQueOrdenar: boolean = false;
-        let currColumn: ISimpleListCol;
+        let currColumn = this.props.columns.find(aColumn => aColumn.key === keyColumn);
         this.props.columns.forEach((aColumn: ISimpleListCol) => {
             if (aColumn.key === keyColumn) {
                 hayQueOrdenar = true;
-                currColumn = aColumn;
                 if (!aColumn.isSorted) {
                     aColumn.isSorted = true;
                     aColumn.isSortedDescending = false
@@ -189,17 +228,28 @@ export class SimpleList {
             }
         });
 
-        if (hayQueOrdenar)
-            sortByColumn(this._state.dataFiltered, currColumn!.field, currColumn!.isSortedDescending)
-        else
-            sortByKey(this._state.dataFiltered, false)
+        if (hayQueOrdenar && currColumn) {
+            if (currColumn.isNumeric)
+                sortByNumber(this._state.dataFiltered, currColumn.field, currColumn.isSortedDescending)
+            else
+                sortByText(this._state.dataFiltered, currColumn.field, currColumn.isSortedDescending)
+        } else
+            sortByNumber(this._state.dataFiltered, 'key', false)
     }
 
     public filterByText(filterText: string, filterByTextAction: filterByTextActions, filterByTextField: string): void {
         let filterData: boolean = false;
-        let filterFunction = getFilterFunction(filterByTextAction);
+        let filterByTextActionLabel = getFilterByTextActionLabel(filterByTextAction);
+        let filterFunction = filterByTextActionLabel.filterFunction;
+        let theColumn = this.props.columns.find(aColumn=>(aColumn.field == filterByTextField));
+        let fieldIsNumeric: boolean = (theColumn && theColumn.isNumeric) ? true : false;
 
-        if (filterText != this._state.filterText) {
+
+        if (filterByTextActionLabel.notRequireText) {
+            filterText = '';
+            if (filterByTextAction != this.state.filterByTextAction) filterData = true;
+            if (filterByTextField != this.state.filterByTextField) filterData = true;
+        } else if (filterText != this._state.filterText) {
             filterData = true;
         } else if (filterText.length > 0) {
             if (filterByTextAction != this.state.filterByTextAction) filterData = true;
@@ -209,10 +259,11 @@ export class SimpleList {
         this._state.filterByTextAction = filterByTextAction;
         this._state.filterText = filterText;
         this._state.filterByTextField = filterByTextField;
+        this._state.requireFilterText = (filterByTextActionLabel.notRequireText) ? false : true;
 
         if (filterData) {
-            if (filterText.length > 0) {
-                this._ItemsFilteredByText = this._allItems.filter(item => filterFunction(item, filterText, filterByTextField));
+            if (filterText.length > 0 || filterByTextActionLabel.notRequireText) {
+                this._ItemsFilteredByText = this._allItems.filter(item => filterFunction(item, filterText, filterByTextField, fieldIsNumeric));
             } else {
                 this._ItemsFilteredByText = this._allItems.slice(0);
             }

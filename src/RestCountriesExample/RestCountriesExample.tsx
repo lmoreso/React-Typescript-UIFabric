@@ -36,7 +36,7 @@ const COLUMNS_DEF: ISimpleListCol[] = [
   { title: "Región", field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", canSortAndFilter: true, canGroup: true },
   { title: "Siglas", field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true },
   { title: "Idiomas", field: "idiomas", width: 100, canSortAndFilter: false },
-  { title: "Nº Husos", field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true },
+  { title: "Nº Husos", field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true, isNumeric: true },
 ]
 
 interface IRestCountriesExampleStates {
