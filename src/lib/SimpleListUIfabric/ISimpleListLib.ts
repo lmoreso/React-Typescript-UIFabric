@@ -3,8 +3,6 @@ export interface ISimpleListProps {
     columns: ISimpleListCol[];
     labelItem: string;
     labelItems: string;
-    fieldsTextFilter?: string[];
-    fieldsDropdownFilter?: { valueIfNull: string; field: string; valueNoFilter: string };
 }
 
 export const ALL_ITEMS_GROUPED_KEY = -1;
@@ -44,9 +42,9 @@ export const filterByTextActionsLabels: filterByTextActionLabel[] = [
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
             let numberFilter: number = parseInt(textFilter);
             if (isNaN(numberFilter) || !isNumeric) {
-                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() > textFilter.toLowerCase()) ? true : false);
-            }  else {
-                return( (item[field] && parseInt(item[field]) > numberFilter) ? true : false);
+                return ((textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() > textFilter.toLowerCase()) ? true : false);
+            } else {
+                return ((item[field] && parseInt(item[field]) > numberFilter) ? true : false);
             }
         },
     },
@@ -55,9 +53,9 @@ export const filterByTextActionsLabels: filterByTextActionLabel[] = [
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
             let numberFilter: number = parseInt(textFilter);
             if (isNaN(numberFilter) || !isNumeric) {
-                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() >= textFilter.toLowerCase()) ? true : false);
-            }  else {
-                return( (item[field] && parseInt(item[field]) >= numberFilter) ? true : false);
+                return ((textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() >= textFilter.toLowerCase()) ? true : false);
+            } else {
+                return ((item[field] && parseInt(item[field]) >= numberFilter) ? true : false);
             }
         },
     },
@@ -66,9 +64,9 @@ export const filterByTextActionsLabels: filterByTextActionLabel[] = [
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
             let numberFilter: number = parseInt(textFilter);
             if (isNaN(numberFilter) || !isNumeric) {
-                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() == textFilter.toLowerCase()) ? true : false);
-            }  else {
-                return( (item[field] && parseInt(item[field]) == numberFilter) ? true : false);
+                return ((textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() == textFilter.toLowerCase()) ? true : false);
+            } else {
+                return ((item[field] && parseInt(item[field]) == numberFilter) ? true : false);
             }
         },
     },
@@ -77,9 +75,9 @@ export const filterByTextActionsLabels: filterByTextActionLabel[] = [
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
             let numberFilter: number = parseInt(textFilter);
             if (isNaN(numberFilter) || !isNumeric) {
-                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() <= textFilter.toLowerCase()) ? true : false);
-            }  else {
-                return( (item[field] && parseInt(item[field]) <= numberFilter) ? true : false);
+                return ((textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() <= textFilter.toLowerCase()) ? true : false);
+            } else {
+                return ((item[field] && parseInt(item[field]) <= numberFilter) ? true : false);
             }
         },
     },
@@ -88,9 +86,9 @@ export const filterByTextActionsLabels: filterByTextActionLabel[] = [
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
             let numberFilter: number = parseInt(textFilter);
             if (isNaN(numberFilter) || !isNumeric) {
-                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() < textFilter.toLowerCase()) ? true : false);
-            }  else {
-                return( (item[field] && parseInt(item[field]) < numberFilter) ? true : false);
+                return ((textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() < textFilter.toLowerCase()) ? true : false);
+            } else {
+                return ((item[field] && parseInt(item[field]) < numberFilter) ? true : false);
             }
         },
     },
@@ -135,38 +133,16 @@ export interface IGroupedItem {
     numOcurrences: number;
 }
 
-export function copyAndSort<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
-    const key = columnKey as keyof T;
-    return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
-}
-
-function sortByText<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
-    const key = columnKey as keyof T;
-    items.sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
-    return items;
-}
-
-
-export function copyAndSortByKey<T>(items: T[], isSortedDescending?: boolean): T[] {
-    const key = 'key';
-    return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[key]) < parseInt(b[key]) : parseInt(a[key]) > parseInt(b[key])) ? 1 : -1));
-}
-
-function sortByNumber<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
-    items.sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[columnKey]) < parseInt(b[columnKey]) : parseInt(a[columnKey]) > parseInt(b[columnKey])) ? 1 : -1));
-    return items;
-}
-
 export interface ISimpleListStates {
     dataFiltered: any[];
+    filterableFields: ISimpleListCol[];
     groupableFields: ISimpleListCol[];
     groupedItems: IGroupedItem[];
-    filterGroupedText: string;
-    filterableFields: ISimpleListCol[];
-    filterText: string;
-    filterByTextAction: filterByTextActions;
-    filterByTextField: string;
-    numItemsFilteredByText: number;
+    filterByGroupValue?: IGroupedItem;
+    filterByGroupField?: ISimpleListCol;
+    filterByTextValue?: string;
+    filterByTextAction?: filterByTextActions;
+    filterByTextField?: string;
     requireFilterText: boolean;
 }
 
@@ -190,21 +166,26 @@ export class SimpleList {
 
         this._state = {
             dataFiltered: this._allItems,
-            filterGroupedText: '',
-            filterText: '',
-            groupedItems: this._makeGroupedList(this._allItems),
-            numItemsFilteredByText: this._allItems.length,
+            filterByGroupValue: '',
+            filterByTextValue: '',
+            groupedItems: [],
             groupableFields: [],
+            // filterByGroupField: '',
             filterableFields: [],
             filterByTextAction: DEF_FILTER_BY_TEXT_ACTION_LABEL.action,
             filterByTextField: '',
             requireFilterText: (DEF_FILTER_BY_TEXT_ACTION_LABEL.notRequireText) ? false : true,
         }
 
+        // Crear listas de campos ordenables y agrupables
         this.props.columns.forEach((aColumn: ISimpleListCol) => {
             if (aColumn.canGroup) this._state.groupableFields.push(aColumn);
             if (aColumn.canSortAndFilter) this._state.filterableFields.push(aColumn);
         });
+
+        if (this._state.groupableFields.length > 0) {
+            this._makeGroupedList();
+        }
     }
 
     public orderByColumn(keyColumn: string): void {
@@ -241,7 +222,7 @@ export class SimpleList {
         let filterData: boolean = false;
         let filterByTextActionLabel = getFilterByTextActionLabel(filterByTextAction);
         let filterFunction = filterByTextActionLabel.filterFunction;
-        let theColumn = this.props.columns.find(aColumn=>(aColumn.field == filterByTextField));
+        let theColumn = this.props.columns.find(aColumn => (aColumn.field == filterByTextField));
         let fieldIsNumeric: boolean = (theColumn && theColumn.isNumeric) ? true : false;
 
 
@@ -249,7 +230,7 @@ export class SimpleList {
             filterText = '';
             if (filterByTextAction != this.state.filterByTextAction) filterData = true;
             if (filterByTextField != this.state.filterByTextField) filterData = true;
-        } else if (filterText != this._state.filterText) {
+        } else if (filterText != this._state.filterByTextValue) {
             filterData = true;
         } else if (filterText.length > 0) {
             if (filterByTextAction != this.state.filterByTextAction) filterData = true;
@@ -257,7 +238,7 @@ export class SimpleList {
         }
 
         this._state.filterByTextAction = filterByTextAction;
-        this._state.filterText = filterText;
+        this._state.filterByTextValue = filterText;
         this._state.filterByTextField = filterByTextField;
         this._state.requireFilterText = (filterByTextActionLabel.notRequireText) ? false : true;
 
@@ -268,52 +249,71 @@ export class SimpleList {
                 this._ItemsFilteredByText = this._allItems.slice(0);
             }
             this._state.dataFiltered = this._ItemsFilteredByText;
-            this._state.filterGroupedText = '';
-            this._state.groupedItems = this._makeGroupedList(this._ItemsFilteredByText);
-            this._state.numItemsFilteredByText = this._ItemsFilteredByText.length;
+            this._state.filterByGroupValue = '';
+            this._state.groupedItems = this._makeGroupedList();
         }
     }
 
-    private _makeGroupedList(data: any[]): IGroupedItem[] {
-        // let numGroups: number = 0;
-        let newGroupedItem = new Array<IGroupedItem>();
-
-        if (this.props.fieldsDropdownFilter && this.props.fieldsDropdownFilter.field.length > 0) {
-            let field = this.props.fieldsDropdownFilter.field;
-            let valueIfNull = this.props.fieldsDropdownFilter.valueIfNull;
-            // Calculamos la lista de Items agrupados
-            data.forEach(aRow => {
-                let value = (aRow[field]) ? aRow[field] : valueIfNull;
-                let newValue = newGroupedItem.find((aGroup) => (aGroup.value === value));
-                if (newValue) {
-                    newValue.numOcurrences!++;
-                } else {
-                    newGroupedItem.push({ value, numOcurrences: 1 });
-                    // numGroups++;
-                }
-            })
-            // Ordenamos la lista de Items agrupados
-            newGroupedItem.sort((a, b) => (a.value > b.value) ? 1 : -1);
-        }
-
-        return (newGroupedItem);
-    }
-
-    public filterByGroup(filterGroupedItem: string): void {
-        if (this.props.fieldsDropdownFilter) {
+    public filterByGroup(filterGroupedValue: ISimpleListCol, filterGroupedField: string): void {
+        if (this.state.) {
             let data = this._ItemsFilteredByText;
-            let fieldValue = (filterGroupedItem == this.props.fieldsDropdownFilter.valueIfNull) ? '' : filterGroupedItem;
+            let fieldValue = (filterGroupedValue == this.props.fieldsDropdownFilter.valueIfNull) ? '' : filterGroupedValue;
 
-            if (filterGroupedItem != this.props.fieldsDropdownFilter.valueNoFilter) {
+            if (filterGroupedValue != this.props.fieldsDropdownFilter.valueNoFilter) {
                 let field = this.props.fieldsDropdownFilter.field;
                 data = data.filter(anItem => {
                     return (anItem[field] == fieldValue);
                 });
             }
             this._state.dataFiltered = data;
-            this._state.filterGroupedText = filterGroupedItem;
+            this._state.filterByGroupValue = filterGroupedValue;
         }
     }
 
+    private _makeGroupedList(): IGroupedItem[] {
+        let filterByGroupField: ISimpleListCol = this.state.filterByGroupField;
+        let newGroupedItem = new Array<IGroupedItem>();
+        let field = filterByGroupField.field;
+        let labelIfGroupIsNull = `Without ${filterByGroupField.title}`;
+        // Calculamos la lista de Items agrupados
+        this._state.dataFiltered.forEach(aRow => {
+            let value = (aRow[field]) ? aRow[field] : labelIfGroupIsNull;
+            let newValue = newGroupedItem.find((aGroup) => (aGroup.value === value));
+            if (newValue) {
+                newValue.numOcurrences!++;
+            } else {
+                newGroupedItem.push({ value, numOcurrences: 1 });
+                // numGroups++;
+            }
+        })
+        // Ordenamos la lista de Items agrupados
+        newGroupedItem.sort((a, b) => (a.value > b.value) ? 1 : -1);
+
+        return (newGroupedItem);
+    }
+
+
+}
+
+export function copyAndSort<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
+    const key = columnKey as keyof T;
+    return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
+}
+
+function sortByText<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
+    const key = columnKey as keyof T;
+    items.sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
+    return items;
+}
+
+
+export function copyAndSortByKey<T>(items: T[], isSortedDescending?: boolean): T[] {
+    const key = 'key';
+    return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[key]) < parseInt(b[key]) : parseInt(a[key]) > parseInt(b[key])) ? 1 : -1));
+}
+
+function sortByNumber<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
+    items.sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[columnKey]) < parseInt(b[columnKey]) : parseInt(a[columnKey]) > parseInt(b[columnKey])) ? 1 : -1));
+    return items;
 }
 
