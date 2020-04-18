@@ -3,7 +3,6 @@ export interface ISimpleListProps {
     columns: ISimpleListCol[];
     labelItem: string;
     labelItems: string;
-    fieldsTextFilter?: string[];
     fieldsDropdownFilter?: { valueIfNull: string; field: string; valueNoFilter: string };
 }
 
@@ -160,19 +159,21 @@ function sortByNumber<T>(items: T[], columnKey: string, isSortedDescending?: boo
 export interface ISimpleListStates {
     dataFiltered: any[];
     groupableFields: ISimpleListCol[];
-    groupedItems: IGroupedItem[];
-    filterGroupedText: string;
     filterableFields: ISimpleListCol[];
     filterText: string;
     filterByTextAction: filterByTextActions;
-    filterByTextField: string;
-    numItemsFilteredByText: number;
+    filterByTextField: ISimpleListCol | undefined;
     requireFilterText: boolean;
+    groupedItems: IGroupedItem[];
+    filterGroupedText: string;
 }
 
 export class SimpleList {
     private _allItems: any[];
     private _ItemsFilteredByText: any[];
+    public get numItemsFilteredByText(): number {
+        return(this._ItemsFilteredByText.length);
+    };
     private props: ISimpleListProps;
     private readonly _state: ISimpleListStates;
     public get state() {
@@ -193,11 +194,10 @@ export class SimpleList {
             filterGroupedText: '',
             filterText: '',
             groupedItems: this._makeGroupedList(this._allItems),
-            numItemsFilteredByText: this._allItems.length,
             groupableFields: [],
             filterableFields: [],
             filterByTextAction: DEF_FILTER_BY_TEXT_ACTION_LABEL.action,
-            filterByTextField: '',
+            filterByTextField: undefined,
             requireFilterText: (DEF_FILTER_BY_TEXT_ACTION_LABEL.notRequireText) ? false : true,
         }
 
@@ -237,40 +237,39 @@ export class SimpleList {
             sortByNumber(this._state.dataFiltered, 'key', false)
     }
 
-    public filterByText(filterText: string, filterByTextAction: filterByTextActions, filterByTextField: string): void {
+    public filterByText(filterText: string, filterByTextAction: filterByTextActions, filterByTextField: ISimpleListCol): void {
         let filterData: boolean = false;
         let filterByTextActionLabel = getFilterByTextActionLabel(filterByTextAction);
         let filterFunction = filterByTextActionLabel.filterFunction;
-        let theColumn = this.props.columns.find(aColumn=>(aColumn.field == filterByTextField));
-        let fieldIsNumeric: boolean = (theColumn && theColumn.isNumeric) ? true : false;
-
+        let fieldIsNumeric: boolean = (filterByTextField && filterByTextField.isNumeric) ? true : false;
 
         if (filterByTextActionLabel.notRequireText) {
             filterText = '';
             if (filterByTextAction != this.state.filterByTextAction) filterData = true;
-            if (filterByTextField != this.state.filterByTextField) filterData = true;
+            if (filterByTextField.field != this.state.filterByTextField!.field) filterData = true;
         } else if (filterText != this._state.filterText) {
             filterData = true;
         } else if (filterText.length > 0) {
             if (filterByTextAction != this.state.filterByTextAction) filterData = true;
-            if (filterByTextField != this.state.filterByTextField) filterData = true;
+            if (filterByTextField.field != this.state.filterByTextField!.field) filterData = true;
         }
 
         this._state.filterByTextAction = filterByTextAction;
         this._state.filterText = filterText;
         this._state.filterByTextField = filterByTextField;
         this._state.requireFilterText = (filterByTextActionLabel.notRequireText) ? false : true;
+        // Quitar el órden de las columnas
+        this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
 
         if (filterData) {
             if (filterText.length > 0 || filterByTextActionLabel.notRequireText) {
-                this._ItemsFilteredByText = this._allItems.filter(item => filterFunction(item, filterText, filterByTextField, fieldIsNumeric));
+                this._ItemsFilteredByText = this._allItems.filter(item => filterFunction(item, filterText, filterByTextField.field, fieldIsNumeric));
             } else {
                 this._ItemsFilteredByText = this._allItems.slice(0);
             }
             this._state.dataFiltered = this._ItemsFilteredByText;
             this._state.filterGroupedText = '';
             this._state.groupedItems = this._makeGroupedList(this._ItemsFilteredByText);
-            this._state.numItemsFilteredByText = this._ItemsFilteredByText.length;
         }
     }
 

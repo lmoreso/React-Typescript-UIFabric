@@ -177,7 +177,6 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
           labelItem='Pais'
           labelItems='Paises'
           columns={COLUMNS_DEF}
-          fieldsTextFilter={['Paises', 'name', 'nativeName']}
           fieldsDropdownFilter={{ valueIfNull: 'Without Continent', field: 'region', valueNoFilter: 'Todos los Continentes' }}
           listCompactMode={false}
           showToggleCompactMode={true}
