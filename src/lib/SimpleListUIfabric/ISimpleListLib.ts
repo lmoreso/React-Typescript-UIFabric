@@ -242,12 +242,14 @@ export class SimpleList {
         let filterByTextActionLabel = getFilterByTextActionLabel(filterByTextAction);
         let filterFunction = filterByTextActionLabel.filterFunction;
         let fieldIsNumeric: boolean = (filterByTextField && filterByTextField.isNumeric) ? true : false;
+        filterText = filterText.trim();
 
         if (filterByTextActionLabel.notRequireText) {
             filterText = '';
             if (filterByTextAction != this.state.filterByTextAction) filterData = true;
             if (filterByTextField.field != this.state.filterByTextField!.field) filterData = true;
-        } else if (filterText != this._state.filterText) {
+        } else if (filterText != this._state.filterText 
+            || (filterText.length == 0 && getFilterByTextActionLabel(this.state.filterByTextAction).notRequireText)) {
             filterData = true;
         } else if (filterText.length > 0) {
             if (filterByTextAction != this.state.filterByTextAction) filterData = true;

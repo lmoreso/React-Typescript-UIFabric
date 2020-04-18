@@ -26,8 +26,8 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
     this._simpleList = new SimpleList(props);
     // this._listStates = this._simpleList.filterByText('z', this._listStates);
-    this._simpleList.filterByGroup('Oceania');
-    this._simpleList.orderByColumn('6');
+    // this._simpleList.filterByGroup('Oceania');
+    // this._simpleList.orderByColumn('6');
     this.state = {
       dataFiltered: this._simpleList.state.dataFiltered,
       filterText: this._simpleList.state.filterText,
