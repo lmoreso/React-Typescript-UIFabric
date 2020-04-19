@@ -3,116 +3,112 @@ export interface ISimpleListProps {
     columns: ISimpleListCol[];
     labelItem: string;
     labelItems: string;
-    fieldsTextFilter?: string[];
-    fieldsDropdownFilter?: { valueIfNull: string; field: string; valueNoFilter: string };
 }
 
-export const ALL_ITEMS_GROUPED_KEY = -1;
-
-export enum filterByTextActions {
+export enum filterByTextActionsId {
     startBy = 'startBy', contains = 'contains', finishBy = 'finishBy',
     greater = 'greater', greaterOrEqual = 'greaterOrEqual', equal = 'equal',
     smallerOrEqual = 'smallerOrEqual', smaller = 'smaller', nullValue = 'nullValue',
     notNull = 'notNull',
 }
 
-export interface filterByTextActionLabel {
-    action: filterByTextActions;
+export interface filterByTextAction {
+    action: filterByTextActionsId;
     title: string;
     filterFunction: (item: any, textFilter: string, field: string, isNumeric: boolean) => boolean;
     notRequireText?: boolean;
 }
 
-export const filterByTextActionsLabels: filterByTextActionLabel[] = [
+export const filterByTextActionsList: filterByTextAction[] = [
     {
-        action: filterByTextActions.startBy, title: 'Starts by',
+        action: filterByTextActionsId.startBy, title: 'Starts by',
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean =>
             (item[field] && item[field].toString().trim().toLowerCase().indexOf(textFilter.toLowerCase()) == 0) ? true : false,
     },
     {
-        action: filterByTextActions.contains, title: 'Contains',
+        action: filterByTextActionsId.contains, title: 'Contains',
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean =>
             (item[field] && item[field].toString().trim().toLowerCase().indexOf(textFilter.toLowerCase()) > -1) ? true : false,
     },
     {
-        action: filterByTextActions.finishBy, title: 'Finish by',
+        action: filterByTextActionsId.finishBy, title: 'Finish by',
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean =>
             (!item[field] || textFilter.length <= 0) ? false : (item[field].toString().trim().slice(-textFilter.length) == textFilter) ? true : false,
     },
     {
-        action: filterByTextActions.greater, title: '>',
+        action: filterByTextActionsId.greater, title: '>',
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
             let numberFilter: number = parseInt(textFilter);
             if (isNaN(numberFilter) || !isNumeric) {
-                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() > textFilter.toLowerCase()) ? true : false);
-            }  else {
-                return( (item[field] && parseInt(item[field]) > numberFilter) ? true : false);
+                return ((textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() > textFilter.toLowerCase()) ? true : false);
+            } else {
+                return ((item[field] && parseInt(item[field]) > numberFilter) ? true : false);
             }
         },
     },
     {
-        action: filterByTextActions.greaterOrEqual, title: '>=',
+        action: filterByTextActionsId.greaterOrEqual, title: '>=',
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
             let numberFilter: number = parseInt(textFilter);
             if (isNaN(numberFilter) || !isNumeric) {
-                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() >= textFilter.toLowerCase()) ? true : false);
-            }  else {
-                return( (item[field] && parseInt(item[field]) >= numberFilter) ? true : false);
+                return ((textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() >= textFilter.toLowerCase()) ? true : false);
+            } else {
+                return ((item[field] && parseInt(item[field]) >= numberFilter) ? true : false);
             }
         },
     },
     {
-        action: filterByTextActions.equal, title: '=',
+        action: filterByTextActionsId.equal, title: '=',
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
             let numberFilter: number = parseInt(textFilter);
             if (isNaN(numberFilter) || !isNumeric) {
-                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() == textFilter.toLowerCase()) ? true : false);
-            }  else {
-                return( (item[field] && parseInt(item[field]) == numberFilter) ? true : false);
+                return ((textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() == textFilter.toLowerCase()) ? true : false);
+            } else {
+                return ((item[field] && parseInt(item[field]) == numberFilter) ? true : false);
             }
         },
     },
     {
-        action: filterByTextActions.smallerOrEqual, title: '<=',
+        action: filterByTextActionsId.smallerOrEqual, title: '<=',
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
             let numberFilter: number = parseInt(textFilter);
             if (isNaN(numberFilter) || !isNumeric) {
-                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() <= textFilter.toLowerCase()) ? true : false);
-            }  else {
-                return( (item[field] && parseInt(item[field]) <= numberFilter) ? true : false);
+                return ((textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() <= textFilter.toLowerCase()) ? true : false);
+            } else {
+                return ((item[field] && parseInt(item[field]) <= numberFilter) ? true : false);
             }
         },
     },
     {
-        action: filterByTextActions.smaller, title: '<',
+        action: filterByTextActionsId.smaller, title: '<',
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean => {
             let numberFilter: number = parseInt(textFilter);
             if (isNaN(numberFilter) || !isNumeric) {
-                return( (textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() < textFilter.toLowerCase()) ? true : false);
-            }  else {
-                return( (item[field] && parseInt(item[field]) < numberFilter) ? true : false);
+                return ((textFilter.length > 0 && item[field] && item[field].toString().trim().toLowerCase() < textFilter.toLowerCase()) ? true : false);
+            } else {
+                return ((item[field] && parseInt(item[field]) < numberFilter) ? true : false);
             }
         },
     },
     {
-        action: filterByTextActions.nullValue, title: 'Is Null',
+        action: filterByTextActionsId.nullValue, title: 'Is Null',
         notRequireText: true,
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean =>
             (item[field] == null || item[field].toString().trim() == '') ? true : false,
     },
     {
-        action: filterByTextActions.notNull, title: 'Is Not Null',
+        action: filterByTextActionsId.notNull, title: 'Is Not Null',
         notRequireText: true,
         filterFunction: (item: any, textFilter: string, field: string, isNumeric?: boolean): boolean =>
             (item[field] && item[field].toString().trim().length > 0) ? true : false,
     },
 ]
 
-export const DEF_FILTER_BY_TEXT_ACTION_LABEL = filterByTextActionsLabels[1];
+export const DEFAULT_FILTER_BY_TEXT_ACTION = filterByTextActionsList[1];
 
-function getFilterByTextActionLabel(action: filterByTextActions): filterByTextActionLabel {
-    let theActionLabel = filterByTextActionsLabels.find((anActionLabel) => (action === anActionLabel.action) ? true : false);
-    return ((theActionLabel) ? theActionLabel : DEF_FILTER_BY_TEXT_ACTION_LABEL);
+function getFilterByTextActionLabel(action: filterByTextActionsId): filterByTextAction {
+    let theActionLabel = filterByTextActionsList.find((anActionLabel) => (action === anActionLabel.action) ? true : false);
+    return ((theActionLabel) ? theActionLabel : DEFAULT_FILTER_BY_TEXT_ACTION);
 };
 
 export interface ISimpleListCol {
@@ -130,53 +126,41 @@ export interface ISimpleListCol {
     isNumeric?: boolean;
 }
 
+export interface IGroupedCol extends ISimpleListCol {
+    valueIfNull: string;
+    valueNoFilter: string;
+    numItems: number;
+}
+
 export interface IGroupedItem {
+    key: number | string;
     value: string;
     numOcurrences: number;
 }
 
-export function copyAndSort<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
-    const key = columnKey as keyof T;
-    return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
-}
-
-function sortByText<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
-    const key = columnKey as keyof T;
-    items.sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
-    return items;
-}
-
-
-export function copyAndSortByKey<T>(items: T[], isSortedDescending?: boolean): T[] {
-    const key = 'key';
-    return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[key]) < parseInt(b[key]) : parseInt(a[key]) > parseInt(b[key])) ? 1 : -1));
-}
-
-function sortByNumber<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
-    items.sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[columnKey]) < parseInt(b[columnKey]) : parseInt(a[columnKey]) > parseInt(b[columnKey])) ? 1 : -1));
-    return items;
-}
-
 export interface ISimpleListStates {
     dataFiltered: any[];
-    groupableFields: ISimpleListCol[];
-    groupedItems: IGroupedItem[];
-    filterGroupedText: string;
+    groupableFields: IGroupedCol[];
     filterableFields: ISimpleListCol[];
     filterText: string;
-    filterByTextAction: filterByTextActions;
-    filterByTextField: string;
-    numItemsFilteredByText: number;
+    filterByTextActionId: filterByTextActionsId;
+    filterByTextField: ISimpleListCol | undefined;
     requireFilterText: boolean;
+    groupedItems: IGroupedItem[];
+    filterByGroupField: IGroupedCol | undefined;
+    filterByGroupText: string;
 }
 
 export class SimpleList {
     private _allItems: any[];
     private _ItemsFilteredByText: any[];
+    public get numItemsFilteredByText(): number {
+        return (this._ItemsFilteredByText.length);
+    };
     private props: ISimpleListProps;
     private readonly _state: ISimpleListStates;
     public get state() {
-        return this._state
+        return (this._state);
     };
 
     public constructor(props: ISimpleListProps) {
@@ -190,29 +174,36 @@ export class SimpleList {
 
         this._state = {
             dataFiltered: this._allItems,
-            filterGroupedText: '',
+            filterByGroupText: '',
             filterText: '',
-            groupedItems: this._makeGroupedList(this._allItems),
-            numItemsFilteredByText: this._allItems.length,
+            filterByGroupField: undefined,
+            groupedItems: [],
             groupableFields: [],
             filterableFields: [],
-            filterByTextAction: DEF_FILTER_BY_TEXT_ACTION_LABEL.action,
-            filterByTextField: '',
-            requireFilterText: (DEF_FILTER_BY_TEXT_ACTION_LABEL.notRequireText) ? false : true,
+            filterByTextActionId: DEFAULT_FILTER_BY_TEXT_ACTION.action,
+            filterByTextField: undefined,
+            requireFilterText: (DEFAULT_FILTER_BY_TEXT_ACTION.notRequireText) ? false : true,
         }
 
         this.props.columns.forEach((aColumn: ISimpleListCol) => {
-            if (aColumn.canGroup) this._state.groupableFields.push(aColumn);
-            if (aColumn.canSortAndFilter) this._state.filterableFields.push(aColumn);
+            if (aColumn.canGroup)
+                this._state.groupableFields.push({ ...aColumn, valueIfNull: `Sin ${aColumn.title}`, valueNoFilter: 'Todos', numItems: 0 });
+            if (aColumn.canSortAndFilter)
+                this._state.filterableFields.push(aColumn);
         });
+
+        if (this._state.groupableFields.length > 0) {
+            this._state.filterByGroupField = this._state.groupableFields[0];
+            this._makeGroupedItemsList();
+        }
     }
 
     public orderByColumn(keyColumn: string): void {
-        let hayQueOrdenar: boolean = false;
+        let mustOrder: boolean = false;
         let currColumn = this.props.columns.find(aColumn => aColumn.key === keyColumn);
         this.props.columns.forEach((aColumn: ISimpleListCol) => {
             if (aColumn.key === keyColumn) {
-                hayQueOrdenar = true;
+                mustOrder = true;
                 if (!aColumn.isSorted) {
                     aColumn.isSorted = true;
                     aColumn.isSortedDescending = false
@@ -220,7 +211,7 @@ export class SimpleList {
                     aColumn.isSortedDescending = true
                 } else {
                     aColumn.isSorted = false;
-                    hayQueOrdenar = false;
+                    mustOrder = false;
                 }
             } else {
                 aColumn.isSorted = false;
@@ -228,7 +219,7 @@ export class SimpleList {
             }
         });
 
-        if (hayQueOrdenar && currColumn) {
+        if (mustOrder && currColumn) {
             if (currColumn.isNumeric)
                 sortByNumber(this._state.dataFiltered, currColumn.field, currColumn.isSortedDescending)
             else
@@ -237,83 +228,112 @@ export class SimpleList {
             sortByNumber(this._state.dataFiltered, 'key', false)
     }
 
-    public filterByText(filterText: string, filterByTextAction: filterByTextActions, filterByTextField: string): void {
-        let filterData: boolean = false;
-        let filterByTextActionLabel = getFilterByTextActionLabel(filterByTextAction);
+    public filterByText(filterText: string, filterByTextActionId: filterByTextActionsId, filterByTextField: ISimpleListCol): void {
+        let mustFilter: boolean = false;
+        let filterByTextActionLabel = getFilterByTextActionLabel(filterByTextActionId);
         let filterFunction = filterByTextActionLabel.filterFunction;
-        let theColumn = this.props.columns.find(aColumn=>(aColumn.field == filterByTextField));
-        let fieldIsNumeric: boolean = (theColumn && theColumn.isNumeric) ? true : false;
-
+        let fieldIsNumeric: boolean = (filterByTextField && filterByTextField.isNumeric) ? true : false;
+        filterText = filterText.trim();
 
         if (filterByTextActionLabel.notRequireText) {
             filterText = '';
-            if (filterByTextAction != this.state.filterByTextAction) filterData = true;
-            if (filterByTextField != this.state.filterByTextField) filterData = true;
-        } else if (filterText != this._state.filterText) {
-            filterData = true;
+            if (filterByTextActionId != this.state.filterByTextActionId) mustFilter = true;
+            if (filterByTextField.field != this.state.filterByTextField!.field) mustFilter = true;
+        } else if (filterText != this._state.filterText
+            || (filterText.length == 0 && getFilterByTextActionLabel(this.state.filterByTextActionId).notRequireText)) {
+            mustFilter = true;
         } else if (filterText.length > 0) {
-            if (filterByTextAction != this.state.filterByTextAction) filterData = true;
-            if (filterByTextField != this.state.filterByTextField) filterData = true;
+            if (filterByTextActionId != this.state.filterByTextActionId) mustFilter = true;
+            if (filterByTextField.field != this.state.filterByTextField!.field) mustFilter = true;
         }
 
-        this._state.filterByTextAction = filterByTextAction;
+        this._state.filterByTextActionId = filterByTextActionId;
         this._state.filterText = filterText;
         this._state.filterByTextField = filterByTextField;
         this._state.requireFilterText = (filterByTextActionLabel.notRequireText) ? false : true;
+        // Quitar el órden de las columnas
+        this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
 
-        if (filterData) {
+        if (mustFilter) {
             if (filterText.length > 0 || filterByTextActionLabel.notRequireText) {
-                this._ItemsFilteredByText = this._allItems.filter(item => filterFunction(item, filterText, filterByTextField, fieldIsNumeric));
+                this._ItemsFilteredByText = this._allItems.filter(item => filterFunction(item, filterText, filterByTextField.field, fieldIsNumeric));
             } else {
                 this._ItemsFilteredByText = this._allItems.slice(0);
             }
             this._state.dataFiltered = this._ItemsFilteredByText;
-            this._state.filterGroupedText = '';
-            this._state.groupedItems = this._makeGroupedList(this._ItemsFilteredByText);
-            this._state.numItemsFilteredByText = this._ItemsFilteredByText.length;
+            this._state.filterByGroupText = '';
+            this._makeGroupedItemsList();
         }
     }
 
-    private _makeGroupedList(data: any[]): IGroupedItem[] {
-        // let numGroups: number = 0;
+    public makeGroupedItemsList(groupedFieldTitle: string): void {
+        let groupedField = this._state.groupableFields.find(aGroup => (aGroup.field == groupedFieldTitle));
+        this._state.filterByGroupField = groupedField;
+        this._makeGroupedItemsList();
+    }
+
+    private _makeGroupedItemsList(): void {
+        let data = this._ItemsFilteredByText;
         let newGroupedItem = new Array<IGroupedItem>();
 
-        if (this.props.fieldsDropdownFilter && this.props.fieldsDropdownFilter.field.length > 0) {
-            let field = this.props.fieldsDropdownFilter.field;
-            let valueIfNull = this.props.fieldsDropdownFilter.valueIfNull;
+        if (this._state.filterByGroupField) {
+            let field = this._state.filterByGroupField.field;
+            let valueIfNull = `Sin ${this._state.filterByGroupField.title}`;
             // Calculamos la lista de Items agrupados
-            data.forEach(aRow => {
+            data.forEach((aRow, index) => {
                 let value = (aRow[field]) ? aRow[field] : valueIfNull;
                 let newValue = newGroupedItem.find((aGroup) => (aGroup.value === value));
                 if (newValue) {
                     newValue.numOcurrences!++;
                 } else {
-                    newGroupedItem.push({ value, numOcurrences: 1 });
+                    newGroupedItem.push({ key: index, value, numOcurrences: 1 });
                     // numGroups++;
                 }
             })
             // Ordenamos la lista de Items agrupados
             newGroupedItem.sort((a, b) => (a.value > b.value) ? 1 : -1);
+            this._state.groupedItems = newGroupedItem;
         }
-
-        return (newGroupedItem);
+        // deshacemos el filtro anterior de grupos, si lo hubiera
+        this._state.filterByGroupText = '';
+        this._state.dataFiltered = this._ItemsFilteredByText;
     }
 
     public filterByGroup(filterGroupedItem: string): void {
-        if (this.props.fieldsDropdownFilter) {
+        if (this._state.filterByGroupField) {
             let data = this._ItemsFilteredByText;
-            let fieldValue = (filterGroupedItem == this.props.fieldsDropdownFilter.valueIfNull) ? '' : filterGroupedItem;
+            let fieldValue = (filterGroupedItem == this._state.filterByGroupField.valueIfNull) ? '' : filterGroupedItem;
 
-            if (filterGroupedItem != this.props.fieldsDropdownFilter.valueNoFilter) {
-                let field = this.props.fieldsDropdownFilter.field;
+            if (filterGroupedItem != this._state.filterByGroupField.valueNoFilter) {
+                let field = this._state.filterByGroupField.field;
                 data = data.filter(anItem => {
                     return (anItem[field] == fieldValue);
                 });
             }
             this._state.dataFiltered = data;
-            this._state.filterGroupedText = filterGroupedItem;
+            this._state.filterByGroupText = filterGroupedItem;
         }
     }
+}
 
+export function copyAndSort<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
+    const key = columnKey as keyof T;
+    return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
+}
+
+function sortByText<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
+    const key = columnKey as keyof T;
+    items.sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
+    return items;
+}
+
+export function copyAndSortByKey<T>(items: T[], isSortedDescending?: boolean): T[] {
+    const key = 'key';
+    return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[key]) < parseInt(b[key]) : parseInt(a[key]) > parseInt(b[key])) ? 1 : -1));
+}
+
+function sortByNumber<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
+    items.sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[columnKey]) < parseInt(b[columnKey]) : parseInt(a[columnKey]) > parseInt(b[columnKey])) ? 1 : -1));
+    return items;
 }
 
