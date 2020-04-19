@@ -3,6 +3,7 @@ import * as React from 'react';
 import { ISimpleListHtmlProps } from './ISimpleListHtmlProps';
 import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, filterByTextActionsList, IGroupedCol } from './ISimpleListLib';
 import './SimpleListHtml.css';
+import { strings } from './loc/SimpleListStrings';
 
 const BACKGROUND_COLOR_DEF = 'DimGray';
 
@@ -25,6 +26,8 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
 
     this._simpleList = new SimpleList(props);
+    // console.log('SimpleListHtml.constructor:');
+
     // this._listStates = this._simpleList.filterByText('z', this._listStates);
     // this._simpleList.filterByGroup('Oceania');
     // this._simpleList.orderByColumn('6');
@@ -108,7 +111,6 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
   }
 
   private _renderHeader(): JSX.Element {
-    // console.log(this._listStates);
     return (
       <div className='Control-wrapper' >
         {/* <p>{`Filtro Texto Activo: '${this._listStates.filterText}'`}</p>
@@ -146,7 +148,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
             {/* Combo de operación de filtro */}
             <select style={{ textAlign: 'center' }} className='Control-styles' value={this.state.filterByTextAction} onChange={this._onChangeFilterByTextAction}>
-              {filterByTextActionsList.map((anAction: filterByTextAction, index) => {
+              {filterByTextActionsList().map((anAction: filterByTextAction, index) => {
                 return (
                   <option key={index} value={anAction.action} style={{ textAlign: 'center' }}>
                     {`${anAction.title}`}
@@ -169,7 +171,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
               {this._simpleList.state.groupableFields.map((aField: ISimpleListCol, index) => {
                 return (
                   <option key={index} value={aField.field}>
-                    {`Filtrar por ${aField.title}`}
+                    {`${strings.filterBy} ${aField.title}`}
                   </option>
                 )
               })}
@@ -202,6 +204,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
   }
 
   public render(): JSX.Element {
+    // console.log('SimpleListHtml render:');
     if (this.props.hidden) {
       return (<div></div>);
     } else {

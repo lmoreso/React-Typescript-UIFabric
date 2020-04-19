@@ -68,14 +68,12 @@ async function DownloadCountries(dataSource: dataSources): Promise<any> {
         fetch(URL_COUNTRIES)
           .then(res => {
             if (res) {
-              // console.log(res);
               resolve(res.json());
             } else {
               reject(`La url ${URL_COUNTRIES}, no ha devuelto nada.`);
             }
           })
           .catch(err => {
-            // console.log(`El error ha llegado al catch`, err);
             reject(err);
           });
       });
@@ -123,7 +121,6 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
     // DescargarPaises(origenesDatos.ninguno)
     DownloadCountries(dataSource)
       .then((datos) => {
-        // console.log(datos);
         this._data = datos;
         this._data.forEach((registro, indice) => {
           registro.key = indice.toString();
@@ -144,7 +141,6 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
         this.setState({ numRegs: datos.length, fetchResult: fetchResults.loadedOk });
       })
       .catch((err) => {
-        // console.log(`Error en la vista: ${err}`);
         this.setState({ numRegs: 0, fetchResult: fetchResults.loadedErr, fetchResultMessage: err });
       });
   }
@@ -154,7 +150,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
   }
 
   public render(): JSX.Element {
-    console.log('render:', 'this.state.estado', this.state.fetchResult, 'this.state.origenDatos', this.state.dataSource);
+    // console.log('RestCountriesExample render');
     if (this.state.fetchResult == fetchResults.loading) {
       return (
         <div>
