@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { ISimpleListHtmlProps } from './ISimpleListHtmlProps';
-import { ISimpleListCol, SimpleList, ALL_ITEMS_GROUPED_KEY, filterByTextActions, filterByTextActionLabel, filterByTextActionsLabels } from './ISimpleListLib';
+import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, filterByTextActionsList, IGroupedCol } from './ISimpleListLib';
 import './SimpleListHtml.css';
 
 const BACKGROUND_COLOR_DEF = 'DimGray';
@@ -11,9 +11,9 @@ interface ISimpleListHtmlStates {
   filterText: string;
   filterGroupedText: string;
   isCompactMode: boolean;
-  filterByGroupField: string;
+  filterByGroupField: IGroupedCol | undefined;
   filterByTextField: ISimpleListCol | undefined;
-  filterByTextAction: filterByTextActions;
+  filterByTextAction: filterByTextActionsId;
   requireFilterText: boolean;
 }
 
@@ -31,11 +31,11 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     this.state = {
       dataFiltered: this._simpleList.state.dataFiltered,
       filterText: this._simpleList.state.filterText,
-      filterGroupedText: this._simpleList.state.filterGroupedText,
+      filterGroupedText: this._simpleList.state.filterByGroupText,
       isCompactMode: (this.props.listCompactMode) ? true : false,
-      filterByGroupField: (this._simpleList.state.groupableFields.length > 0) ? this._simpleList.state.groupableFields[0].field : '',
+      filterByGroupField: (this._simpleList.state.groupableFields.length > 0) ? this._simpleList.state.groupableFields[0] : undefined,
       filterByTextField: (this._simpleList.state.filterableFields.length > 0) ? this._simpleList.state.filterableFields[0] : undefined,
-      filterByTextAction: this._simpleList.state.filterByTextAction,
+      filterByTextAction: this._simpleList.state.filterByTextActionId,
       requireFilterText: this._simpleList.state.requireFilterText,
     }
 
@@ -54,34 +54,37 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,
-      filterGroupedText: this._simpleList.state.filterGroupedText,
+      filterGroupedText: this._simpleList.state.filterByGroupText,
     });
   }
 
   private _onChangeGroupField(event: React.ChangeEvent<HTMLSelectElement>): void {
-    this.setState({
-      filterByGroupField: event.target.value,
-    });
+    this._simpleList.makeGroupedItemsList(event.target.value);
+    if (this._simpleList.state.filterByGroupField)
+      this.setState({
+        filterByGroupField: this._simpleList.state.filterByGroupField,
+        dataFiltered: this._simpleList.state.dataFiltered,
+      });
   }
 
   private _onChangeFilterByTextAction(event: React.ChangeEvent<HTMLSelectElement>): void {
-    this._filterByText(this.state.filterText, event.target.value as filterByTextActions, this.state.filterByTextField!);
+    this._filterByText(this.state.filterText, event.target.value as filterByTextActionsId, this.state.filterByTextField!);
   }
 
   private _onChangeFilterByTextField(event: React.ChangeEvent<HTMLSelectElement>): void {
-    let newFilterByTextField = this._simpleList.state.filterableFields.find(aColumn=>(aColumn.field == event.target.value));
+    let newFilterByTextField = this._simpleList.state.filterableFields.find(aColumn => (aColumn.field == event.target.value));
     if (newFilterByTextField)
       this._filterByText(this.state.filterText, this.state.filterByTextAction, newFilterByTextField);
   }
 
-  private _filterByText(textFilter: string, filterByTextAction: filterByTextActions, filterByTextField: ISimpleListCol): void {
+  private _filterByText(textFilter: string, filterByTextAction: filterByTextActionsId, filterByTextField: ISimpleListCol): void {
     this._simpleList.filterByText(textFilter, filterByTextAction, filterByTextField);
     // this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,
       filterText: this._simpleList.state.filterText,
-      filterGroupedText: this._simpleList.state.filterGroupedText,
-      filterByTextAction: this._simpleList.state.filterByTextAction,
+      filterGroupedText: this._simpleList.state.filterByGroupText,
+      filterByTextAction: this._simpleList.state.filterByTextActionId,
       filterByTextField: this._simpleList.state.filterByTextField,
       requireFilterText: this._simpleList.state.requireFilterText,
     });
@@ -143,7 +146,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
             {/* Combo de operación de filtro */}
             <select style={{ textAlign: 'center' }} className='Control-styles' value={this.state.filterByTextAction} onChange={this._onChangeFilterByTextAction}>
-              {filterByTextActionsLabels.map((anAction: filterByTextActionLabel, index) => {
+              {filterByTextActionsList.map((anAction: filterByTextAction, index) => {
                 return (
                   <option key={index} value={anAction.action} style={{ textAlign: 'center' }}>
                     {`${anAction.title}`}
@@ -151,7 +154,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                 )
               })}
             </select>
-            
+
             {/* Texto a filtrar */}
             <input disabled={!this.state.requireFilterText} className='Control-styles' type="text" value={this.state.filterText} onChange={this._onChangeFilterText} />
           </label>
@@ -162,7 +165,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
         {(this._simpleList.state.groupableFields.length <= 0) ? null :
           <label className='Control-styles'>
             {/* Combo de Campos Agrupables */}
-            <select style={{ textAlign: 'center' }} className='Control-styles' value={this.state.filterByGroupField} onChange={this._onChangeGroupField}>
+            <select style={{ textAlign: 'center' }} className='Control-styles' value={this.state.filterByGroupField!.field} onChange={this._onChangeGroupField}>
               {this._simpleList.state.groupableFields.map((aField: ISimpleListCol, index) => {
                 return (
                   <option key={index} value={aField.field}>
@@ -174,8 +177,8 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
             {/* Combo del Grupo Activo */}
             <select style={{ textAlign: 'center' }} className='Control-styles' value={this.state.filterGroupedText} onChange={this._onChangeGroupText}>
-              <option key={ALL_ITEMS_GROUPED_KEY} value={(this.props.fieldsDropdownFilter) ? this.props.fieldsDropdownFilter.valueNoFilter : undefined}>
-                {`${this.props.fieldsDropdownFilter!.valueNoFilter} (${this._simpleList.numItemsFilteredByText} ${this.props.labelItems})`}
+              <option key={-1} value={(this.state.filterByGroupField) ? this.state.filterByGroupField.valueNoFilter : undefined}>
+                {`${this.state.filterByGroupField!.valueNoFilter} (${this._simpleList.numItemsFilteredByText} ${this.props.labelItems})`}
               </option>
               {this._simpleList.state.groupedItems.map((aGroup, index) => {
                 return (

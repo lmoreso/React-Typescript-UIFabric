@@ -67,7 +67,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     this._filterByText(this.state.filterText, false);
   }
 
-  private _makeDropdownList(data: any[]): number {
+    private _makeDropdownList(data: any[]): number {
     let numItems: number = 0;
     let numGroups: number = 0;
 
@@ -76,14 +76,14 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
       let field = this.props.fieldDropdownFilter.field;
       let valueIfNull = this.props.fieldDropdownFilter.valueIfNull;
       // Calculamos la lista de Items agrupados
-      data.forEach(aRow => {
+      data.forEach((aRow, index) => {
         numItems++;
         let value = (aRow[field]) ? aRow[field] : valueIfNull;
         let newValue = this._groupedItems.find((aGroup) => (aGroup.value === value));
         if (newValue) {
           newValue.numOcurrences!++;
         } else {
-          this._groupedItems.push({ value, numOcurrences: 1 });
+          this._groupedItems.push({ key: index, value, numOcurrences: 1 });
           numGroups++;
         }
       })
