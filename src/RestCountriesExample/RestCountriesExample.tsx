@@ -55,6 +55,7 @@ interface IRestCountriesExampleStates {
   fetchResult: fetchResults;
   fetchResultMessage: string;
   dataSource: dataSources;
+  hiddenConfig: boolean;
 }
 
 export interface IRestCountriesExampleProps {
@@ -94,7 +95,7 @@ async function DownloadCountries(dataSource: dataSources): Promise<any> {
 export class RestCountriesExample extends React.Component<IRestCountriesExampleProps, IRestCountriesExampleStates> {
   private _data: any[];
   private _columns: IColumn[];
-
+  
   public constructor(props: IRestCountriesExampleProps) {
     super(props);
 
@@ -102,7 +103,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
     initStrings(detectLanguage(this.props.language));
 
     // Inicializar estados
-    this.state = { numRegs: 0, fetchResult: fetchResults.loading, fetchResultMessage: '', dataSource: DATA_SOURCE_DEF }
+    this.state = { numRegs: 0, fetchResult: fetchResults.loading, fetchResultMessage: '', dataSource: DATA_SOURCE_DEF, hiddenConfig: true }
 
     // Inicializar las columnas para el DetailList
     this._columns = new Array<IColumn>();
@@ -126,6 +127,13 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
       });
     })
 
+    // Binds de funciones
+    this._renderTitle = this._renderTitle.bind(this);
+    this._onClickButtonConfig = this._onClickButtonConfig.bind(this);
+  }
+
+  private _onClickButtonConfig(event: any): void {
+    this.setState({hiddenConfig: !this.state.hiddenConfig})
   }
 
   private _downloadCountries(dataSource: dataSources) {
@@ -162,20 +170,31 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
 
   private _renderTitle(): JSX.Element {
     return (
-      <div style={{
-        fontSize: 'large', display: 'flex', justifyContent: 'flex-end', padding: '4px', alignSelf: 'center', color: 'white',
-        backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%', 
-      }}>
-        <div style={{ alignSelf: 'left', verticalAlign: 'middle', width: '100%'}} >
-          {strings.title_App}
-          <small>
-            {` (${strings.agradecimiento} `}
-            <a target='_blank' style={{ color: 'white'}} href={URL_RESTCOUNTRIES_SITE}>{URL_RESTCOUNTRIES_SITE}</a>{')'}
-          </small>
+      <div>
+        <div style={{
+          fontSize: 'large', display: 'flex', justifyContent: 'flex-end', padding: '4px', alignSelf: 'center', color: 'white',
+          backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%', borderStyle: 'solid', borderColor: COLOR_TITLE_AND_TABLE_HEADER,
+          borderWidth: '2px',
+        }}>
+          <div style={{ alignSelf: 'left', verticalAlign: 'middle', width: '100%' }} >
+            {strings.title_App}
+            <small>
+              {` (${strings.agradecimiento} `}
+              <a target='_blank' style={{ color: 'white' }} href={URL_RESTCOUNTRIES_SITE}>{URL_RESTCOUNTRIES_SITE}</a>{')'}
+            </small>
+          </div>
+          <span style={{ verticalAlign: 'middle', width: '30px' }}>
+            <img onClick={this._onClickButtonConfig} src={imgConfig} title='Configuración ...' style={{ cursor:'pointer' }} />
+          </span>
         </div>
-        <span style={{ verticalAlign: 'middle', width: '30px'}}>
-          <img /* height='30' */  src={imgConfig} title='Configuración ...'/>
-        </span>
+        <div
+          hidden={this.state.hiddenConfig}
+          style={{
+            verticalAlign: 'middle', padding: '4px', height: '40px', borderStyle: 'solid', borderColor: COLOR_TITLE_AND_TABLE_HEADER,
+            borderWidth: '2px', width: '100%',
+          }}
+        >
+        </div>
       </div>
     );
   }
