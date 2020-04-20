@@ -10,6 +10,8 @@ import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 // import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from '../lib/SimpleListUIfabric/SimpleList';
 import { initStrings, strings, detectLanguage, } from './loc/RestCountriesStrings';
+import imgConfig from './recursos/config.svg';
+
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
 const URL_FLAGS = 'https://restcountries.eu/data/';
@@ -161,15 +163,18 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
   private _renderTitle(): JSX.Element {
     return (
       <div style={{
-        fontSize: 'large', display: 'flex', justifyContent: 'center', padding: '4px', alignSelf: 'center', color: 'white',
-        backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%'
+        fontSize: 'large', display: 'flex', justifyContent: 'flex-end', padding: '4px', alignSelf: 'center', color: 'white',
+        backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%', 
       }}>
-        <span >
+        <div style={{ alignSelf: 'left', verticalAlign: 'middle', width: '100%'}} >
           {strings.title_App}
           <small>
             {` (${strings.agradecimiento} `}
-            <a target='_blank' style={{ color: 'white', }} href={URL_RESTCOUNTRIES_SITE}>{URL_RESTCOUNTRIES_SITE}</a>{')'}
+            <a target='_blank' style={{ color: 'white'}} href={URL_RESTCOUNTRIES_SITE}>{URL_RESTCOUNTRIES_SITE}</a>{')'}
           </small>
+        </div>
+        <span style={{ verticalAlign: 'middle', width: '30px'}}>
+          <img /* height='30' */  src={imgConfig} title='Configuración ...'/>
         </span>
       </div>
     );
