@@ -9,7 +9,7 @@ import { SimpleListUIFabric } from '../lib/SimpleListUIfabric/SimpleListUIFabric
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 // import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from '../lib/SimpleListUIfabric/SimpleList';
-import { languagesSupported, stringToLanguagesSupported, DEFAULT_LANGUAGE, initStrings, strings, } from './loc/RestCountriesStrings';
+import { initStrings, strings, detectLanguage, } from './loc/RestCountriesStrings';
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
 const URL_FLAGS = 'https://restcountries.eu/data/';
@@ -25,8 +25,10 @@ enum fetchResults { loading, loadedOk, loadedErr }
 
 const DATA_SOURCE_DEF = dataSources.fromURL;
 
+const COLOR_TITLE_AND_TABLE_HEADER = 'DARKSLATEBLUE';
+
 function getRestCountriesColumns(): ISimpleListCol[] {
-  return(
+  return (
     [
       // { titulo: "Key", campo: "key", width: 10 },
       // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
@@ -42,7 +44,7 @@ function getRestCountriesColumns(): ISimpleListCol[] {
       { title: strings.field_NumHusos, field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true, isNumeric: true },
     ]
   )
-} 
+}
 
 interface IRestCountriesExampleStates {
   numRegs: number;
@@ -85,24 +87,6 @@ async function DownloadCountries(dataSource: dataSources): Promise<any> {
   }
 }
 
-function detectLanguage(languagePrefered?: string): languagesSupported {
-  // Detectar si el lenguaje preferido está implementado
-  let languageSelected = stringToLanguagesSupported(languagePrefered);
-
-  // si ho viene un lenguaje preferido, miramos si tenemos implementado el idioma preferente del navegador
-  if (!languageSelected)
-      languageSelected = stringToLanguagesSupported(navigator.language);
-
-  // para terminar, miramos si tenemos implementado alguno de los idiomas secundarios del navegador
-  if (!languageSelected)
-      navigator.languages.forEach(aLn => {
-          if (!languageSelected) languageSelected = stringToLanguagesSupported(aLn);
-      });
-
-  return ((languageSelected) ? languageSelected : DEFAULT_LANGUAGE);
-}
-
-
 export class RestCountriesExample extends React.Component<IRestCountriesExampleProps, IRestCountriesExampleStates> {
   private _data: any[];
   private _columns: IColumn[];
@@ -115,7 +99,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
 
     // Inicializar estados
     this.state = { numRegs: 0, fetchResult: fetchResults.loading, fetchResultMessage: '', dataSource: DATA_SOURCE_DEF }
-    
+
     // Inicializar las columnas para el DetailList
     this._columns = new Array<IColumn>();
     getRestCountriesColumns().forEach((aCountry: ISimpleListCol, indice) => {
@@ -173,28 +157,40 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
     this._downloadCountries(this.state.dataSource);
   }
 
+  private _renderTitle(): JSX.Element {
+  return (
+    <div style={{ fontSize: 'large', display: 'flex', justifyContent: 'center', padding: '4px', alignSelf: 'center', color: 'white', backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%' }}>
+      <span >{strings.title_App}</span>
+    </div>
+  );
+}
+
   public render(): JSX.Element {
-    // console.log('RestCountriesExample render');
-    if (this.state.fetchResult == fetchResults.loading) {
-      return (
-        <div>
-          <Label> {strings.model_Loading}</Label>
-          <Spinner size={SpinnerSize.large} />
-        </div>
-      );
-    } else if (this.state.fetchResult == fetchResults.loadedErr) {
-      return (
-        <div>
-          <h1>Se ha producido un error:</h1>
-          <p>{this.state.fetchResultMessage}</p>
-        </div>
-      );
-    } else if (this.props.showAsHtmlTable) {
-      return (
+  // console.log('RestCountriesExample render');
+  if (this.state.fetchResult == fetchResults.loading) {
+    return (
+      <div>
+        <this._renderTitle />
+        <Label> {strings.model_Loading}</Label>
+        <Spinner size={SpinnerSize.large} />
+      </div>
+    );
+  } else if (this.state.fetchResult == fetchResults.loadedErr) {
+    return (
+      <div>
+        <this._renderTitle />
+        <h1>Se ha producido un error:</h1>
+        <p>{this.state.fetchResultMessage}</p>
+      </div>
+    );
+  } else if (this.props.showAsHtmlTable) {
+    return (
+      <div>
+        <this._renderTitle />
         <SimpleListHtml
           hidden={false}
           data={this._data}
-          labelItem={strings.label_Pais }
+          labelItem={strings.label_Pais}
           labelItems={strings.label_Paises}
           columns={getRestCountriesColumns()}
           listCompactMode={false}
@@ -202,11 +198,14 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
           showLabel={true}
           heightInPx={600}
           language={this.props.language}
-        // backgroundColorHeader='blue'
+          backgroundColorHeader={COLOR_TITLE_AND_TABLE_HEADER}
         />
-      )
-    } else {
-      return (
+      </div>
+    )
+  } else {
+    return (
+      <div>
+        <this._renderTitle />
         <SimpleListUIFabric
           hidden={false}
           data={this._data}
@@ -220,9 +219,10 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
           fixedHeader={false}
           showLabel={false}
         />
-      );
-    }
+      </div>
+    );
   }
+}
 }
 
 

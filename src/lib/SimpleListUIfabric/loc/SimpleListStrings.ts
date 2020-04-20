@@ -32,3 +32,21 @@ export function stringToLanguagesSupported(language?: string): languagesSupporte
 }
 
 export const DEFAULT_LANGUAGE = languagesSupported.en;
+
+export function detectLanguage(languagePrefered?: string): languagesSupported {
+    // Detectar si el lenguaje preferido está implementado
+    let languageSelected = stringToLanguagesSupported(languagePrefered);
+
+    // si ho viene un lenguaje preferido, miramos si tenemos implementado el idioma preferente del navegador
+    if (!languageSelected)
+        languageSelected = stringToLanguagesSupported(navigator.language);
+
+    // para terminar, miramos si tenemos implementado alguno de los idiomas secundarios del navegador
+    if (!languageSelected)
+        navigator.languages.forEach(aLn => {
+            if (!languageSelected) languageSelected = stringToLanguagesSupported(aLn);
+        });
+
+    return ((languageSelected) ? languageSelected : DEFAULT_LANGUAGE);
+}
+
