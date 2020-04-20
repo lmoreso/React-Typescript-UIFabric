@@ -1,6 +1,8 @@
-export enum languagesSupported { es = 'es', ca = 'ca', en='en'/* , fr='fr' */ }
+export enum languagesSupported { es = 'es', ca = 'ca', en='en', fr='fr' }
 
 export interface ISimpleListStrings {
+    order_ClickToOrder: any;
+    order_CantOrder: string;
     groupAll: string;
     groupWithout: any;
     filterAction_notNull: string;
@@ -28,4 +30,4 @@ export function stringToLanguagesSupported(language?: string): languagesSupporte
     return (undefined);
 }
 
-export const DEFAULT_LANGUAGE = languagesSupported.es;
+export const DEFAULT_LANGUAGE = languagesSupported.en;
