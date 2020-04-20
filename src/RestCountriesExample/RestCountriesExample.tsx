@@ -13,6 +13,8 @@ import { initStrings, strings, detectLanguage, } from './loc/RestCountriesString
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
 const URL_FLAGS = 'https://restcountries.eu/data/';
+const URL_RESTCOUNTRIES_SITE = 'https://restcountries.eu/';
+
 const URL_FLAGS_EXT = 'svg';
 const JSON_DATA = require('./recursos/countries.json');
 
@@ -135,10 +137,9 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
           registro.Pais = registro.translations.es;
           registro.numHusos = registro.timezones.length;
           registro.idiomas = (Array.isArray(registro.languages)) ? registro.languages.join(', ') : registro.languages;
-          registro.husosTooltip = (Array.isArray(registro.timezones) ? registro.timezones.join(', ') : '')
+          registro.husosTooltip = (Array.isArray(registro.timezones) ? registro.timezones.join(', ') : '');
           registro.wikiEnUrl = `${URL_WIKIPEDIA_EN}/${registro.name}`;
           registro.wikiEsUrl = `${URL_WIKIPEDIA_ES}/${registro.translations.es}`;
-          // registro.banderaUrl = `${URL_FLAGS}${registro.name.toString().replace(/ /g, URL_FLAGS_SEP).toLowerCase()}.${URL_FLAGS_EXT}`;
           registro.banderaUrl = `${URL_FLAGS}${registro.alpha3Code.toString().toLowerCase()}.${URL_FLAGS_EXT}`;
           registro.mapsPaisUrl = `${URL_MAPS}${registro.name}, country of ${registro.subregion}`;
           registro.mapsContinenteUrl = `${URL_MAPS}${registro.region}, continent`;
@@ -158,71 +159,80 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
   }
 
   private _renderTitle(): JSX.Element {
-  return (
-    <div style={{ fontSize: 'large', display: 'flex', justifyContent: 'center', padding: '4px', alignSelf: 'center', color: 'white', backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%' }}>
-      <span >{strings.title_App}</span>
-    </div>
-  );
-}
-
-  public render(): JSX.Element {
-  // console.log('RestCountriesExample render');
-  if (this.state.fetchResult == fetchResults.loading) {
     return (
-      <div>
-        <this._renderTitle />
-        <Label> {strings.model_Loading}</Label>
-        <Spinner size={SpinnerSize.large} />
-      </div>
-    );
-  } else if (this.state.fetchResult == fetchResults.loadedErr) {
-    return (
-      <div>
-        <this._renderTitle />
-        <h1>Se ha producido un error:</h1>
-        <p>{this.state.fetchResultMessage}</p>
-      </div>
-    );
-  } else if (this.props.showAsHtmlTable) {
-    return (
-      <div>
-        <this._renderTitle />
-        <SimpleListHtml
-          hidden={false}
-          data={this._data}
-          labelItem={strings.label_Pais}
-          labelItems={strings.label_Paises}
-          columns={getRestCountriesColumns()}
-          listCompactMode={false}
-          showToggleCompactMode={true}
-          showLabel={true}
-          heightInPx={600}
-          language={this.props.language}
-          backgroundColorHeader={COLOR_TITLE_AND_TABLE_HEADER}
-        />
-      </div>
-    )
-  } else {
-    return (
-      <div>
-        <this._renderTitle />
-        <SimpleListUIFabric
-          hidden={false}
-          data={this._data}
-          labelItem='Pais'
-          labelItems='Paises'
-          columns={getRestCountriesColumns()}
-          fieldsTextFilter={['Paises', 'name', 'nativeName']}
-          fieldDropdownFilter={{ valueIfNull: 'Without Continent', field: 'region', valueNoFilter: 'Todos los Continentes' }}
-          listCompactMode={true}
-          showToggleCompactMode={false}
-          fixedHeader={false}
-          showLabel={false}
-        />
+      <div style={{
+        fontSize: 'large', display: 'flex', justifyContent: 'center', padding: '4px', alignSelf: 'center', color: 'white',
+        backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%'
+      }}>
+        <span >
+          {strings.title_App}
+          <small>
+            {` (${strings.agradecimiento} `}
+            <a target='_blank' style={{ color: 'white', }} href={URL_RESTCOUNTRIES_SITE}>{URL_RESTCOUNTRIES_SITE}</a>{')'}
+          </small>
+        </span>
       </div>
     );
   }
-}
+
+  public render(): JSX.Element {
+    // console.log('RestCountriesExample render');
+    if (this.state.fetchResult == fetchResults.loading) {
+      return (
+        <div>
+          <this._renderTitle />
+          <Label> {strings.model_Loading}</Label>
+          <Spinner size={SpinnerSize.large} />
+        </div>
+      );
+    } else if (this.state.fetchResult == fetchResults.loadedErr) {
+      return (
+        <div>
+          <this._renderTitle />
+          <h1>Se ha producido un error:</h1>
+          <p>{this.state.fetchResultMessage}</p>
+        </div>
+      );
+    } else if (this.props.showAsHtmlTable) {
+      return (
+        <div>
+          <this._renderTitle />
+          <SimpleListHtml
+            hidden={false}
+            data={this._data}
+            labelItem={strings.label_Pais}
+            labelItems={strings.label_Paises}
+            columns={getRestCountriesColumns()}
+            listCompactMode={false}
+            showToggleCompactMode={false}
+            showLabel={false}
+            heightInPx={600}
+            language={this.props.language}
+            backgroundColorHeader={COLOR_TITLE_AND_TABLE_HEADER}
+          />
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          <this._renderTitle />
+          <SimpleListUIFabric
+            hidden={false}
+            data={this._data}
+            labelItem='Pais'
+            labelItems='Paises'
+            columns={getRestCountriesColumns()}
+            fieldsTextFilter={['Paises', 'name', 'nativeName']}
+            fieldDropdownFilter={{ valueIfNull: 'Without Continent', field: 'region', valueNoFilter: 'Todos los Continentes' }}
+            listCompactMode={true}
+            showToggleCompactMode={false}
+            fixedHeader={false}
+            showLabel={false}
+          />
+        </div>
+      );
+    }
+  }
 }
 
 

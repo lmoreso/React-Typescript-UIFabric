@@ -1,6 +1,7 @@
 import {ISimpleListStrings} from './RestCountriesStrings';
 
 export const strings: ISimpleListStrings = {
+    agradecimiento: 'grâce au Service Rest de',
     model_Loading: 'Attendez quelques secondes',
     title_App: 'Pays et Drapeaux du Monde', 
     label_Paises: 'Pays',

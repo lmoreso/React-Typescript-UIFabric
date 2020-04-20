@@ -1,6 +1,7 @@
 export enum languagesSupported { es = 'es', ca = 'ca', en='en', fr='fr' }
 
 export interface ISimpleListStrings {
+    agradecimiento: string;
     model_Loading: string;
     title_App: string;
     label_Paises: string;
