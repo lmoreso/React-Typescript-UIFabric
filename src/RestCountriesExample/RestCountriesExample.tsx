@@ -9,6 +9,7 @@ import { SimpleListUIFabric } from '../lib/SimpleListUIfabric/SimpleListUIFabric
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 // import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from '../lib/SimpleListUIfabric/SimpleList';
+import { languagesSupported, stringToLanguagesSupported, DEFAULT_LANGUAGE, initStrings, strings, } from './loc/RestCountriesStrings';
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
 const URL_FLAGS = 'https://restcountries.eu/data/';
@@ -24,20 +25,24 @@ enum fetchResults { loading, loadedOk, loadedErr }
 
 const DATA_SOURCE_DEF = dataSources.fromURL;
 
-const COLUMNS_DEF: ISimpleListCol[] = [
-  // { titulo: "Key", campo: "key", width: 10 },
-  // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
-  { title: "Bandera", field: "banderaUrl", width: 35, isImage: true },
-  { title: "Nombre Nativo", field: "nativeName", width: 150, fieldUrl: "mapsPaisUrl", canSortAndFilter: true },
-  { title: "Nombre Inglés", field: "name", width: 150, fieldUrl: "wikiEnUrl", canSortAndFilter: true },
-  { title: "Nombre Español", field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSortAndFilter: true },
-  { title: "Capital", field: "capital", width: 120, fieldUrl: "mapsCapitalUrl", canSortAndFilter: true },
-  { title: "Continente", field: "region", width: 100, fieldUrl: "mapsContinenteUrl", canSortAndFilter: true, canGroup: true },
-  { title: "Región", field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", canSortAndFilter: true, canGroup: true },
-  { title: "Siglas", field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true },
-  { title: "Idiomas", field: "idiomas", width: 100, canSortAndFilter: false },
-  { title: "Nº Husos", field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true, isNumeric: true },
-]
+function getRestCountriesColumns(): ISimpleListCol[] {
+  return(
+    [
+      // { titulo: "Key", campo: "key", width: 10 },
+      // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
+      { title: strings.field_Flag, field: "banderaUrl", width: 35, isImage: true },
+      { title: strings.field_NativeName, field: "nativeName", width: 150, fieldUrl: "mapsPaisUrl", canSortAndFilter: true },
+      { title: strings.field_EnglishName, field: "name", width: 150, fieldUrl: "wikiEnUrl", canSortAndFilter: true },
+      { title: strings.field_SpanishName, field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSortAndFilter: true },
+      { title: strings.field_Capital, field: "capital", width: 120, fieldUrl: "mapsCapitalUrl", canSortAndFilter: true },
+      { title: strings.field_Continente, field: "region", width: 100, fieldUrl: "mapsContinenteUrl", canSortAndFilter: true, canGroup: true },
+      { title: strings.field_Region, field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", canSortAndFilter: true, canGroup: true },
+      { title: strings.field_Siglas, field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true },
+      { title: strings.field_Idiomas, field: "idiomas", width: 100, canSortAndFilter: false },
+      { title: strings.field_NumHusos, field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true, isNumeric: true },
+    ]
+  )
+} 
 
 interface IRestCountriesExampleStates {
   numRegs: number;
@@ -46,10 +51,8 @@ interface IRestCountriesExampleStates {
   dataSource: dataSources;
 }
 
-export enum languages { es, fr, en };
-
 export interface IRestCountriesExampleProps {
-  language?: languages;
+  language?: string;
   showAsHtmlTable?: boolean;
 };
 
@@ -82,6 +85,24 @@ async function DownloadCountries(dataSource: dataSources): Promise<any> {
   }
 }
 
+function detectLanguage(languagePrefered?: string): languagesSupported {
+  // Detectar si el lenguaje preferido está implementado
+  let languageSelected = stringToLanguagesSupported(languagePrefered);
+
+  // si ho viene un lenguaje preferido, miramos si tenemos implementado el idioma preferente del navegador
+  if (!languageSelected)
+      languageSelected = stringToLanguagesSupported(navigator.language);
+
+  // para terminar, miramos si tenemos implementado alguno de los idiomas secundarios del navegador
+  if (!languageSelected)
+      navigator.languages.forEach(aLn => {
+          if (!languageSelected) languageSelected = stringToLanguagesSupported(aLn);
+      });
+
+  return ((languageSelected) ? languageSelected : DEFAULT_LANGUAGE);
+}
+
+
 export class RestCountriesExample extends React.Component<IRestCountriesExampleProps, IRestCountriesExampleStates> {
   private _data: any[];
   private _columns: IColumn[];
@@ -89,12 +110,15 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
   public constructor(props: IRestCountriesExampleProps) {
     super(props);
 
+    // cargar traducciones
+    initStrings(detectLanguage(this.props.language));
+
     // Inicializar estados
     this.state = { numRegs: 0, fetchResult: fetchResults.loading, fetchResultMessage: '', dataSource: DATA_SOURCE_DEF }
-
+    
     // Inicializar las columnas para el DetailList
     this._columns = new Array<IColumn>();
-    COLUMNS_DEF.forEach((aCountry: ISimpleListCol, indice) => {
+    getRestCountriesColumns().forEach((aCountry: ISimpleListCol, indice) => {
       this._columns.push({
         key: indice.toString(),
         name: aCountry.title,
@@ -154,7 +178,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
     if (this.state.fetchResult == fetchResults.loading) {
       return (
         <div>
-          <Label>Cargando ...</Label>
+          <Label> {strings.model_Loading}</Label>
           <Spinner size={SpinnerSize.large} />
         </div>
       );
@@ -170,16 +194,17 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
         <SimpleListHtml
           hidden={false}
           data={this._data}
-          labelItem='Pais'
-          labelItems='Paises'
-          columns={COLUMNS_DEF}
+          labelItem={strings.label_Pais }
+          labelItems={strings.label_Paises}
+          columns={getRestCountriesColumns()}
           listCompactMode={false}
           showToggleCompactMode={true}
           showLabel={true}
           heightInPx={600}
-          // backgroundColorHeader='blue'
+          language={this.props.language}
+        // backgroundColorHeader='blue'
         />
-       )
+      )
     } else {
       return (
         <SimpleListUIFabric
@@ -187,7 +212,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
           data={this._data}
           labelItem='Pais'
           labelItems='Paises'
-          columns={COLUMNS_DEF}
+          columns={getRestCountriesColumns()}
           fieldsTextFilter={['Paises', 'name', 'nativeName']}
           fieldDropdownFilter={{ valueIfNull: 'Without Continent', field: 'region', valueNoFilter: 'Todos los Continentes' }}
           listCompactMode={true}

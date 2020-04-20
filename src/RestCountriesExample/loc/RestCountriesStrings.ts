@@ -1,17 +1,20 @@
 export enum languagesSupported { es = 'es', ca = 'ca', en='en', fr='fr' }
 
 export interface ISimpleListStrings {
-    config_CompactMode: string;
-    order_ClickToOrder: string;
-    order_CantOrder: string;
-    groupAll: string;
-    groupWithout: string;
-    filterAction_notNull: string;
-    filterAction_nullValue: string;
-    filterAction_FinishBy: string;
-    filterAction_Contains: string;
-    filterAction_StartsBy: string;
-    filterBy: string;
+    model_Loading: string;
+    title_App: string;
+    label_Paises: string;
+    label_Pais: string;
+    field_NumHusos: string;
+    field_Idiomas: string;
+    field_Siglas: string;
+    field_Region: string;
+    field_Continente: string;
+    field_Capital: string;
+    field_Flag: string;
+    field_NativeName: string;
+    field_EnglishName: string;
+    field_SpanishName: string;
 }
 
 export let strings: ISimpleListStrings;

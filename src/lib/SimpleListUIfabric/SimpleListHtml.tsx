@@ -112,7 +112,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
         {/* CheckBox CompactMode */}
         {(!this.props.showToggleCompactMode) ? null :
           <label className='Control-styles'>
-            Muestra la lista en modo 'Compacto'
+            {strings.config_CompactMode}
             <input
               name="ToggleCompactMode"
               type="checkbox"
@@ -238,12 +238,12 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                     styleCH.width = aColumn.width;
                     return (
                       <th
+                        key={aColumn.key}
                         onClick={(!aColumn.canSortAndFilter) ? undefined : (event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>) => {
                           this._onClickHeaderColumn(aColumn.key!);
                         }}
                         style={styleCH} className='Table-header-cell'
                         // key={`-1_${indice.toString()}`}
-                        key={aColumn.key}
                         title={(!aColumn.canSortAndFilter) ?
                           strings.order_CantOrder.replace('[%s]', aColumn.title)
                           :

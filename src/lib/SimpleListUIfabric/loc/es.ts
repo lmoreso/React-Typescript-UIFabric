@@ -1,6 +1,7 @@
 import {ISimpleListStrings} from './SimpleListStrings';
 
 export const strings: ISimpleListStrings = {
+    config_CompactMode: 'Muestra la lista en modo "Compacto"',
     order_ClickToOrder: 'Clica para ordenar la lista por "[%s]"',
     order_CantOrder: 'La columna "[%s]" no se puede ordenar',
     groupAll: 'Todos',
