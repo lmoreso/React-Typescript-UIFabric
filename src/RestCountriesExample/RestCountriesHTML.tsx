@@ -23,7 +23,7 @@ const URL_WIKIPEDIA_ES = 'https://es.wikipedia.org/wiki'
 enum dataSources { fromURL, fromJson, fromJsonWithDelay };
 enum fetchResults { loading, loadedOk, loadedErr }
 
-const DATA_SOURCE_DEF = dataSources.fromURL;
+const DATA_SOURCE_DEF = dataSources.fromJsonWithDelay;
 
 const COLOR_TITLE_AND_TABLE_HEADER = 'DARKSLATEBLUE';
 
@@ -66,7 +66,7 @@ async function DownloadCountries(dataSource: dataSources): Promise<any> {
       return new Promise((resolve) => {
         setTimeout(function () {
           resolve(JSON_DATA);
-        }, 2000);
+        }, 800);
       })
     case dataSources.fromJson:
       return new Promise((resolve) => { resolve(JSON_DATA); })
@@ -121,7 +121,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       fetchResult: fetchResults.loading,
       fetchResultMessage: '',
       dataSource: DATA_SOURCE_DEF,
-      hiddenConfig: true,
+      hiddenConfig: false,
       isCompactMode: true,
       language: this._loadStrings(stringToLanguagesSupported(this.props.language)),
     }
@@ -133,6 +133,14 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     this._onClickButtonConfig = this._onClickButtonConfig.bind(this);
     this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
     this._onChangeComboIdiomas = this._onChangeComboIdiomas.bind(this);
+    this._onChangeCheckBoxIsUrl = this._onChangeCheckBoxIsUrl.bind(this);
+  }
+
+  private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
+    let checked: boolean = event.target.checked; 
+    let dataSource = (checked) ? dataSources.fromURL : dataSources.fromJsonWithDelay;
+
+    this._downloadCountries(dataSource);
   }
 
   private _onChangeComboIdiomas(event: ChangeEvent<HTMLSelectElement>): void {
@@ -211,7 +219,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
 
     let cssConfigBody: React.CSSProperties = {
       margin: '2px 2px 2px 2px',
-      verticalAlign: 'middle',
+      verticalAlign: 'baseline',
     }
 
     let cssTitleHeader: React.CSSProperties = {
@@ -244,7 +252,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
             {/* Checkbox isCompactMode */}
             <label style={cssConfigBody}>
               {strings.config_CompactMode}
-              <input
+              <input style={{ marginLeft: '2px' }}
                 name="ToggleCompactMode"
                 type="checkbox"
                 checked={this.state.isCompactMode}
@@ -264,7 +272,17 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
                   )
                 })}
               </select>
+            </label>
 
+            {/* Checkbox dataSource */}
+            <label style={cssConfigBody}>
+              {'Descargar Banderas de restCountries.eu'}
+              <input style={{ textAlign: 'center', marginLeft: '2px' }}
+                name="ToggleIsUrl"
+                type="checkbox"
+                checked={this.state.dataSource == dataSources.fromURL}
+                onChange={this._onChangeCheckBoxIsUrl}
+              />
             </label>
 
           </div>
