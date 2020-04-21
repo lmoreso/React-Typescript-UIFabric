@@ -175,13 +175,8 @@ export class SimpleList {
         this._allItems = props.data.slice(0);
         this._ItemsFilteredByText = this._allItems.slice(0);
 
-        this.props.columns.forEach((aColumn: ISimpleListCol, indice) => {
-            aColumn.key = indice.toString();
-        });
-        
         // cargar traducciones
         initStrings(detectLanguage(this.props.language));
-
  
         // Inicializar estados
         this._state = {

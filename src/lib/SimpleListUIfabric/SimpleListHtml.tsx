@@ -25,7 +25,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     super(props);
 
     this._simpleList = new SimpleList(props);
- 
+
     this.state = {
       dataFiltered: this._simpleList.state.dataFiltered,
       filterText: this._simpleList.state.filterText,
@@ -236,14 +236,16 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                     }
                     let styleCH = { ...styleCellHeader };
                     styleCH.width = aColumn.width;
+                    if (aColumn.canSortAndFilter)
+                      styleCH.cursor = 'pointer';
                     return (
                       <th
-                        key={aColumn.key}
+                        // key={aColumn.key}
+                        key={`-1_${indice.toString()}`}
                         onClick={(!aColumn.canSortAndFilter) ? undefined : (event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>) => {
                           this._onClickHeaderColumn(aColumn.key!);
                         }}
                         style={styleCH} className='Table-header-cell'
-                        // key={`-1_${indice.toString()}`}
                         title={(!aColumn.canSortAndFilter) ?
                           strings.order_CantOrder.replace('[%s]', aColumn.title)
                           :

@@ -94,21 +94,29 @@ async function DownloadCountries(dataSource: dataSources): Promise<any> {
 
 export class RestCountriesExample extends React.Component<IRestCountriesExampleProps, IRestCountriesExampleStates> {
   private _data: any[];
-  private _columns: IColumn[];
+  private _columnsUIFabric: IColumn[];
+  private _simpleListColumns: ISimpleListCol[];
   
   public constructor(props: IRestCountriesExampleProps) {
     super(props);
+     // cargar traducciones
+     initStrings(detectLanguage(this.props.language));
 
-    // cargar traducciones
-    initStrings(detectLanguage(this.props.language));
+     // Copiar columnas y calcular su key
+    this._simpleListColumns = new Array<ISimpleListCol>();
+    getRestCountriesColumns().forEach((theColumn: ISimpleListCol, indice) => {
+      let aCol = {...theColumn};
+      aCol.key = indice.toString();
+      this._simpleListColumns.push(aCol); 
+    })
 
     // Inicializar estados
     this.state = { numRegs: 0, fetchResult: fetchResults.loading, fetchResultMessage: '', dataSource: DATA_SOURCE_DEF, hiddenConfig: true }
 
     // Inicializar las columnas para el DetailList
-    this._columns = new Array<IColumn>();
-    getRestCountriesColumns().forEach((aCountry: ISimpleListCol, indice) => {
-      this._columns.push({
+    this._columnsUIFabric = new Array<IColumn>();
+    this._simpleListColumns.forEach((aCountry: ISimpleListCol, indice) => {
+      this._columnsUIFabric.push({
         key: indice.toString(),
         name: aCountry.title,
         fieldName: aCountry.field,
@@ -156,7 +164,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
           registro.mapsRegionUrl = `${URL_MAPS}${registro.subregion}, region of ${registro.region}`;
           registro.mapsCapitalUrl = `${URL_MAPS}${registro.capital}, city of ${registro.name}`;
         })
-        console.log(this._data[5]);
+        // console.log(this._data[5]);
         this.setState({ numRegs: datos.length, fetchResult: fetchResults.loadedOk });
       })
       .catch((err) => {
@@ -169,6 +177,30 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
   }
 
   private _renderTitle(): JSX.Element {
+/*     let cssConfigHeader: React.CSSProperties = {
+      verticalAlign: 'middle',
+      padding: '4px',
+      height: '40px',
+      borderStyle: 'solid',
+      borderColor: COLOR_TITLE_AND_TABLE_HEADER,
+      borderWidth: '2px', width: '100%',
+      display: 'flex',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      justifyContent: 'spaceEvenly',
+    };
+
+    let cssConfigBody: React.CSSProperties = {
+      margin: '2px 2px 2px 2px',
+      verticalAlign: 'middle',
+    }
+
+    let cssTitleHeader: React.CSSProperties = {
+      fontSize: 'large', display: 'flex', justifyContent: 'flex-end', padding: '4px', alignSelf: 'center', color: 'white',
+      backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%', borderStyle: 'solid', borderColor: COLOR_TITLE_AND_TABLE_HEADER,
+      borderWidth: '2px',
+    }
+ */
     return (
       <div>
         <div style={{
@@ -176,7 +208,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
           backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%', borderStyle: 'solid', borderColor: COLOR_TITLE_AND_TABLE_HEADER,
           borderWidth: '2px',
         }}>
-          <div style={{ alignSelf: 'left', verticalAlign: 'middle', width: '100%' }} >
+          <div style={{ verticalAlign: 'middle', width: '100%' }} >
             {strings.title_App}
             <small>
               {` (${strings.agradecimiento} `}
@@ -226,7 +258,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
             data={this._data}
             labelItem={strings.label_Pais}
             labelItems={strings.label_Paises}
-            columns={getRestCountriesColumns()}
+            columns={this._simpleListColumns}
             listCompactMode={false}
             showToggleCompactMode={false}
             showLabel={false}

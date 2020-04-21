@@ -22,7 +22,6 @@ export let strings: ISimpleListStrings;
 
 export function initStrings(ln: languagesSupported): void {
     strings = require(`./${ln}`).strings;
-    console.log('initStrings', strings);
 }
 
 export function stringToLanguagesSupported(language?: string): languagesSupported | undefined {
