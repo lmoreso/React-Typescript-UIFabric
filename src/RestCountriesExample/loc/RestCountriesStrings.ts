@@ -45,6 +45,7 @@ export function stringToLanguagesSupported(language?: string): languagesSupporte
   return (undefined);
 }
 
+
 export function detectLanguage(languagePrefered?: string): languagesSupportedIds {
   // Detectar si el lenguaje preferido está implementado
   let languageSelected = stringToLanguagesSupported(languagePrefered);

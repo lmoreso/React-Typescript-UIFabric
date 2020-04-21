@@ -8,7 +8,8 @@ import { Sticky, /* StickyPositionType */ } from 'office-ui-fabric-react/lib/Sti
 // Aplicattion imports
 import { DetailsListDocumentsExample } from './FluentUiExamples/DetailListDocumentsExample';
 import { ScrollablePaneDetailsListExample } from './FluentUiExamples/ScrollablePaneExample';
-import { RestCountriesExample } from './RestCountriesExample/RestCountriesExample';
+import { RestCountriesHTML } from './RestCountriesExample/RestCountriesHTML';
+import { RestCountriesUIFabric } from './RestCountriesExample/RestCountriesUIFabric';
 
 enum menuOptionsId { restCountriesUIFabric = 1, restCountriesHtml, fabricListDocExample, scrollablePaneExample }
 const DEF_MENU_ID: menuOptionsId = menuOptionsId.restCountriesHtml;
@@ -94,12 +95,11 @@ export class MainView extends React.Component<IMainViewProps, IMainViewStates> {
             {(this._isMenuActive(menuOptionsId.scrollablePaneExample)) ? <ScrollablePaneDetailsListExample /> : null}
 
             {(!this._isMenuActive(menuOptionsId.restCountriesUIFabric)) ? null :
-              <RestCountriesExample />
+              <RestCountriesUIFabric />
             }
 
             {(!this._isMenuActive(menuOptionsId.restCountriesHtml)) ? null :
-              <RestCountriesExample
-                showAsHtmlTable={true}
+              <RestCountriesHTML
               />
             }
 
