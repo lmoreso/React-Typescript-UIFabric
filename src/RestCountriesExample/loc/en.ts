@@ -1,6 +1,10 @@
 import {ISimpleListStrings} from './RestCountriesStrings';
 
 export const strings: ISimpleListStrings = {
+    config_SelectLanguage: "Select Language", 
+    header_ShowConfig: 'Show Settings',
+    header_HideConfig: 'Hide Settings',
+     config_CompactMode: 'Displays the list in "Compact" mode',
     agradecimiento: 'thanks to the Rest Service ',
     model_Loading: 'Loading ...',
     title_App: 'Countries and Flags of the World', 

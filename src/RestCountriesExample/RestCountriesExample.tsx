@@ -9,8 +9,9 @@ import { SimpleListUIFabric } from '../lib/SimpleListUIfabric/SimpleListUIFabric
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 // import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from '../lib/SimpleListUIfabric/SimpleList';
-import { initStrings, strings, detectLanguage, } from './loc/RestCountriesStrings';
+import { initStrings, strings, detectLanguage, languagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
 import imgConfig from './recursos/config.svg';
+import { ChangeEvent } from 'react';
 
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
@@ -56,6 +57,8 @@ interface IRestCountriesExampleStates {
   fetchResultMessage: string;
   dataSource: dataSources;
   hiddenConfig: boolean;
+  isCompactMode: boolean;
+  language: string;
 }
 
 export interface IRestCountriesExampleProps {
@@ -96,22 +99,32 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
   private _data: any[];
   private _columnsUIFabric: IColumn[];
   private _simpleListColumns: ISimpleListCol[];
-  
+  private _simpleListRef = React.createRef<SimpleListHtml>();
+
   public constructor(props: IRestCountriesExampleProps) {
     super(props);
-     // cargar traducciones
-     initStrings(detectLanguage(this.props.language));
+    // cargar traducciones
+    let languageDetected = detectLanguage(this.props.language);
+    initStrings(languageDetected);
 
-     // Copiar columnas y calcular su key
+    // Copiar columnas y calcular su key
     this._simpleListColumns = new Array<ISimpleListCol>();
     getRestCountriesColumns().forEach((theColumn: ISimpleListCol, indice) => {
-      let aCol = {...theColumn};
+      let aCol = { ...theColumn };
       aCol.key = indice.toString();
-      this._simpleListColumns.push(aCol); 
+      this._simpleListColumns.push(aCol);
     })
 
     // Inicializar estados
-    this.state = { numRegs: 0, fetchResult: fetchResults.loading, fetchResultMessage: '', dataSource: DATA_SOURCE_DEF, hiddenConfig: true }
+    this.state = {
+      numRegs: 0,
+      fetchResult: fetchResults.loading,
+      fetchResultMessage: '',
+      dataSource: DATA_SOURCE_DEF,
+      hiddenConfig: true,
+      isCompactMode: true,
+      language: languageDetected,
+    }
 
     // Inicializar las columnas para el DetailList
     this._columnsUIFabric = new Array<IColumn>();
@@ -138,10 +151,24 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
     // Binds de funciones
     this._renderTitle = this._renderTitle.bind(this);
     this._onClickButtonConfig = this._onClickButtonConfig.bind(this);
+    this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
+    this._onChangeComboIdiomas = this._onChangeComboIdiomas.bind(this);
+  }
+
+  private _onChangeComboIdiomas(event: ChangeEvent<HTMLSelectElement>): void {
+    initStrings(event.target.value as languagesSupportedIds )
+    this.setState({ language: event.target.value });
   }
 
   private _onClickButtonConfig(event: any): void {
-    this.setState({hiddenConfig: !this.state.hiddenConfig})
+    // console.log('_onClickButtonConfig');
+    this.setState({ hiddenConfig: !this.state.hiddenConfig });
+  }
+
+  private _onChangeCheckBoxCompactMode(event: React.ChangeEvent<HTMLInputElement>): void {
+    let checked: boolean = !this.state.isCompactMode;  // event.target.checked
+    this.setState({ isCompactMode: checked, });
+    this._simpleListRef.current!.setState({ isCompactMode: checked, });
   }
 
   private _downloadCountries(dataSource: dataSources) {
@@ -177,7 +204,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
   }
 
   private _renderTitle(): JSX.Element {
-/*     let cssConfigHeader: React.CSSProperties = {
+    let cssConfigHeader: React.CSSProperties = {
       verticalAlign: 'middle',
       padding: '4px',
       height: '40px',
@@ -187,7 +214,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
       display: 'flex',
       flexWrap: 'wrap',
       alignItems: 'center',
-      justifyContent: 'spaceEvenly',
+      justifyContent: 'space-evenly',
     };
 
     let cssConfigBody: React.CSSProperties = {
@@ -200,14 +227,10 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
       backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%', borderStyle: 'solid', borderColor: COLOR_TITLE_AND_TABLE_HEADER,
       borderWidth: '2px',
     }
- */
+
     return (
       <div>
-        <div style={{
-          fontSize: 'large', display: 'flex', justifyContent: 'flex-end', padding: '4px', alignSelf: 'center', color: 'white',
-          backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%', borderStyle: 'solid', borderColor: COLOR_TITLE_AND_TABLE_HEADER,
-          borderWidth: '2px',
-        }}>
+        <div style={cssTitleHeader}>
           <div style={{ verticalAlign: 'middle', width: '100%' }} >
             {strings.title_App}
             <small>
@@ -216,23 +239,50 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
             </small>
           </div>
           <span style={{ verticalAlign: 'middle', width: '30px' }}>
-            <img onClick={this._onClickButtonConfig} src={imgConfig} title='Configuración ...' style={{ cursor:'pointer' }} />
+            <img onClick={this._onClickButtonConfig}
+              src={imgConfig}
+              title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
+              style={{ cursor: 'pointer' }}
+            />
           </span>
         </div>
-        <div
-          hidden={this.state.hiddenConfig}
-          style={{
-            verticalAlign: 'middle', padding: '4px', height: '40px', borderStyle: 'solid', borderColor: COLOR_TITLE_AND_TABLE_HEADER,
-            borderWidth: '2px', width: '100%',
-          }}
-        >
-        </div>
+        {/* Configuración */}
+        {(this.state.hiddenConfig ? null :
+          <div style={cssConfigHeader}>
+            {/* Checkbox isCompactMode */}
+            <label style={cssConfigBody}>
+              {strings.config_CompactMode}
+              <input
+                name="ToggleCompactMode"
+                type="checkbox"
+                checked={this.state.isCompactMode}
+                onChange={this._onChangeCheckBoxCompactMode}
+              />
+            </label>
+
+             {/* Combo idiomas */}
+             <label style={cssConfigBody}>
+              {strings.config_SelectLanguage}
+              <select style={{ textAlign: 'center', marginLeft: '2px' }} value={this.state.language} onChange={this._onChangeComboIdiomas}>
+              {languagesSupported.map((aLanguage, index) => {
+                return (
+                  <option key={index} value={aLanguage.id}>
+                    {`${aLanguage.title}`}
+                  </option>
+                )
+              })}
+            </select>
+
+            </label>
+           
+          </div>
+        )}
       </div>
     );
   }
 
   public render(): JSX.Element {
-    // console.log('RestCountriesExample render');
+    // console.log('RestCountriesExample render', 'ver config?', this.state.hiddenConfig);
     if (this.state.fetchResult == fetchResults.loading) {
       return (
         <div>
@@ -254,16 +304,17 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
         <div>
           <this._renderTitle />
           <SimpleListHtml
+            ref={this._simpleListRef}
             hidden={false}
             data={this._data}
             labelItem={strings.label_Pais}
             labelItems={strings.label_Paises}
             columns={this._simpleListColumns}
-            listCompactMode={false}
+            isCompactMode={this.state.isCompactMode}
             showToggleCompactMode={false}
             showLabel={false}
             heightInPx={600}
-            language={this.props.language}
+            language={this.state.language}
             backgroundColorHeader={COLOR_TITLE_AND_TABLE_HEADER}
           />
         </div>

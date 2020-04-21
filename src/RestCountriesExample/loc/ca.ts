@@ -1,6 +1,10 @@
 import {ISimpleListStrings} from './RestCountriesStrings';
 
 export const strings: ISimpleListStrings = {
+    config_SelectLanguage: "Sel·leccionar Idioma", 
+    header_ShowConfig: 'Mostra la Configuració',
+    header_HideConfig: 'Amaga la Configuració',
+    config_CompactMode: 'Mostra la llista en mode "Compacte"',
     agradecimiento: 'agraiments als Serveis Rest de',
     model_Loading: 'Carregant els Països ...',
     title_App: 'Països i Banderes del Món',

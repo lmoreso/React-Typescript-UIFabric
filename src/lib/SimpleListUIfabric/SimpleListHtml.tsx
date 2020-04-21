@@ -30,7 +30,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
       dataFiltered: this._simpleList.state.dataFiltered,
       filterText: this._simpleList.state.filterText,
       filterGroupedText: this._simpleList.state.filterByGroupText,
-      isCompactMode: (this.props.listCompactMode) ? true : false,
+      isCompactMode: (this.props.isCompactMode) ? true : false,
       filterByGroupField: (this._simpleList.state.groupableFields.length > 0) ? this._simpleList.state.groupableFields[0] : undefined,
       filterByTextField: (this._simpleList.state.filterableFields.length > 0) ? this._simpleList.state.filterableFields[0] : undefined,
       filterByTextAction: this._simpleList.state.filterByTextActionId,
