@@ -50,11 +50,6 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     this._onChangeFilterByTextAction = this._onChangeFilterByTextAction.bind(this);
   }
 
-  public setLanguage(newLanguage: languagesSupportedIds): void {
-    this._simpleList.setLanguage(newLanguage);
-    this.setState({language: newLanguage});
-  }
-
   private _onChangeGroupText(event: React.ChangeEvent<HTMLSelectElement>): void {
     this._simpleList.filterByGroup(event.target.value);
     this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });

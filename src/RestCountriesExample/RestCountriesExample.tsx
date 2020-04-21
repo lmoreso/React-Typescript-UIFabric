@@ -9,7 +9,7 @@ import { SimpleListUIFabric } from '../lib/SimpleListUIfabric/SimpleListUIFabric
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 // import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from '../lib/SimpleListUIfabric/SimpleList';
-import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, } from './loc/RestCountriesStrings';
+import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
 import imgConfig from './recursos/config.svg';
 import { ChangeEvent } from 'react';
 
@@ -101,12 +101,13 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
   private _simpleListColumns: ISimpleListCol[];
   private _simpleListRef = React.createRef<SimpleListHtml>();
 
-  public constructor(props: IRestCountriesExampleProps) {
-    super(props);
-    // cargar traducciones
-    let languageDetected = detectLanguage(this.props.language);
+  private _loadStrings(languageProposed: languagesSupportedIds | undefined) : languagesSupportedIds {
+    let languageDetected = detectLanguage(languageProposed);
     initStrings(languageDetected);
+    return(languageDetected);
+  }
 
+  private _loadColumns(): ISimpleListCol[] {
     // Copiar columnas y calcular su key
     this._simpleListColumns = new Array<ISimpleListCol>();
     getRestCountriesColumns().forEach((theColumn: ISimpleListCol, indice) => {
@@ -114,6 +115,12 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
       aCol.key = indice.toString();
       this._simpleListColumns.push(aCol);
     })
+
+    return(this._simpleListColumns);
+  }
+
+  public constructor(props: IRestCountriesExampleProps) {
+    super(props);
 
     // Inicializar estados
     this.state = {
@@ -123,8 +130,10 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
       dataSource: DATA_SOURCE_DEF,
       hiddenConfig: true,
       isCompactMode: true,
-      language: languageDetected,
+      language: this._loadStrings(stringToLanguagesSupported(this.props.language)),
     }
+    // inicializar columnas para SimpeListHtml
+    this._loadColumns();
 
     // Inicializar las columnas para el DetailList
     this._columnsUIFabric = new Array<IColumn>();
@@ -158,11 +167,18 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
   private _onChangeComboIdiomas(event: ChangeEvent<HTMLSelectElement>): void {
     let newlanguage = stringToLanguagesSupported(event.target.value);
     if (newlanguage) {
-      initStrings(newlanguage);
+      this._piensaUnTiempo(0.5);
+      this._loadStrings(newlanguage);
+      this._loadColumns();
       this.setState({ language: newlanguage });
-      if (this._simpleListRef.current)
-        this._simpleListRef.current.setLanguage(newlanguage);
+      // if (this._simpleListRef.current)
+      //   this._simpleListRef.current.setLanguage(newlanguage);
     }
+  }
+
+  private _piensaUnTiempo (segundos: number) : void {
+    this.setState({ fetchResult: fetchResults.loading });
+    setTimeout(()=>this.setState({ fetchResult: fetchResults.loadedOk }), segundos * 1000);
   }
 
   private _onClickButtonConfig(event: any): void {

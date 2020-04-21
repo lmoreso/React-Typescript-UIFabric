@@ -210,11 +210,6 @@ export class SimpleList {
 
     }
 
-    public setLanguage(newLanguage: languagesSupportedIds): void {
-        this.state.language = newLanguage;
-        initStrings(newLanguage);
-    }
-
     public orderByColumn(keyColumn: string): void {
         let mustOrder: boolean = false;
         let currColumn = this.props.columns.find(aColumn => aColumn.key === keyColumn);
