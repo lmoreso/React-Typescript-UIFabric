@@ -1,16 +1,11 @@
 import * as React from 'react';
-// Fluent UI imports
-import { Label } from 'office-ui-fabric-react/lib/Label';
-import { IColumn, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
 
 // Aplicattion imports
 import { ISimpleListCol } from '../lib/SimpleListUIfabric/ISimpleListLib';
-import { SimpleListUIFabric } from '../lib/SimpleListUIfabric/SimpleListUIFabric';
-import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
-// import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from '../lib/SimpleListUIfabric/SimpleList';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
 import imgConfig from './recursos/config.svg';
+import imgSpinner from './recursos/oval.svg';
 import { ChangeEvent } from 'react';
 
 
@@ -63,7 +58,6 @@ interface IRestCountriesExampleStates {
 
 export interface IRestCountriesExampleProps {
   language?: string;
-  showAsHtmlTable?: boolean;
 };
 
 async function DownloadCountries(dataSource: dataSources): Promise<any> {
@@ -95,9 +89,8 @@ async function DownloadCountries(dataSource: dataSources): Promise<any> {
   }
 }
 
-export class RestCountriesExample extends React.Component<IRestCountriesExampleProps, IRestCountriesExampleStates> {
+export class RestCountriesHTML extends React.Component<IRestCountriesExampleProps, IRestCountriesExampleStates> {
   private _data: any[];
-  private _columnsUIFabric: IColumn[];
   private _simpleListColumns: ISimpleListCol[];
   private _simpleListRef = React.createRef<SimpleListHtml>();
 
@@ -134,28 +127,6 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
     }
     // inicializar columnas para SimpeListHtml
     this._loadColumns();
-
-    // Inicializar las columnas para el DetailList
-    this._columnsUIFabric = new Array<IColumn>();
-    this._simpleListColumns.forEach((aCountry: ISimpleListCol, indice) => {
-      this._columnsUIFabric.push({
-        key: indice.toString(),
-        name: aCountry.title,
-        fieldName: aCountry.field,
-        minWidth: aCountry.width * 3,
-        // maxWidth: unPais.width * 2,
-        // isRowHeader: true,
-        isResizable: true,
-        columnActionsMode: ColumnActionsMode.clickable,
-        // isSorted: true,
-        // isSortedDescending: false,
-        // sortAscendingAriaLabel: 'Sorted A to Z',
-        // sortDescendingAriaLabel: 'Sorted Z to A',
-        // onColumnClick: this._onColumnClick,
-        data: 'string',
-        isPadded: true
-      });
-    })
 
     // Binds de funciones
     this._renderTitle = this._renderTitle.bind(this);
@@ -308,8 +279,12 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
       return (
         <div>
           <this._renderTitle />
-          <Label> {strings.model_Loading}</Label>
-          <Spinner size={SpinnerSize.large} />
+          <p> {strings.model_Loading}</p>
+          <img 
+              src={imgSpinner}
+              title={strings.model_Loading}
+              style={{ color: COLOR_TITLE_AND_TABLE_HEADER }}
+            />
         </div>
       );
     } else if (this.state.fetchResult == fetchResults.loadedErr) {
@@ -320,7 +295,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
           <p>{this.state.fetchResultMessage}</p>
         </div>
       );
-    } else if (this.props.showAsHtmlTable) {
+    } else {
       return (
         <div>
           <this._renderTitle />
@@ -340,26 +315,7 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
           />
         </div>
       )
-    } else {
-      return (
-        <div>
-          <this._renderTitle />
-          <SimpleListUIFabric
-            hidden={false}
-            data={this._data}
-            labelItem='Pais'
-            labelItems='Paises'
-            columns={getRestCountriesColumns()}
-            fieldsTextFilter={['Paises', 'name', 'nativeName']}
-            fieldDropdownFilter={{ valueIfNull: 'Without Continent', field: 'region', valueNoFilter: 'Todos los Continentes' }}
-            listCompactMode={true}
-            showToggleCompactMode={false}
-            fixedHeader={false}
-            showLabel={false}
-          />
-        </div>
-      );
-    }
+    } 
   }
 }
 

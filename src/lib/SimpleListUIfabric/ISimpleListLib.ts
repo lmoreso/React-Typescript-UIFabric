@@ -250,7 +250,7 @@ export class SimpleList {
         if (filterByTextActionLabel.notRequireText) {
             filterText = '';
             if (filterByTextActionId != this.state.filterByTextActionId) mustFilter = true;
-            if (filterByTextField.field != this.state.filterByTextField!.field) mustFilter = true;
+            if (!mustFilter && filterByTextField && filterByTextField.field != this.state.filterByTextField!.field) mustFilter = true;
         } else if (filterText != this._state.filterText
             || (filterText.length == 0 && getFilterByTextActionLabel(this.state.filterByTextActionId).notRequireText)) {
             mustFilter = true;
