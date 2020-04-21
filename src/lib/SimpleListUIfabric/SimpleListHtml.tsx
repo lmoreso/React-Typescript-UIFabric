@@ -4,6 +4,7 @@ import { ISimpleListHtmlProps } from './ISimpleListHtmlProps';
 import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, filterByTextActionsList, IGroupedCol } from './ISimpleListLib';
 import './SimpleListHtml.css';
 import { strings } from './loc/SimpleListStrings';
+import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
 
 const BACKGROUND_COLOR_DEF = 'DimGray';
 
@@ -16,6 +17,7 @@ interface ISimpleListHtmlStates {
   filterByTextField: ISimpleListCol | undefined;
   filterByTextAction: filterByTextActionsId;
   requireFilterText: boolean;
+  language: languagesSupportedIds;
 }
 
 export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpleListHtmlStates> {
@@ -35,6 +37,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
       filterByTextField: (this._simpleList.state.filterableFields.length > 0) ? this._simpleList.state.filterableFields[0] : undefined,
       filterByTextAction: this._simpleList.state.filterByTextActionId,
       requireFilterText: this._simpleList.state.requireFilterText,
+      language: this._simpleList.state.language,
     }
 
     this._renderHeader = this._renderHeader.bind(this);
@@ -45,6 +48,11 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     this._onChangeGroupField = this._onChangeGroupField.bind(this);
     this._onChangeFilterByTextField = this._onChangeFilterByTextField.bind(this);
     this._onChangeFilterByTextAction = this._onChangeFilterByTextAction.bind(this);
+  }
+
+  public setLanguage(newLanguage: languagesSupportedIds): void {
+    this._simpleList.setLanguage(newLanguage);
+    this.setState({language: newLanguage});
   }
 
   private _onChangeGroupText(event: React.ChangeEvent<HTMLSelectElement>): void {

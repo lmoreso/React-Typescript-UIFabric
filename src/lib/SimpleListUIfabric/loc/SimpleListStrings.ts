@@ -1,3 +1,5 @@
+import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
+
 export enum languagesSupported { es = 'es', ca = 'ca', en='en', fr='fr' }
 
 export interface ISimpleListStrings {
@@ -16,23 +18,23 @@ export interface ISimpleListStrings {
 
 export let strings: ISimpleListStrings;
 
-export function initStrings(ln: languagesSupported): void {
+export function initStrings(ln: languagesSupportedIds): void {
     strings = require(`./${ln}`).strings;
 }
 
-export function stringToLanguagesSupported(language?: string): languagesSupported | undefined {
+export function stringToLanguagesSupported(language?: string): languagesSupportedIds | undefined {
     if (language) {
         language = language.substring(0, 2);
-        for (let ln in languagesSupported) {
-            if (ln == language) return (ln as languagesSupported);
+        for (let ln in languagesSupportedIds) {
+            if (ln == language) return (ln as languagesSupportedIds);
         }
     }
     return (undefined);
 }
 
-export const DEFAULT_LANGUAGE = languagesSupported.en;
+export const DEFAULT_LANGUAGE = languagesSupportedIds.en;
 
-export function detectLanguage(languagePrefered?: string): languagesSupported {
+export function detectLanguage(languagePrefered?: string): languagesSupportedIds {
     // Detectar si el lenguaje preferido está implementado
     let languageSelected = stringToLanguagesSupported(languagePrefered);
 

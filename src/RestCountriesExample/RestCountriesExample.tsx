@@ -9,7 +9,7 @@ import { SimpleListUIFabric } from '../lib/SimpleListUIfabric/SimpleListUIFabric
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 // import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from '../lib/SimpleListUIfabric/SimpleList';
-import { initStrings, strings, detectLanguage, languagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
+import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, } from './loc/RestCountriesStrings';
 import imgConfig from './recursos/config.svg';
 import { ChangeEvent } from 'react';
 
@@ -156,8 +156,13 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
   }
 
   private _onChangeComboIdiomas(event: ChangeEvent<HTMLSelectElement>): void {
-    initStrings(event.target.value as languagesSupportedIds )
-    this.setState({ language: event.target.value });
+    let newlanguage = stringToLanguagesSupported(event.target.value);
+    if (newlanguage) {
+      initStrings(newlanguage);
+      this.setState({ language: newlanguage });
+      if (this._simpleListRef.current)
+        this._simpleListRef.current.setLanguage(newlanguage);
+    }
   }
 
   private _onClickButtonConfig(event: any): void {
@@ -260,21 +265,21 @@ export class RestCountriesExample extends React.Component<IRestCountriesExampleP
               />
             </label>
 
-             {/* Combo idiomas */}
-             <label style={cssConfigBody}>
+            {/* Combo idiomas */}
+            <label style={cssConfigBody}>
               {strings.config_SelectLanguage}
               <select style={{ textAlign: 'center', marginLeft: '2px' }} value={this.state.language} onChange={this._onChangeComboIdiomas}>
-              {languagesSupported.map((aLanguage, index) => {
-                return (
-                  <option key={index} value={aLanguage.id}>
-                    {`${aLanguage.title}`}
-                  </option>
-                )
-              })}
-            </select>
+                {languagesSupported.map((aLanguage, index) => {
+                  return (
+                    <option key={index} value={aLanguage.id}>
+                      {`${aLanguage.title}`}
+                    </option>
+                  )
+                })}
+              </select>
 
             </label>
-           
+
           </div>
         )}
       </div>

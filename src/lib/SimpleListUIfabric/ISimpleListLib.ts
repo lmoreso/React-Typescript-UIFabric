@@ -1,4 +1,5 @@
 import { initStrings, strings, detectLanguage, } from './loc/SimpleListStrings';
+import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
 
 export interface ISimpleListProps {
     data: any[];
@@ -109,13 +110,13 @@ export function filterByTextActionsList(): filterByTextAction[] {
     ])
 }
 
-function getDefaultFilterByTextAction () {
+function getDefaultFilterByTextAction() {
     return filterByTextActionsList()[0];
 }
 
 function getFilterByTextActionLabel(action: filterByTextActionsId): filterByTextAction {
     let theActionLabel = filterByTextActionsList().find((anActionLabel) => (action === anActionLabel.action) ? true : false);
-    return ((theActionLabel) ? theActionLabel : getDefaultFilterByTextAction ());
+    return ((theActionLabel) ? theActionLabel : getDefaultFilterByTextAction());
 };
 
 export interface ISimpleListCol {
@@ -156,6 +157,7 @@ export interface ISimpleListStates {
     groupedItems: IGroupedItem[];
     filterByGroupField: IGroupedCol | undefined;
     filterByGroupText: string;
+    language: languagesSupportedIds;
 }
 
 export class SimpleList {
@@ -176,8 +178,9 @@ export class SimpleList {
         this._ItemsFilteredByText = this._allItems.slice(0);
 
         // cargar traducciones
-        initStrings(detectLanguage(this.props.language));
- 
+        let langDetected = detectLanguage(this.props.language);
+        initStrings(langDetected);
+
         // Inicializar estados
         this._state = {
             dataFiltered: this._allItems,
@@ -187,9 +190,10 @@ export class SimpleList {
             groupedItems: [],
             groupableFields: [],
             filterableFields: [],
-            filterByTextActionId: getDefaultFilterByTextAction ().action,
+            filterByTextActionId: getDefaultFilterByTextAction().action,
             filterByTextField: undefined,
-            requireFilterText: (getDefaultFilterByTextAction ().notRequireText) ? false : true,
+            requireFilterText: (getDefaultFilterByTextAction().notRequireText) ? false : true,
+            language: langDetected,
         }
 
         this.props.columns.forEach((aColumn: ISimpleListCol) => {
@@ -204,6 +208,11 @@ export class SimpleList {
             this._makeGroupedItemsList();
         }
 
+    }
+
+    public setLanguage(newLanguage: languagesSupportedIds): void {
+        this.state.language = newLanguage;
+        initStrings(newLanguage);
     }
 
     public orderByColumn(keyColumn: string): void {
