@@ -35,11 +35,11 @@ export interface IMainViewProps { };
 
 export class MainView extends React.Component<IMainViewProps, IMainViewStates> {
   private _isMenuActive = (menuOptionId: menuOptionsId): boolean => (this.state.activeMenuOptionId === menuOptionId);
-  private _getActiveMenuOption = (): IMenuOptions => {
-    let menuOption = menuOptions.find((value: IMenuOptions, index, obj) => (this._isMenuActive(value.key)));
-    if (menuOption == undefined) throw `No hay ninguna opción seleccionada`;
-    return (menuOption);
-  }
+  // private _getActiveMenuOption = (): IMenuOptions => {
+  //   let menuOption = menuOptions.find((value: IMenuOptions, index, obj) => (this._isMenuActive(value.key)));
+  //   if (menuOption == undefined) throw `No hay ninguna opción seleccionada`;
+  //   return (menuOption);
+  // }
   private _optionsComboMenu: { key: number; text: string }[];
 
   public constructor(props: IMainViewProps) {
@@ -83,9 +83,6 @@ export class MainView extends React.Component<IMainViewProps, IMainViewStates> {
                 styles={{ dropdown: { width: 400, padding: '5px' } }}
 
               />
-            </div>
-            <div style={{ fontSize: 'large', display: 'flex', justifyContent: 'center', padding: '4px', alignSelf: 'center', backgroundColor: 'rgba(220, 220, 220)', width: '100%' }}>
-              <span >{this._getActiveMenuOption().title}</span>
             </div>
           </Sticky>
           <div style={{ padding: '5px', alignSelf: 'center', justifyContent: 'center' }}>

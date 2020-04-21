@@ -3,6 +3,7 @@ import * as React from 'react';
 import { ISimpleListHtmlProps } from './ISimpleListHtmlProps';
 import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, filterByTextActionsList, IGroupedCol } from './ISimpleListLib';
 import './SimpleListHtml.css';
+import { strings } from './loc/SimpleListStrings';
 
 const BACKGROUND_COLOR_DEF = 'DimGray';
 
@@ -23,11 +24,8 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
   public constructor(props: ISimpleListHtmlProps) {
     super(props);
 
-
     this._simpleList = new SimpleList(props);
-    // this._listStates = this._simpleList.filterByText('z', this._listStates);
-    // this._simpleList.filterByGroup('Oceania');
-    // this._simpleList.orderByColumn('6');
+
     this.state = {
       dataFiltered: this._simpleList.state.dataFiltered,
       filterText: this._simpleList.state.filterText,
@@ -108,19 +106,13 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
   }
 
   private _renderHeader(): JSX.Element {
-    // console.log(this._listStates);
     return (
       <div className='Control-wrapper' >
-        {/* <p>{`Filtro Texto Activo: '${this._listStates.filterText}'`}</p>
-        <p>{`Se han encontrado ${this._listStates.groupedItems.length} Grupos:`}</p>
-        {this._listStates.groupedItems.map(aGroup => { return (<span>{`${aGroup.value} (${aGroup.numOcurrences}) - `}</span>) })}
-        <p>{`Filtro Grupo Activo: '${this._listStates.filterGroupedItem}'`}</p>
-        <p>{`Nº de paises encontrados: ${this._listStates.dataFiltered.length}`}</p> */}
 
         {/* CheckBox CompactMode */}
         {(!this.props.showToggleCompactMode) ? null :
           <label className='Control-styles'>
-            Muestra la lista en modo 'Compacto'
+            {strings.config_CompactMode}
             <input
               name="ToggleCompactMode"
               type="checkbox"
@@ -146,7 +138,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
             {/* Combo de operación de filtro */}
             <select style={{ textAlign: 'center' }} className='Control-styles' value={this.state.filterByTextAction} onChange={this._onChangeFilterByTextAction}>
-              {filterByTextActionsList.map((anAction: filterByTextAction, index) => {
+              {filterByTextActionsList().map((anAction: filterByTextAction, index) => {
                 return (
                   <option key={index} value={anAction.action} style={{ textAlign: 'center' }}>
                     {`${anAction.title}`}
@@ -169,7 +161,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
               {this._simpleList.state.groupableFields.map((aField: ISimpleListCol, index) => {
                 return (
                   <option key={index} value={aField.field}>
-                    {`Filtrar por ${aField.title}`}
+                    {`${strings.filterBy} ${aField.title}`}
                   </option>
                 )
               })}
@@ -202,6 +194,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
   }
 
   public render(): JSX.Element {
+    // console.log('SimpleListHtml render:');
     if (this.props.hidden) {
       return (<div></div>);
     } else {
@@ -243,18 +236,20 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                     }
                     let styleCH = { ...styleCellHeader };
                     styleCH.width = aColumn.width;
+                    if (aColumn.canSortAndFilter)
+                      styleCH.cursor = 'pointer';
                     return (
                       <th
+                        // key={aColumn.key}
+                        key={`-1_${indice.toString()}`}
                         onClick={(!aColumn.canSortAndFilter) ? undefined : (event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>) => {
                           this._onClickHeaderColumn(aColumn.key!);
                         }}
                         style={styleCH} className='Table-header-cell'
-                        // key={`-1_${indice.toString()}`}
-                        key={aColumn.key}
                         title={(!aColumn.canSortAndFilter) ?
-                          `La columna '${aColumn.title}' no se puede ordenar`
+                          strings.order_CantOrder.replace('[%s]', aColumn.title)
                           :
-                          `Clica para ordenar la lista por '${aColumn.title}'`
+                          strings.order_ClickToOrder.replace('[%s]', aColumn.title)
                         }
                       >
                         {`${aColumn.title}  ${iconOrder}`}
