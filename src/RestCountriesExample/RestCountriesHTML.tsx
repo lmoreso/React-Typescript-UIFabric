@@ -37,15 +37,15 @@ function getRestCountriesColumns(): ISimpleListCol[] {
       // { titulo: "Key", campo: "key", width: 10 },
       // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
       { title: strings.field_Flag, field: "banderaUrl", width: 35, isImage: true },
-      { title: strings.field_NativeName, field: "nativeName", width: 150, fieldUrl: "mapsPaisUrl", canSortAndFilter: true },
-      { title: strings.field_EnglishName, field: "name", width: 150, fieldUrl: "wikiEnUrl", canSortAndFilter: true },
-      { title: strings.field_SpanishName, field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSortAndFilter: true },
-      { title: strings.field_Capital, field: "capital", width: 120, fieldUrl: "mapsCapitalUrl", canSortAndFilter: true },
-      { title: strings.field_Continente, field: "region", width: 100, fieldUrl: "mapsContinenteUrl", canSortAndFilter: true, canGroup: true },
-      { title: strings.field_Region, field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", canSortAndFilter: true, canGroup: true },
-      { title: strings.field_Siglas, field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true },
+      { title: strings.field_NativeName, field: "nativeName", width: 150, fieldUrl: "mapsPaisUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a 'Google Maps'" },
+      { title: strings.field_EnglishName, field: "name", width: 150, fieldUrl: "wikiEnUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a la 'Wikipedia' en Inglés" },
+      { title: strings.field_SpanishName, field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a la 'Wikipedia' en Español"  },
+      { title: strings.field_Capital, field: "capital", width: 120, fieldUrl: "mapsCapitalUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a 'Google Maps'" },
+      { title: strings.field_Continente, field: "region", width: 100, fieldUrl: "mapsContinenteUrl", canSortAndFilter: true, canGroup: true, headerTooltip: "Clica para ir a 'Google Maps'" },
+      { title: strings.field_Region, field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", canSortAndFilter: true, canGroup: true, headerTooltip: "Clica para ir a 'Google Maps'" },
+      { title: strings.field_Siglas, field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true, headerTooltip: "Clica para ver la Bandera" },
       { title: strings.field_Idiomas, field: "idiomas", width: 100, canSortAndFilter: false },
-      { title: strings.field_NumHusos, field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true, isNumeric: true },
+      { title: strings.field_NumHusos, field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true, isNumeric: true, headerTooltip: "Mantén quieto el ratón para ver los Husos Horarios" },
     ]
   )
 }
@@ -218,7 +218,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       height: '40px',
       borderStyle: 'solid',
       borderColor: COLOR_TITLE_AND_TABLE_HEADER,
-      borderWidth: '2px', width: '100%',
+      borderWidth: '1px', width: '100%',
       display: 'flex',
       flexWrap: 'wrap',
       alignItems: 'center',
@@ -233,7 +233,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     let cssTitleHeader: React.CSSProperties = {
       fontSize: 'large', display: 'flex', justifyContent: 'flex-end', padding: '4px', alignSelf: 'center', color: 'white',
       backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%', borderStyle: 'solid', borderColor: COLOR_TITLE_AND_TABLE_HEADER,
-      borderWidth: '2px',
+      borderWidth: '1px',
     }
 
     return (

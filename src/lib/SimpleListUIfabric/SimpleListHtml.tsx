@@ -5,6 +5,9 @@ import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, 
 import './SimpleListHtml.css';
 import { strings } from './loc/SimpleListStrings';
 import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
+import imgArrowUp from './img/up-arrow.svg';
+import imgArrowDown from './img/down-arrow.svg';
+import imgArrowScroll from './img/scroll-arrow.svg';
 
 const BACKGROUND_COLOR_DEF = 'DimGray';
 
@@ -233,29 +236,40 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
               <thead>
                 <tr className='Table-header' key={'-1'}>
                   {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
-                    let iconOrder: string = '';
-                    if (aColumn.canSortAndFilter && aColumn.isSorted) {
-                      iconOrder = (aColumn.isSortedDescending) ? String.fromCharCode(8595) : String.fromCharCode(8593);
-                    }
                     let styleCH = { ...styleCellHeader };
                     styleCH.width = aColumn.width;
-                    if (aColumn.canSortAndFilter)
-                      styleCH.cursor = 'pointer';
                     return (
                       <th
                         // key={aColumn.key}
                         key={`-1_${indice.toString()}`}
-                        onClick={(!aColumn.canSortAndFilter) ? undefined : (event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>) => {
-                          this._onClickHeaderColumn(aColumn.key!);
-                        }}
                         style={styleCH} className='Table-header-cell'
-                        title={(!aColumn.canSortAndFilter) ?
-                          strings.order_CantOrder.replace('[%s]', aColumn.title)
-                          :
-                          strings.order_ClickToOrder.replace('[%s]', aColumn.title)
-                        }
                       >
-                        {`${aColumn.title}  ${iconOrder}`}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                          <span style={{ verticalAlign: 'baseline', width: '100%', }}
+                            title={(aColumn.headerTooltip) ? aColumn.headerTooltip : ''}
+                          >
+                            {aColumn.title}
+                          </span>
+                          {(!aColumn.canSortAndFilter) ? null :
+                            <span
+                              onClick={(!aColumn.canSortAndFilter) ? undefined : (event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>) => {
+                                this._onClickHeaderColumn(aColumn.key!);
+                              }}
+                              style={{ verticalAlign: 'baseline', width: '20px', cursor: 'pointer' }}
+                              title={strings.order_ClickToOrder.replace('[%s]', aColumn.title)}
+                            >
+                              <img
+                                style={{ alignSelf: 'baseline' }}
+                                src={
+                                  (aColumn.isSorted) ?
+                                    (aColumn.isSortedDescending) ? imgArrowDown : imgArrowUp
+                                    :
+                                    imgArrowScroll
+                                }
+                              />
+                            </span>
+                          }
+                        </div>
                       </th>
                     );
                   })}
