@@ -20,6 +20,10 @@ const URL_MAPS = 'https://maps.google.com/?q=';
 const URL_WIKIPEDIA_EN = 'https://en.wikipedia.org/wiki'
 const URL_WIKIPEDIA_ES = 'https://es.wikipedia.org/wiki'
 
+const DEFAULT_HEIGHT = 600;
+const DEFAULT_WIDTH = 1100;
+
+
 enum dataSources { fromURL, fromJson, fromJsonWithDelay };
 enum fetchResults { loading, loadedOk, loadedErr }
 
@@ -58,6 +62,8 @@ interface IRestCountriesExampleStates {
 
 export interface IRestCountriesExampleProps {
   language?: string;
+  height?: number;
+  width?: number;
 };
 
 async function DownloadCountries(dataSource: dataSources): Promise<any> {
@@ -100,14 +106,16 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     return(languageDetected);
   }
 
-  private _loadColumns(): ISimpleListCol[] {
+  private _loadColumns(ignoreFlag: boolean): ISimpleListCol[] {
     // Copiar columnas y calcular su key
     this._simpleListColumns = new Array<ISimpleListCol>();
     getRestCountriesColumns().forEach((theColumn: ISimpleListCol, indice) => {
-      let aCol = { ...theColumn };
-      aCol.key = indice.toString();
-      this._simpleListColumns.push(aCol);
-    })
+      if (!ignoreFlag || theColumn.field != 'banderaUrl') {
+        let aCol = { ...theColumn };
+        aCol.key = indice.toString();
+        this._simpleListColumns.push(aCol);
+        }
+    });
 
     return(this._simpleListColumns);
   }
@@ -126,7 +134,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       language: this._loadStrings(stringToLanguagesSupported(this.props.language)),
     }
     // inicializar columnas para SimpeListHtml
-    this._loadColumns();
+    this._loadColumns(this.state.dataSource != dataSources.fromURL);
 
     // Binds de funciones
     this._renderTitle = this._renderTitle.bind(this);
@@ -139,7 +147,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
   private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
     let checked: boolean = event.target.checked; 
     let dataSource = (checked) ? dataSources.fromURL : dataSources.fromJsonWithDelay;
-
+    this._loadColumns(dataSource != dataSources.fromURL);
     this._downloadCountries(dataSource);
   }
 
@@ -148,7 +156,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     if (newlanguage) {
       this._piensaUnTiempo(0.5);
       this._loadStrings(newlanguage);
-      this._loadColumns();
+      this._loadColumns(this.state.dataSource != dataSources.fromURL);
       this.setState({ language: newlanguage });
       // if (this._simpleListRef.current)
       //   this._simpleListRef.current.setLanguage(newlanguage);
@@ -229,7 +237,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     }
 
     return (
-      <div>
+      <div style={{width: this.props.width || DEFAULT_WIDTH}}>
         <div style={cssTitleHeader}>
           <div style={{ verticalAlign: 'middle', width: '100%' }} >
             {strings.title_App}
@@ -238,7 +246,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
               <a target='_blank' style={{ color: 'white' }} href={URL_RESTCOUNTRIES_SITE}>{URL_RESTCOUNTRIES_SITE}</a>{')'}
             </small>
           </div>
-          <span style={{ verticalAlign: 'middle', width: '30px' }}>
+          <span style={{ verticalAlign: 'middle', width: '30px' , }}>
             <img onClick={this._onClickButtonConfig}
               src={imgConfig}
               title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
@@ -295,7 +303,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     // console.log('RestCountriesExample render', 'ver config?', this.state.hiddenConfig);
     if (this.state.fetchResult == fetchResults.loading) {
       return (
-        <div>
+        <div style={{width: this.props.width || DEFAULT_WIDTH}}>
           <this._renderTitle />
           <p> {strings.model_Loading}</p>
           <img 
@@ -307,7 +315,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       );
     } else if (this.state.fetchResult == fetchResults.loadedErr) {
       return (
-        <div>
+        <div style={{width: this.props.width || DEFAULT_WIDTH}}>
           <this._renderTitle />
           <h1>Se ha producido un error:</h1>
           <p>{this.state.fetchResultMessage}</p>
@@ -315,7 +323,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       );
     } else {
       return (
-        <div>
+        <div style={{width: this.props.width || DEFAULT_WIDTH}}>
           <this._renderTitle />
           <SimpleListHtml
             ref={this._simpleListRef}
@@ -327,7 +335,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
             isCompactMode={this.state.isCompactMode}
             showToggleCompactMode={false}
             showLabel={false}
-            heightInPx={600}
+            heightInPx={this.props.height || DEFAULT_HEIGHT}
             language={this.state.language}
             backgroundColorHeader={COLOR_TITLE_AND_TABLE_HEADER}
           />
