@@ -2,16 +2,16 @@ import * as React from 'react';
 // Fluent UI imports
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { IColumn, ColumnActionsMode } from 'office-ui-fabric-react/lib/DetailsList';
+import { ChangeEvent } from 'react';
+import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 
 // Aplicattion imports
 import { ISimpleListCol } from '../lib/SimpleListUIfabric/ISimpleListLib';
 import { SimpleListUIFabric } from '../lib/SimpleListUIfabric/SimpleListUIFabric';
-import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 // import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from '../lib/SimpleListUIfabric/SimpleList';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
-import imgConfig from './recursos/config.svg';
-import { ChangeEvent } from 'react';
+import { IconoConfig, } from './recursos/svgs';
 
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
@@ -101,10 +101,10 @@ export class RestCountriesUIFabric extends React.Component<IRestCountriesExample
   private _simpleListColumns: ISimpleListCol[];
   private _simpleListRef = React.createRef<SimpleListHtml>();
 
-  private _loadStrings(languageProposed: languagesSupportedIds | undefined) : languagesSupportedIds {
+  private _loadStrings(languageProposed: languagesSupportedIds | undefined): languagesSupportedIds {
     let languageDetected = detectLanguage(languageProposed);
     initStrings(languageDetected);
-    return(languageDetected);
+    return (languageDetected);
   }
 
   private _loadColumns(): ISimpleListCol[] {
@@ -116,7 +116,7 @@ export class RestCountriesUIFabric extends React.Component<IRestCountriesExample
       this._simpleListColumns.push(aCol);
     })
 
-    return(this._simpleListColumns);
+    return (this._simpleListColumns);
   }
 
   public constructor(props: IRestCountriesExampleProps) {
@@ -176,9 +176,9 @@ export class RestCountriesUIFabric extends React.Component<IRestCountriesExample
     }
   }
 
-  private _piensaUnTiempo (segundos: number) : void {
+  private _piensaUnTiempo(segundos: number): void {
     this.setState({ fetchResult: fetchResults.loading });
-    setTimeout(()=>this.setState({ fetchResult: fetchResults.loadedOk }), segundos * 1000);
+    setTimeout(() => this.setState({ fetchResult: fetchResults.loadedOk }), segundos * 1000);
   }
 
   private _onClickButtonConfig(event: any): void {
@@ -259,12 +259,12 @@ export class RestCountriesUIFabric extends React.Component<IRestCountriesExample
               <a target='_blank' style={{ color: 'white' }} href={URL_RESTCOUNTRIES_SITE}>{URL_RESTCOUNTRIES_SITE}</a>{')'}
             </small>
           </div>
-          <span style={{ verticalAlign: 'middle', width: '30px' }}>
-            <img onClick={this._onClickButtonConfig}
-              src={imgConfig}
-              title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
-              style={{ cursor: 'pointer' }}
-            />
+          <span 
+            style={{ verticalAlign: 'middle', width: '30px', cursor: 'pointer', }}
+            title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
+            onClick={this._onClickButtonConfig}
+          >
+            <IconoConfig fill={'white'} />
           </span>
         </div>
         {/* Configuración */}

@@ -5,9 +5,10 @@ import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, 
 import './SimpleListHtml.css';
 import { strings } from './loc/SimpleListStrings';
 import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
-import imgArrowUp from './img/up-arrow.svg';
-import imgArrowDown from './img/down-arrow.svg';
-import imgArrowScroll from './img/scroll-arrow.svg';
+import { Flechas } from './img/svgs';
+// import imgArrowUp from './img/up-arrow.svg';
+// import imgArrowDown from './img/down-arrow.svg';
+// import imgArrowScroll from './img/scroll-arrow.svg';
 
 const BACKGROUND_COLOR_DEF = 'DimGray';
 
@@ -258,7 +259,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                               style={{ verticalAlign: 'baseline', width: '20px', cursor: 'pointer' }}
                               title={strings.order_ClickToOrder.replace('[%s]', aColumn.title)}
                             >
-                              <img
+                              {/* <img
                                 style={{ alignSelf: 'baseline' }}
                                 src={
                                   (aColumn.isSorted) ?
@@ -266,6 +267,15 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                                     :
                                     imgArrowScroll
                                 }
+                              /> */}
+                              <Flechas 
+                                name= {
+                                  (aColumn.isSorted) ?
+                                    (aColumn.isSortedDescending) ? 'down' : 'up'
+                                    :
+                                    ''
+                                }
+                                fill={'white'}
                               />
                             </span>
                           }

@@ -4,9 +4,8 @@ import * as React from 'react';
 import { ISimpleListCol } from '../lib/SimpleListUIfabric/ISimpleListLib';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
-import imgConfig from './recursos/config.svg';
-import imgSpinner from './recursos/oval.svg';
 import { ChangeEvent } from 'react';
+import { IconoConfig, IconoSpinner } from './recursos/svgs';
 
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
@@ -23,13 +22,12 @@ const URL_WIKIPEDIA_ES = 'https://es.wikipedia.org/wiki'
 const DEFAULT_HEIGHT = 600;
 const DEFAULT_WIDTH = 1100;
 
-
 enum dataSources { fromURL, fromJson, fromJsonWithDelay };
 enum fetchResults { loading, loadedOk, loadedErr }
 
 const DATA_SOURCE_DEF = dataSources.fromJsonWithDelay;
 
-const COLOR_TITLE_AND_TABLE_HEADER = 'DARKSLATEBLUE';
+const DEF_COLOR_TITLE_AND_TABLE_HEADER = '#626567' /* 'DARKSLATEBLUE' */;
 
 function getRestCountriesColumns(): ISimpleListCol[] {
   return (
@@ -39,7 +37,7 @@ function getRestCountriesColumns(): ISimpleListCol[] {
       { title: strings.field_Flag, field: "banderaUrl", width: 35, isImage: true },
       { title: strings.field_NativeName, field: "nativeName", width: 150, fieldUrl: "mapsPaisUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a 'Google Maps'" },
       { title: strings.field_EnglishName, field: "name", width: 150, fieldUrl: "wikiEnUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a la 'Wikipedia' en Inglés" },
-      { title: strings.field_SpanishName, field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a la 'Wikipedia' en Español"  },
+      { title: strings.field_SpanishName, field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a la 'Wikipedia' en Español" },
       { title: strings.field_Capital, field: "capital", width: 120, fieldUrl: "mapsCapitalUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a 'Google Maps'" },
       { title: strings.field_Continente, field: "region", width: 100, fieldUrl: "mapsContinenteUrl", canSortAndFilter: true, canGroup: true, headerTooltip: "Clica para ir a 'Google Maps'" },
       { title: strings.field_Region, field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", canSortAndFilter: true, canGroup: true, headerTooltip: "Clica para ir a 'Google Maps'" },
@@ -100,10 +98,10 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
   private _simpleListColumns: ISimpleListCol[];
   private _simpleListRef = React.createRef<SimpleListHtml>();
 
-  private _loadStrings(languageProposed: languagesSupportedIds | undefined) : languagesSupportedIds {
+  private _loadStrings(languageProposed: languagesSupportedIds | undefined): languagesSupportedIds {
     let languageDetected = detectLanguage(languageProposed);
     initStrings(languageDetected);
-    return(languageDetected);
+    return (languageDetected);
   }
 
   private _loadColumns(ignoreFlag: boolean): ISimpleListCol[] {
@@ -114,10 +112,10 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
         let aCol = { ...theColumn };
         aCol.key = indice.toString();
         this._simpleListColumns.push(aCol);
-        }
+      }
     });
 
-    return(this._simpleListColumns);
+    return (this._simpleListColumns);
   }
 
   public constructor(props: IRestCountriesExampleProps) {
@@ -145,7 +143,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
   }
 
   private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
-    let checked: boolean = event.target.checked; 
+    let checked: boolean = event.target.checked;
     let dataSource = (checked) ? dataSources.fromURL : dataSources.fromJsonWithDelay;
     this._loadColumns(dataSource != dataSources.fromURL);
     this._downloadCountries(dataSource);
@@ -163,9 +161,9 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     }
   }
 
-  private _piensaUnTiempo (segundos: number) : void {
+  private _piensaUnTiempo(segundos: number): void {
     this.setState({ fetchResult: fetchResults.loading });
-    setTimeout(()=>this.setState({ fetchResult: fetchResults.loadedOk }), segundos * 1000);
+    setTimeout(() => this.setState({ fetchResult: fetchResults.loadedOk }), segundos * 1000);
   }
 
   private _onClickButtonConfig(event: any): void {
@@ -217,7 +215,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       padding: '4px',
       height: '40px',
       borderStyle: 'solid',
-      borderColor: COLOR_TITLE_AND_TABLE_HEADER,
+      borderColor: DEF_COLOR_TITLE_AND_TABLE_HEADER,
       borderWidth: '1px', width: '100%',
       display: 'flex',
       flexWrap: 'wrap',
@@ -232,12 +230,12 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
 
     let cssTitleHeader: React.CSSProperties = {
       fontSize: 'large', display: 'flex', justifyContent: 'flex-end', padding: '4px', alignSelf: 'center', color: 'white',
-      backgroundColor: COLOR_TITLE_AND_TABLE_HEADER, width: '100%', borderStyle: 'solid', borderColor: COLOR_TITLE_AND_TABLE_HEADER,
+      backgroundColor: DEF_COLOR_TITLE_AND_TABLE_HEADER, width: '100%', borderStyle: 'solid', borderColor: DEF_COLOR_TITLE_AND_TABLE_HEADER,
       borderWidth: '1px',
     }
 
     return (
-      <div style={{width: this.props.width || DEFAULT_WIDTH}}>
+      <div style={{ width: this.props.width || DEFAULT_WIDTH }}>
         <div style={cssTitleHeader}>
           <div style={{ verticalAlign: 'middle', width: '100%' }} >
             {strings.title_App}
@@ -246,12 +244,12 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
               <a target='_blank' style={{ color: 'white' }} href={URL_RESTCOUNTRIES_SITE}>{URL_RESTCOUNTRIES_SITE}</a>{')'}
             </small>
           </div>
-          <span style={{ verticalAlign: 'middle', width: '30px' , }}>
-            <img onClick={this._onClickButtonConfig}
-              src={imgConfig}
-              title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
-              style={{ cursor: 'pointer' }}
-            />
+          <span 
+            style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer', }}
+            onClick={this._onClickButtonConfig}
+            title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
+          >
+            <IconoConfig fill={'white'} />
           </span>
         </div>
         {/* Configuración */}
@@ -303,19 +301,22 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     // console.log('RestCountriesExample render', 'ver config?', this.state.hiddenConfig);
     if (this.state.fetchResult == fetchResults.loading) {
       return (
-        <div style={{width: this.props.width || DEFAULT_WIDTH}}>
+        <div style={{ width: this.props.width || DEFAULT_WIDTH }}>
           <this._renderTitle />
           <p> {strings.model_Loading}</p>
-          <img 
+          {/* <img 
               src={imgSpinner}
               title={strings.model_Loading}
               style={{ color: COLOR_TITLE_AND_TABLE_HEADER }}
-            />
+            /> */}
+          <IconoSpinner
+            fill={DEF_COLOR_TITLE_AND_TABLE_HEADER}
+          />
         </div>
       );
     } else if (this.state.fetchResult == fetchResults.loadedErr) {
       return (
-        <div style={{width: this.props.width || DEFAULT_WIDTH}}>
+        <div style={{ width: this.props.width || DEFAULT_WIDTH }}>
           <this._renderTitle />
           <h1>Se ha producido un error:</h1>
           <p>{this.state.fetchResultMessage}</p>
@@ -323,7 +324,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       );
     } else {
       return (
-        <div style={{width: this.props.width || DEFAULT_WIDTH}}>
+        <div style={{ width: this.props.width || DEFAULT_WIDTH }}>
           <this._renderTitle />
           <SimpleListHtml
             ref={this._simpleListRef}
@@ -337,11 +338,11 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
             showLabel={false}
             heightInPx={this.props.height || DEFAULT_HEIGHT}
             language={this.state.language}
-            backgroundColorHeader={COLOR_TITLE_AND_TABLE_HEADER}
+            backgroundColorHeader={DEF_COLOR_TITLE_AND_TABLE_HEADER}
           />
         </div>
       )
-    } 
+    }
   }
 }
 
