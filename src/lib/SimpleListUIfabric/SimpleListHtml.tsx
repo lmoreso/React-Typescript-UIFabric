@@ -6,11 +6,7 @@ import './SimpleListHtml.css';
 import { strings } from './loc/SimpleListStrings';
 import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
 import { Flechas } from './img/svgs';
-// import imgArrowUp from './img/up-arrow.svg';
-// import imgArrowDown from './img/down-arrow.svg';
-// import imgArrowScroll from './img/scroll-arrow.svg';
-
-const BACKGROUND_COLOR_DEF = 'DimGray';
+import { themeGreen, ISlStyles } from './SimpleListHtmlStyles';
 
 interface ISimpleListHtmlStates {
   dataFiltered: any[];
@@ -26,10 +22,11 @@ interface ISimpleListHtmlStates {
 
 export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpleListHtmlStates> {
   private _simpleList: SimpleList;
+  private _theme: ISlStyles;
 
   public constructor(props: ISimpleListHtmlProps) {
     super(props);
-
+    this._theme = this.props.theme || themeGreen;
     this._simpleList = new SimpleList(props);
 
     this.state = {
@@ -113,12 +110,21 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
   }
 
   private _renderHeader(): JSX.Element {
+    let styleHeaderControlsContainer: React.CSSProperties = {
+      color: this._theme.headerControlsContainerColor,
+    };
+
+    let styleHeaderContainer: React.CSSProperties = {
+      backgroundColor: this._theme.headerContainerBackgroundColor,
+    };
+
+
     return (
-      <div className='Control-wrapper' >
+      <div className='Header-container' style={styleHeaderContainer}>
 
         {/* CheckBox CompactMode */}
         {(!this.props.showToggleCompactMode) ? null :
-          <label className='Control-styles'>
+          <label className='Header-controls-container' style={styleHeaderControlsContainer} >
             {strings.config_CompactMode}
             <input
               name="ToggleCompactMode"
@@ -131,9 +137,9 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
         {/* Controles de filtro por Texto */}
         {(this._simpleList.state.groupableFields.length <= 0) ? null :
-          <label className='Control-styles'>
+          <label className='Header-controls-container' style={styleHeaderControlsContainer} >
             {/* Combo de Campos Filtrables */}
-            <select style={{ textAlign: 'center' }} className='Control-styles' value={this.state.filterByTextField!.field} onChange={this._onChangeFilterByTextField}>
+            <select style={{ textAlign: 'center' }} className='Header-controls-combos' value={this.state.filterByTextField!.field} onChange={this._onChangeFilterByTextField}>
               {this._simpleList.state.filterableFields.map((aField: ISimpleListCol, index) => {
                 return (
                   <option key={index} value={aField.field}>
@@ -144,7 +150,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
             </select>
 
             {/* Combo de operación de filtro */}
-            <select style={{ textAlign: 'center' }} className='Control-styles' value={this.state.filterByTextAction} onChange={this._onChangeFilterByTextAction}>
+            <select style={{ textAlign: 'center', }} className='Header-controls-combos' value={this.state.filterByTextAction} onChange={this._onChangeFilterByTextAction}>
               {filterByTextActionsList().map((anAction: filterByTextAction, index) => {
                 return (
                   <option key={index} value={anAction.action} style={{ textAlign: 'center' }}>
@@ -155,16 +161,16 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
             </select>
 
             {/* Texto a filtrar */}
-            <input disabled={!this.state.requireFilterText} className='Control-styles' type="text" value={this.state.filterText} onChange={this._onChangeFilterText} />
+            <input disabled={!this.state.requireFilterText} className='Header-controls-container' style={styleHeaderControlsContainer} type="text" value={this.state.filterText} onChange={this._onChangeFilterText} />
           </label>
         }
 
 
         {/* Combos de filtro por Grupos */}
         {(this._simpleList.state.groupableFields.length <= 0) ? null :
-          <label className='Control-styles'>
+          <label className='Header-controls-container' style={styleHeaderControlsContainer}>
             {/* Combo de Campos Agrupables */}
-            <select style={{ textAlign: 'center' }} className='Control-styles' value={this.state.filterByGroupField!.field} onChange={this._onChangeGroupField}>
+            <select style={{ textAlign: 'center' }} className='Header-controls-combos' value={this.state.filterByGroupField!.field} onChange={this._onChangeGroupField}>
               {this._simpleList.state.groupableFields.map((aField: ISimpleListCol, index) => {
                 return (
                   <option key={index} value={aField.field}>
@@ -175,7 +181,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
             </select>
 
             {/* Combo del Grupo Activo */}
-            <select style={{ textAlign: 'center' }} className='Control-styles' value={this.state.filterGroupedText} onChange={this._onChangeGroupText}>
+            <select style={{ textAlign: 'center' }} className='Header-controls-combos' value={this.state.filterGroupedText} onChange={this._onChangeGroupText}>
               <option key={-1} value={(this.state.filterByGroupField) ? this.state.filterByGroupField.valueNoFilter : undefined}>
                 {`${this.state.filterByGroupField!.valueNoFilter} (${this._simpleList.numItemsFilteredByText} ${this.props.labelItems})`}
               </option>
@@ -192,7 +198,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
         }
 
         {(!this.props.showLabel) ? null :
-          <label className='Control-styles'>
+          <label className='Header-controls-container' style={styleHeaderControlsContainer} >
             {`${this.state.dataFiltered.length} ${this.props.labelItems}.`}
           </label>
         }
@@ -205,22 +211,21 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     if (this.props.hidden) {
       return (<div></div>);
     } else {
-      let styleCellHeader: React.CSSProperties = {};
-      let styleCell: React.CSSProperties = {};
-      let styleTableContainer: React.CSSProperties = {};
+      let cellClassName = (this.state.isCompactMode) ? 'Table-cell' : 'Table-cell Table-cell-no-compact';
+      let cellStyle = {};
+      if (!this.state.isCompactMode)
+        cellStyle = { borderBottomColor: this._theme.tableCellNoCompactBorderBottomColor }
 
-      styleCellHeader.backgroundColor = (this.props.backgroundColorHeader) ? this.props.backgroundColorHeader : BACKGROUND_COLOR_DEF;
+      let styleMainContainer: React.CSSProperties = {
+        backgroundColor: this._theme.mainContainerBackgroundColor,
+        borderColor: this._theme.mainContainerBorderColor,
+      };
 
-      if (!this.state.isCompactMode) {
-        styleCell.borderBottomColor = styleCellHeader.backgroundColor;
-        styleCell.borderBottomStyle = "solid";
-        styleCell.borderBottomWidth = "1px"
-        styleCell.padding = "8px";
-      }
-
-      styleTableContainer.borderColor = (this.props.backgroundColorHeader) ? this.props.backgroundColorHeader : BACKGROUND_COLOR_DEF;
-      styleTableContainer.borderStyle = 'solid';
-      styleTableContainer.borderWidth = '1px';
+      let styleTableContainer: React.CSSProperties = {
+        backgroundColor: this._theme.tableContainerBackgroundColor,
+        borderTopColor: this._theme.tableContainerBorderTopColor,
+        scrollbarColor: this._theme.tableContainerScrollbarColor,
+      };
 
       if (this.props.heightInPx && this.props.heightInPx > 0) {
         let heightInPx = (this.props.heightInPx < 500) ? 500 : this.props.heightInPx;
@@ -230,15 +235,21 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
       }
 
       return (
-        <div>
+        <div className='Main-container' style={styleMainContainer}>
           <this._renderHeader />
-          <div style={styleTableContainer}>
+          <div style={styleTableContainer} className='Table-container'>
             <table>
               <thead>
                 <tr className='Table-header' key={'-1'}>
                   {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
-                    let styleCH = { ...styleCellHeader };
-                    styleCH.width = aColumn.width;
+                    let styleCH = { 
+                      width: aColumn.width, 
+                      backgroundColor: this._theme.tableHeaderCellBackgroundColor, 
+                      borderBottomColor: this._theme.tableHeaderCellBackgroundColor, 
+                      borderLeftColor: this._theme.tableHeaderCellBackgroundColor, 
+                      color: this._theme.tableHeaderColor,
+                    };
+
                     return (
                       <th
                         // key={aColumn.key}
@@ -268,14 +279,14 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                                     imgArrowScroll
                                 }
                               /> */}
-                              <Flechas 
-                                name= {
+                              <Flechas
+                                name={
                                   (aColumn.isSorted) ?
                                     (aColumn.isSortedDescending) ? 'down' : 'up'
                                     :
                                     ''
                                 }
-                                fill={'white'}
+                                fill={this._theme.tableHeaderColor}
                               />
                             </span>
                           }
@@ -292,7 +303,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                       {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
                         if (aColumn.fieldUrl) {
                           return (
-                            <td key={`${dato.key}_${indice.toString()}`} className='Table-cell' style={styleCell}>
+                            <td key={`${dato.key}_${indice.toString()}`} className={cellClassName} style={cellStyle} >
                               <a href={dato[aColumn.fieldUrl]} target="_blank">
                                 <span title={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : dato[aColumn.fieldUrl]}>
                                   {Array.isArray(dato[aColumn.field]) ? dato[aColumn.field].join(', ') : dato[aColumn.field]}
@@ -302,13 +313,13 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                           );
                         } else if (aColumn.isImage) {
                           return (
-                            <td key={`${dato.key}_${indice.toString()}`} className='Table-cell' style={styleCell} >
+                            <td key={`${dato.key}_${indice.toString()}`} className={cellClassName} style={cellStyle} >
                               <img src={dato[aColumn.field]} width={aColumn.width} alt={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : dato[aColumn.field]} />
                             </td>
                           );
                         } else {
                           return (
-                            <td key={`${dato.key}_${indice.toString()}`} className='Table-cell' style={styleCell} >
+                            <td key={`${dato.key}_${indice.toString()}`} className={cellClassName} style={cellStyle} >
                               <span title={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : ''}>
                                 {Array.isArray(dato[aColumn.field]) ? dato[aColumn.field].join(', ') : dato[aColumn.field]}
                               </span>

@@ -6,6 +6,7 @@ import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
 import { ChangeEvent } from 'react';
 import { IconoConfig, IconoSpinner } from './recursos/svgs';
+import { themeRed, themeGreen, themeVoid, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles } from 'src/lib/SimpleListUIfabric/SimpleListHtmlStyles';
 
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
@@ -56,6 +57,7 @@ interface IRestCountriesExampleStates {
   hiddenConfig: boolean;
   isCompactMode: boolean;
   language: string;
+  theme: IRCTheme;
 }
 
 export interface IRestCountriesExampleProps {
@@ -93,10 +95,52 @@ async function DownloadCountries(dataSource: dataSources): Promise<any> {
   }
 }
 
+interface IRCTheme {
+  key: string; 
+  slStyle: ISlStyles; 
+  name: string;
+}
+
 export class RestCountriesHTML extends React.Component<IRestCountriesExampleProps, IRestCountriesExampleStates> {
   private _data: any[];
   private _simpleListColumns: ISimpleListCol[];
   private _simpleListRef = React.createRef<SimpleListHtml>();
+  private _themes: IRCTheme[];
+
+  public constructor(props: IRestCountriesExampleProps) {
+    super(props);
+    this._themes = new Array<{key: string; slStyle: ISlStyles; name: string}>();
+    this._themes.push({key: "themeCyan", slStyle: themeCyan, name: 'Cyan' });
+    this._themes.push({key: "themeGray", slStyle: themeGray, name: 'Grises' });
+    this._themes.push({key: "themeMagenta", slStyle: themeMagenta, name: 'Magenta' });
+    this._themes.push({key: "themeYellow", slStyle: themeYellow, name: 'Amarillo' });
+    this._themes.push({key: "themeBlue", slStyle: themeBlue, name: 'Azul' });
+    this._themes.push({key: "themeRed", slStyle: themeRed, name: 'Rojo' });
+    this._themes.push({key: "themeGreen", slStyle: themeGreen, name: 'Verde' });
+    this._themes.push({key: "themeVoid", slStyle: themeVoid, name: 'Sin tema' });
+
+    // Inicializar estados
+    this.state = {
+      numRegs: 0,
+      fetchResult: fetchResults.loading,
+      fetchResultMessage: '',
+      dataSource: DATA_SOURCE_DEF,
+      hiddenConfig: false,
+      isCompactMode: true,
+      language: this._loadStrings(stringToLanguagesSupported(this.props.language)),
+      theme: this._themes[0],
+    }
+    // inicializar columnas para SimpeListHtml
+    this._loadColumns(this.state.dataSource != dataSources.fromURL);
+
+    // Binds de funciones
+    this._renderTitle = this._renderTitle.bind(this);
+    this._onClickButtonConfig = this._onClickButtonConfig.bind(this);
+    this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
+    this._onChangeComboIdiomas = this._onChangeComboIdiomas.bind(this);
+    this._onChangeCheckBoxIsUrl = this._onChangeCheckBoxIsUrl.bind(this);
+    this._onChangeComboColores = this._onChangeComboColores.bind(this);
+  }
 
   private _loadStrings(languageProposed: languagesSupportedIds | undefined): languagesSupportedIds {
     let languageDetected = detectLanguage(languageProposed);
@@ -118,31 +162,16 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     return (this._simpleListColumns);
   }
 
-  public constructor(props: IRestCountriesExampleProps) {
-    super(props);
-
-    // Inicializar estados
-    this.state = {
-      numRegs: 0,
-      fetchResult: fetchResults.loading,
-      fetchResultMessage: '',
-      dataSource: DATA_SOURCE_DEF,
-      hiddenConfig: false,
-      isCompactMode: true,
-      language: this._loadStrings(stringToLanguagesSupported(this.props.language)),
-    }
-    // inicializar columnas para SimpeListHtml
-    this._loadColumns(this.state.dataSource != dataSources.fromURL);
-
-    // Binds de funciones
-    this._renderTitle = this._renderTitle.bind(this);
-    this._onClickButtonConfig = this._onClickButtonConfig.bind(this);
-    this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
-    this._onChangeComboIdiomas = this._onChangeComboIdiomas.bind(this);
-    this._onChangeCheckBoxIsUrl = this._onChangeCheckBoxIsUrl.bind(this);
+  private _onChangeComboColores(event: ChangeEvent<HTMLSelectElement>): void {
+    this._piensaUnTiempo(0.1);
+    this.setState({theme: this._getTheme(event.target.value)});
+  }
+    
+  private _getTheme(themeKey: string): IRCTheme {
+    return(this._themes.find((aTheme)=>(aTheme.key == themeKey)) || this._themes[7]);
   }
 
-  private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
+private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
     let checked: boolean = event.target.checked;
     let dataSource = (checked) ? dataSources.fromURL : dataSources.fromJsonWithDelay;
     this._loadColumns(dataSource != dataSources.fromURL);
@@ -291,6 +320,20 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
               />
             </label>
 
+            {/* Combo colores */}
+            <label style={cssConfigBody}>
+              {'Selecciona colores'}
+              <select style={{ textAlign: 'center', marginLeft: '2px' }} value={(this.state.theme.key)} onChange={this._onChangeComboColores}>
+                {this._themes.map((aTheme, index) => {
+                  return (
+                    <option key={aTheme.key} value={aTheme.key}>
+                      {`${aTheme.name}`}
+                    </option>
+                  )
+                })}
+              </select>
+            </label>
+
           </div>
         )}
       </div>
@@ -338,7 +381,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
             showLabel={false}
             heightInPx={this.props.height || DEFAULT_HEIGHT}
             language={this.state.language}
-            backgroundColorHeader={DEF_COLOR_TITLE_AND_TABLE_HEADER}
+            theme={this.state.theme.slStyle}
           />
         </div>
       )

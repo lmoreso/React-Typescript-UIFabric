@@ -323,21 +323,6 @@ export class RestCountriesUIFabric extends React.Component<IRestCountriesExample
     } else if (this.props.showAsHtmlTable) {
       return (
         <div>
-          <this._renderTitle />
-          <SimpleListHtml
-            ref={this._simpleListRef}
-            hidden={false}
-            data={this._data}
-            labelItem={strings.label_Pais}
-            labelItems={strings.label_Paises}
-            columns={this._simpleListColumns}
-            isCompactMode={this.state.isCompactMode}
-            showToggleCompactMode={false}
-            showLabel={false}
-            heightInPx={600}
-            language={this.state.language}
-            backgroundColorHeader={COLOR_TITLE_AND_TABLE_HEADER}
-          />
         </div>
       )
     } else {

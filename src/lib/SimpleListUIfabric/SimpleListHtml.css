@@ -1,5 +1,14 @@
-.Control-wrapper {
-  background-color: white;
+.Main-container {
+  /* background-color: rgb(224, 250, 224);  */
+  padding: 3px;
+  align-items: center;
+  /* border-color: rgb(0, 26, 0); */
+  border-style: solid;
+  border-width: thin;
+}
+
+.Header-container {
+  /* background-color: rgb(224, 250, 224); */
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -9,20 +18,41 @@
   top: 145px; */
 }
 
-.Control-styles {
+.Header-controls-container {
   margin: 2px 2px 2px 2px;
   vertical-align: middle;
+  /* color: rgb(255, 0, 255); */
+}
+
+.Header-controls-combos {
+  margin: 2px 2px 2px 2px;
+  vertical-align: middle;
+  /* color: rgb(251, 255, 0); */
+}
+
+.Table-container {
+  /* scrollbar-color: rgb(0, 40, 0) rgb(189, 229, 189); */
+  /* background-color: rgb(229, 255, 229); */
+  /* border-top-color: rgb(0, 40, 0); */
+  border-top-style: solid;
+  border-top-width: thin;
 }
 
 .Table-header {
   font-size: 0.9em;
-  color: white;
+  /* color: rgb(229, 255, 229); */
   text-align: left;
   /* border: 2px red solid; */
 }
 
 .Table-header-cell {
   padding: 2px 4px 2px 4px;
+  /* background-color: rgb(0, 26, 0); */
+  /* color: rgb(229, 255, 229); */
+  border-bottom-style: solid;
+  border-bottom-width: thin;
+  border-left-style: solid;
+  border-left-width: thin;
 }
 
 .Table-row {
@@ -32,4 +62,12 @@
 
 .Table-cell {
   vertical-align: middle;
+  padding: 2px;
+}
+
+.Table-cell-no-compact {
+  /* border-bottom-color: rgb(30, 56, 30); */
+  border-bottom-style: dotted;
+  border-bottom-width: thin;
+  padding: 6px;
 }

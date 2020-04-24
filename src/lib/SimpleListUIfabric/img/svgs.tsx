@@ -28,7 +28,7 @@ function Path(props: {name?: string; fillColor?: string}): JSX.Element {
 export const Flechas = ({
   name = "",
   style = {},
-  fill = "white",
+  fill = "",
   viewBox = "0 0 100 100",
   width = "100%",
   className = "",
@@ -44,7 +44,7 @@ export const Flechas = ({
       viewBox={viewBox}
       xmlnsXlink="http://www.w3.org/1999/xlink"
     >
-      <Path name={name} fillColor={fill}/>
+      <Path name={name} fillColor={(fill && fill.length > 0) ? fill : 'black'}/>
     </svg>
   );
 }
