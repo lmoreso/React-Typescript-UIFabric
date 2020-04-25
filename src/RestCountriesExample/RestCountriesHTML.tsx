@@ -28,8 +28,6 @@ enum fetchResults { loading, loadedOk, loadedErr }
 
 const DATA_SOURCE_DEF = dataSources.fromJsonWithDelay;
 
-const DEF_COLOR_TITLE_AND_TABLE_HEADER = '#626567' /* 'DARKSLATEBLUE' */;
-
 function getRestCountriesColumns(): ISimpleListCol[] {
   return (
     [
@@ -96,8 +94,8 @@ async function DownloadCountries(dataSource: dataSources): Promise<any> {
 }
 
 interface IRCTheme {
-  key: string; 
-  slStyle: ISlStyles; 
+  key: string;
+  slStyle: ISlStyles;
   name: string;
 }
 
@@ -109,15 +107,15 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
 
   public constructor(props: IRestCountriesExampleProps) {
     super(props);
-    this._themes = new Array<{key: string; slStyle: ISlStyles; name: string}>();
-    this._themes.push({key: "themeCyan", slStyle: themeCyan, name: 'Cyan' });
-    this._themes.push({key: "themeGray", slStyle: themeGray, name: 'Grises' });
-    this._themes.push({key: "themeMagenta", slStyle: themeMagenta, name: 'Magenta' });
-    this._themes.push({key: "themeYellow", slStyle: themeYellow, name: 'Amarillo' });
-    this._themes.push({key: "themeBlue", slStyle: themeBlue, name: 'Azul' });
-    this._themes.push({key: "themeRed", slStyle: themeRed, name: 'Rojo' });
-    this._themes.push({key: "themeGreen", slStyle: themeGreen, name: 'Verde' });
-    this._themes.push({key: "themeVoid", slStyle: themeVoid, name: 'Sin tema' });
+    this._themes = new Array<{ key: string; slStyle: ISlStyles; name: string }>();
+    this._themes.push({ key: "themeCyan", slStyle: themeCyan, name: 'Cyan' });
+    this._themes.push({ key: "themeGray", slStyle: themeGray, name: 'Grises' });
+    this._themes.push({ key: "themeMagenta", slStyle: themeMagenta, name: 'Magenta' });
+    this._themes.push({ key: "themeYellow", slStyle: themeYellow, name: 'Amarillo' });
+    this._themes.push({ key: "themeBlue", slStyle: themeBlue, name: 'Azul' });
+    this._themes.push({ key: "themeRed", slStyle: themeRed, name: 'Rojo' });
+    this._themes.push({ key: "themeGreen", slStyle: themeGreen, name: 'Verde' });
+    this._themes.push({ key: "themeVoid", slStyle: themeVoid, name: 'Sin tema' });
 
     // Inicializar estados
     this.state = {
@@ -164,14 +162,14 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
 
   private _onChangeComboColores(event: ChangeEvent<HTMLSelectElement>): void {
     this._piensaUnTiempo(0.1);
-    this.setState({theme: this._getTheme(event.target.value)});
-  }
-    
-  private _getTheme(themeKey: string): IRCTheme {
-    return(this._themes.find((aTheme)=>(aTheme.key == themeKey)) || this._themes[7]);
+    this.setState({ theme: this._getTheme(event.target.value) });
   }
 
-private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
+  private _getTheme(themeKey: string): IRCTheme {
+    return (this._themes.find((aTheme) => (aTheme.key == themeKey)) || this._themes[7]);
+  }
+
+  private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
     let checked: boolean = event.target.checked;
     let dataSource = (checked) ? dataSources.fromURL : dataSources.fromJsonWithDelay;
     this._loadColumns(dataSource != dataSources.fromURL);
@@ -238,14 +236,16 @@ private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void
     this._downloadCountries(this.state.dataSource);
   }
 
-  private _renderTitle(): JSX.Element {
+  private _renderTitle(styleHeader: React.CSSProperties): JSX.Element {
     let cssConfigHeader: React.CSSProperties = {
       verticalAlign: 'middle',
-      padding: '4px',
+      // padding: '4px',
       height: '40px',
       borderStyle: 'solid',
-      borderColor: DEF_COLOR_TITLE_AND_TABLE_HEADER,
-      borderWidth: '1px', width: '100%',
+      borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+      borderWidth: '1px',
+      backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
+      width: '100%',
       display: 'flex',
       flexWrap: 'wrap',
       alignItems: 'center',
@@ -258,27 +258,42 @@ private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void
     }
 
     let cssTitleHeader: React.CSSProperties = {
-      fontSize: 'large', display: 'flex', justifyContent: 'flex-end', padding: '4px', alignSelf: 'center', color: 'white',
-      backgroundColor: DEF_COLOR_TITLE_AND_TABLE_HEADER, width: '100%', borderStyle: 'solid', borderColor: DEF_COLOR_TITLE_AND_TABLE_HEADER,
+      fontSize: 'large', display: 'flex', justifyContent: 'flex-end',
+      // padding: '4px', 
+      paddingTop: '4px',
+      alignSelf: 'center',
+      color: this.state.theme.slStyle.tableContainerBackgroundColor,
+      backgroundColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+      width: '100%',
+      borderStyle: 'solid',
+      borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       borderWidth: '1px',
     }
 
     return (
-      <div style={{ width: this.props.width || DEFAULT_WIDTH }}>
+      <div style={{
+        width: this.props.width || DEFAULT_WIDTH,
+        // borderStyle: 'solid',
+        // borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+        // borderWidth: '1px',
+      }}>
         <div style={cssTitleHeader}>
           <div style={{ verticalAlign: 'middle', width: '100%' }} >
             {strings.title_App}
             <small>
               {` (${strings.agradecimiento} `}
-              <a target='_blank' style={{ color: 'white' }} href={URL_RESTCOUNTRIES_SITE}>{URL_RESTCOUNTRIES_SITE}</a>{')'}
+              <a target='_blank'
+                style={{ color: this.state.theme.slStyle.tableContainerBackgroundColor }}
+                href={URL_RESTCOUNTRIES_SITE}>{URL_RESTCOUNTRIES_SITE}
+              </a>{')'}
             </small>
           </div>
-          <span 
+          <span
             style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer', }}
             onClick={this._onClickButtonConfig}
             title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
           >
-            <IconoConfig fill={'white'} />
+            <IconoConfig fill={this.state.theme.slStyle.tableContainerBackgroundColor} />
           </span>
         </div>
         {/* Configuración */}
@@ -327,7 +342,7 @@ private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void
                 {this._themes.map((aTheme, index) => {
                   return (
                     <option key={aTheme.key} value={aTheme.key}>
-                      {`${aTheme.name}`}
+                        {`${aTheme.name}`}
                     </option>
                   )
                 })}
@@ -342,9 +357,16 @@ private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void
 
   public render(): JSX.Element {
     // console.log('RestCountriesExample render', 'ver config?', this.state.hiddenConfig);
+    let mainStyle = {
+      width: this.props.width || DEFAULT_WIDTH,
+      borderStyle: 'solid',
+      borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+      borderWidth: '1px',
+    }
+
     if (this.state.fetchResult == fetchResults.loading) {
       return (
-        <div style={{ width: this.props.width || DEFAULT_WIDTH }}>
+        <div style={mainStyle}>
           <this._renderTitle />
           <p> {strings.model_Loading}</p>
           {/* <img 
@@ -353,13 +375,13 @@ private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void
               style={{ color: COLOR_TITLE_AND_TABLE_HEADER }}
             /> */}
           <IconoSpinner
-            fill={DEF_COLOR_TITLE_AND_TABLE_HEADER}
+            fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor}
           />
         </div>
       );
     } else if (this.state.fetchResult == fetchResults.loadedErr) {
       return (
-        <div style={{ width: this.props.width || DEFAULT_WIDTH }}>
+        <div style={mainStyle}>
           <this._renderTitle />
           <h1>Se ha producido un error:</h1>
           <p>{this.state.fetchResultMessage}</p>
@@ -367,7 +389,7 @@ private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void
       );
     } else {
       return (
-        <div style={{ width: this.props.width || DEFAULT_WIDTH }}>
+        <div style={mainStyle}>
           <this._renderTitle />
           <SimpleListHtml
             ref={this._simpleListRef}
