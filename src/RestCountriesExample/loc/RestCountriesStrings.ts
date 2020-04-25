@@ -7,7 +7,23 @@ export let languagesSupported: {id: languagesSupportedIds; title: string;}[] = [
   {id: languagesSupportedIds.fr, title: 'Français'},
 ]
 
-export interface ISimpleListStrings {
+export interface IRestCountriesStrings {
+  click_ToViewTimeZones: string;
+  click_ToSeeFlag: string;
+  click_ToGoWikipediaInSpanish: string;
+  click_ToGoWikipediaInEnglish: string;
+  click_ToSeeCountryInGoogleMaps: string;
+  click_ToSeeCapitalInGoogleMaps: string;
+  click_ToSeeregionInGoogleMaps: string;
+  click_ToSeeContinentInGoogleMaps: string;
+  config_SelectColors: string;
+  color_Blue: string;
+  color_Green: string;
+  color_Red: string;
+  color_Grays: string;
+  color_Yellow: string;
+  color_Magenta: string;
+  color_Cyan: string;
   config_SelectLanguage: string;
   header_ShowConfig: string;
   header_HideConfig: string;
@@ -29,7 +45,7 @@ export interface ISimpleListStrings {
   field_SpanishName: string;
 }
 
-export let strings: ISimpleListStrings;
+export let strings: IRestCountriesStrings;
 
 export function initStrings(ln: languagesSupportedIds): void {
   strings = require(`./${ln}`).strings;

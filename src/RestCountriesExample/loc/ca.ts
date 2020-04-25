@@ -1,7 +1,23 @@
-import {ISimpleListStrings} from './RestCountriesStrings';
+import { IRestCountriesStrings } from './RestCountriesStrings';
 
-export const strings: ISimpleListStrings = {
-    config_SelectLanguage: "Sel·leccionar Idioma", 
+export const strings: IRestCountriesStrings = {
+    click_ToViewTimeZones: "Deixa quiet el ratolí para veure els Fusos Horaris",
+    click_ToSeeFlag: "Fes clic per veure la Bandera",
+    click_ToGoWikipediaInSpanish: "Fes clic per anar a la 'Wikipedia' en Espanyol",
+    click_ToGoWikipediaInEnglish: "Fes clic per anar a la 'Wikipedia' en Anglès",
+    click_ToSeeCapitalInGoogleMaps: "Fes clic per veure la Capital del Pais a 'Google Maps'",
+    click_ToSeeCountryInGoogleMaps: "Fes clic per veure el Pais a 'Google Maps'",
+    click_ToSeeContinentInGoogleMaps: "Fes clic per veure el Continent a 'Google Maps'",
+    click_ToSeeregionInGoogleMaps: "Fes clic per veure la Regiò a 'Google Maps'",
+    config_SelectColors: 'Seleccionar Colors',
+    color_Blue: 'Blau',
+    color_Green: 'Vert',
+    color_Red: 'Roig',
+    color_Grays: 'Grisos',
+    color_Yellow: 'Groc',
+    color_Magenta: "Magenta",
+    color_Cyan: "Cyan",
+    config_SelectLanguage: "Seleccionar Idioma",
     header_ShowConfig: 'Mostra la Configuració',
     header_HideConfig: 'Amaga la Configuració',
     config_CompactMode: 'Mostra la llista en mode "Compacte"',

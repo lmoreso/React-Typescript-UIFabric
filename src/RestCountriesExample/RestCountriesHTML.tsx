@@ -6,7 +6,7 @@ import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
 import { ChangeEvent } from 'react';
 import { IconoConfig, IconoSpinner } from './recursos/svgs';
-import { themeRed, themeGreen, themeVoid, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles } from 'src/lib/SimpleListUIfabric/SimpleListHtmlStyles';
+import { themeRed, themeGreen, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles } from 'src/lib/SimpleListUIfabric/SimpleListHtmlStyles';
 
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
@@ -34,15 +34,39 @@ function getRestCountriesColumns(): ISimpleListCol[] {
       // { titulo: "Key", campo: "key", width: 10 },
       // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
       { title: strings.field_Flag, field: "banderaUrl", width: 35, isImage: true },
-      { title: strings.field_NativeName, field: "nativeName", width: 150, fieldUrl: "mapsPaisUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a 'Google Maps'" },
-      { title: strings.field_EnglishName, field: "name", width: 150, fieldUrl: "wikiEnUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a la 'Wikipedia' en Inglés" },
-      { title: strings.field_SpanishName, field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a la 'Wikipedia' en Español" },
-      { title: strings.field_Capital, field: "capital", width: 120, fieldUrl: "mapsCapitalUrl", canSortAndFilter: true, headerTooltip: "Clica para ir a 'Google Maps'" },
-      { title: strings.field_Continente, field: "region", width: 100, fieldUrl: "mapsContinenteUrl", canSortAndFilter: true, canGroup: true, headerTooltip: "Clica para ir a 'Google Maps'" },
-      { title: strings.field_Region, field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", canSortAndFilter: true, canGroup: true, headerTooltip: "Clica para ir a 'Google Maps'" },
-      { title: strings.field_Siglas, field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true, headerTooltip: "Clica para ver la Bandera" },
+      {
+        title: strings.field_NativeName, field: "nativeName", width: 150, fieldUrl: "mapsPaisUrl", canSortAndFilter: true,
+        headerTooltip: strings.click_ToSeeCountryInGoogleMaps,
+      },
+      {
+        title: strings.field_EnglishName, field: "name", width: 150, fieldUrl: "wikiEnUrl", canSortAndFilter: true,
+        headerTooltip: strings.click_ToGoWikipediaInEnglish,
+      },
+      {
+        title: strings.field_SpanishName, field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSortAndFilter: true,
+        headerTooltip: strings.click_ToGoWikipediaInSpanish
+      },
+      {
+        title: strings.field_Capital, field: "capital", width: 120, fieldUrl: "mapsCapitalUrl", canSortAndFilter: true,
+        headerTooltip: strings.click_ToSeeCapitalInGoogleMaps,
+      },
+      {
+        title: strings.field_Continente, field: "region", width: 100, fieldUrl: "mapsContinenteUrl", canSortAndFilter: true, canGroup: true,
+        headerTooltip: strings.click_ToSeeContinentInGoogleMaps,
+      },
+      {
+        title: strings.field_Region, field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", canSortAndFilter: true, canGroup: true,
+        headerTooltip: strings.click_ToSeeregionInGoogleMaps,
+      },
+      {
+        title: strings.field_Siglas, field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true,
+        headerTooltip: strings.click_ToSeeFlag
+      },
       { title: strings.field_Idiomas, field: "idiomas", width: 100, canSortAndFilter: false },
-      { title: strings.field_NumHusos, field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true, isNumeric: true, headerTooltip: "Mantén quieto el ratón para ver los Husos Horarios" },
+      {
+        title: strings.field_NumHusos, field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true, isNumeric: true,
+        headerTooltip: strings.click_ToViewTimeZones
+      },
     ]
   )
 }
@@ -104,18 +128,13 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
   private _simpleListColumns: ISimpleListCol[];
   private _simpleListRef = React.createRef<SimpleListHtml>();
   private _themes: IRCTheme[];
+  private _defaultThemeKey = 3 // themeGray
 
   public constructor(props: IRestCountriesExampleProps) {
     super(props);
-    this._themes = new Array<{ key: string; slStyle: ISlStyles; name: string }>();
-    this._themes.push({ key: "themeCyan", slStyle: themeCyan, name: 'Cyan' });
-    this._themes.push({ key: "themeGray", slStyle: themeGray, name: 'Grises' });
-    this._themes.push({ key: "themeMagenta", slStyle: themeMagenta, name: 'Magenta' });
-    this._themes.push({ key: "themeYellow", slStyle: themeYellow, name: 'Amarillo' });
-    this._themes.push({ key: "themeBlue", slStyle: themeBlue, name: 'Azul' });
-    this._themes.push({ key: "themeRed", slStyle: themeRed, name: 'Rojo' });
-    this._themes.push({ key: "themeGreen", slStyle: themeGreen, name: 'Verde' });
-    this._themes.push({ key: "themeVoid", slStyle: themeVoid, name: 'Sin tema' });
+
+    // Cargar traducciones
+    let language = this._loadStrings(stringToLanguagesSupported(this.props.language));
 
     // Inicializar estados
     this.state = {
@@ -125,9 +144,13 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       dataSource: DATA_SOURCE_DEF,
       hiddenConfig: false,
       isCompactMode: true,
-      language: this._loadStrings(stringToLanguagesSupported(this.props.language)),
-      theme: this._themes[0],
+      language: language,
+      theme: this._themes[this._defaultThemeKey],
     }
+
+    // this._themes.push({ key: "themeVoid", slStyle: themeVoid, name: 'Sin tema' });
+
+
     // inicializar columnas para SimpeListHtml
     this._loadColumns(this.state.dataSource != dataSources.fromURL);
 
@@ -140,9 +163,28 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     this._onChangeComboColores = this._onChangeComboColores.bind(this);
   }
 
+  private _initColors() {
+    this._themes = new Array<{
+      key: string;
+      slStyle: ISlStyles;
+      name: string;
+    }>();
+    this._themes.push({ key: "themeCyan", slStyle: themeCyan, name: strings.color_Cyan });
+    this._themes.push({ key: "themeMagenta", slStyle: themeMagenta, name: strings.color_Magenta });
+    this._themes.push({ key: "themeYellow", slStyle: themeYellow, name: strings.color_Yellow });
+    this._themes.push({ key: "themeGray", slStyle: themeGray, name: strings.color_Grays });
+    this._themes.push({ key: "themeRed", slStyle: themeRed, name: strings.color_Red });
+    this._themes.push({ key: "themeGreen", slStyle: themeGreen, name: strings.color_Green });
+    this._themes.push({ key: "themeBlue", slStyle: themeBlue, name: strings.color_Blue });
+  }
+
   private _loadStrings(languageProposed: languagesSupportedIds | undefined): languagesSupportedIds {
     let languageDetected = detectLanguage(languageProposed);
     initStrings(languageDetected);
+
+    // Inicializar lista de Colores
+    this._initColors();
+
     return (languageDetected);
   }
 
@@ -166,7 +208,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
   }
 
   private _getTheme(themeKey: string): IRCTheme {
-    return (this._themes.find((aTheme) => (aTheme.key == themeKey)) || this._themes[7]);
+    return (this._themes.find((aTheme) => (aTheme.key == themeKey)) || this._themes[this._defaultThemeKey]);
   }
 
   private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -337,12 +379,12 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
 
             {/* Combo colores */}
             <label style={cssConfigBody}>
-              {'Selecciona colores'}
+              {strings.config_SelectColors}
               <select style={{ textAlign: 'center', marginLeft: '2px' }} value={(this.state.theme.key)} onChange={this._onChangeComboColores}>
                 {this._themes.map((aTheme, index) => {
                   return (
                     <option key={aTheme.key} value={aTheme.key}>
-                        {`${aTheme.name}`}
+                      {`${aTheme.name}`}
                     </option>
                   )
                 })}

@@ -6,7 +6,7 @@ import './SimpleListHtml.css';
 import { strings } from './loc/SimpleListStrings';
 import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
 import { Flechas } from './img/svgs';
-import { themeGreen, ISlStyles } from './SimpleListHtmlStyles';
+import { ISlStyles, themeGray } from './SimpleListHtmlStyles';
 
 interface ISimpleListHtmlStates {
   dataFiltered: any[];
@@ -26,7 +26,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
   public constructor(props: ISimpleListHtmlProps) {
     super(props);
-    this._theme = this.props.theme || themeGreen;
+    this._theme = this.props.theme || themeGray;
     this._simpleList = new SimpleList(props);
 
     this.state = {

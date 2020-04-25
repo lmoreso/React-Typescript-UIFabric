@@ -1,7 +1,23 @@
-import { ISimpleListStrings } from './RestCountriesStrings';
+import { IRestCountriesStrings } from './RestCountriesStrings';
 
-export const strings: ISimpleListStrings = {
-    config_SelectLanguage: "Seleccionar Idioma", 
+export const strings: IRestCountriesStrings = {
+    click_ToViewTimeZones: "Mantén quieto el ratón para ver los Husos Horarios",
+    click_ToSeeFlag: "Clica para ver la Bandera",
+    click_ToGoWikipediaInSpanish: "Clica para ir a la 'Wikipedia' en Español",
+    click_ToGoWikipediaInEnglish: "Clica para ir a la 'Wikipedia' en Inglés",
+    click_ToSeeCapitalInGoogleMaps: "Clica para ver la Capital del Pais en 'Google Maps'",
+    click_ToSeeCountryInGoogleMaps: "Clica para ver el Pais en 'Google Maps'",
+    click_ToSeeContinentInGoogleMaps: "Clica para ver el Continente en 'Google Maps'",
+    click_ToSeeregionInGoogleMaps: "Clica para ver la Region en 'Google Maps'",
+    config_SelectColors: 'Selecciona Colores',
+    color_Blue: 'Azul',
+    color_Green: 'Verde',
+    color_Red: 'Rojo',
+    color_Grays: 'Grises',
+    color_Yellow: 'Amarillo',
+    color_Magenta: "Magenta",
+    color_Cyan: "Cyan",
+    config_SelectLanguage: "Seleccionar Idioma",
     header_ShowConfig: 'Abrir la Configuración',
     header_HideConfig: 'Cerrar la Configuración',
     config_CompactMode: 'Mostrar la lista en modo "Compacto"',
