@@ -1,11 +1,14 @@
 import * as React from 'react';
 import './App.css';
-import logo from './logo.svg';
 import { initializeIcons } from '@uifabric/icons';
 import { MainView } from './MainView';
 import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
 import { ScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
 import { Sticky, StickyPositionType } from 'office-ui-fabric-react/lib/Sticky';
+
+// La primera opció no funciona en producció si la aplicació no està al arrel.
+// import logo from './logo.svg';
+let logo = window.location.origin + window.location.pathname + 'img/logo.svg'; // Tiene que estar en la carpeta public.
 
 interface IAppStates {
 
