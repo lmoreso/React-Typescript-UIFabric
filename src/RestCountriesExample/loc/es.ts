@@ -1,6 +1,8 @@
 import { IRestCountriesStrings } from './RestCountriesStrings';
 
 export const strings: IRestCountriesStrings = {
+    header_HideInfo: 'Cerrar los Créditos',
+    header_ShowInfo: 'Mostrar los Créditos',
     label_LoadFromRestcountries: 'Descargar las Banderas de restcountries.eu',
     click_ToViewTimeZones: "Mantén quieto el ratón para ver los Husos Horarios",
     click_ToSeeFlag: "Clica para ver la Bandera",
@@ -19,7 +21,7 @@ export const strings: IRestCountriesStrings = {
     color_Magenta: "Magenta",
     color_Cyan: "Cyan",
     config_SelectLanguage: "Seleccionar Idioma",
-    header_ShowConfig: 'Abrir la Configuración',
+    header_ShowConfig: 'Mostrar la Configuración',
     header_HideConfig: 'Cerrar la Configuración',
     config_CompactMode: 'Mostrar la lista en modo "Compacto"',
     agradecimiento: 'agradecimientos a',

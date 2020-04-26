@@ -1,6 +1,8 @@
 import { IRestCountriesStrings } from './RestCountriesStrings';
 
 export const strings: IRestCountriesStrings = {
+    header_HideInfo: 'Masquer les Crédits',
+    header_ShowInfo: 'Afficher les Crédits',
     label_LoadFromRestcountries: 'Téléchargez les Drapeaux sur restcountries.eu',
     click_ToViewTimeZones: "Maintenez votre souris immobile pour voir les Fuseaux horaires",
     click_ToSeeFlag: "Cliquez pour voir le Drapeau",
@@ -19,8 +21,8 @@ export const strings: IRestCountriesStrings = {
     color_Magenta: "Magenta",
     color_Cyan: "Cyan",
     config_SelectLanguage: "Sélectionner la Langue",
-    header_ShowConfig: 'Ouvrir les Paramètres',
-    header_HideConfig: 'Fermer les Paramètres',
+    header_ShowConfig: 'Afficher les Paramètres',
+    header_HideConfig: 'Masquer les Paramètres',
     config_CompactMode: 'Affiche la liste en mode "Compact"',
     agradecimiento: 'grâce au',
     model_Loading: 'Attendez quelques secondes',

@@ -1,6 +1,8 @@
 import { IRestCountriesStrings } from './RestCountriesStrings';
 
 export const strings: IRestCountriesStrings = {
+    header_HideInfo: 'Hide Credits',
+    header_ShowInfo: 'Show Credits',
     label_LoadFromRestcountries: 'Download the Flags from restcountries.eu',
     click_ToViewTimeZones: "Hold your mouse still to see Time zones",
     click_ToSeeFlag: "Click to see the Flag",

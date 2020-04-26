@@ -1,6 +1,8 @@
 import { IRestCountriesStrings } from './RestCountriesStrings';
 
 export const strings: IRestCountriesStrings = {
+    header_HideInfo: 'Amaga els Crèdits',
+    header_ShowInfo: 'Mostra els Crèdits',
     label_LoadFromRestcountries: 'Descarregueu les Banderes de restcountries.eu',
     click_ToViewTimeZones: "Deixa quiet el ratolí para veure els Fusos Horaris",
     click_ToSeeFlag: "Fes clic per veure la Bandera",

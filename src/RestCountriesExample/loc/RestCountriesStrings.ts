@@ -8,6 +8,8 @@ export let languagesSupported: {id: languagesSupportedIds; title: string;}[] = [
 ]
 
 export interface IRestCountriesStrings {
+  header_HideInfo: string;
+  header_ShowInfo: string;
   label_LoadFromRestcountries: string;
   click_ToViewTimeZones: string;
   click_ToSeeFlag: string;

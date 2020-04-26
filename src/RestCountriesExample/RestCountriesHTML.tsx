@@ -5,7 +5,7 @@ import { ISimpleListCol } from '../lib/SimpleListUIfabric/ISimpleListLib';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
 import { ChangeEvent } from 'react';
-import { IconoConfig, IconoSpinner } from './recursos/svgs';
+import { IconoConfig, IconoSpinner, IconoInfo } from './recursos/svgs';
 import { themeRed, themeGreen, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles } from 'src/lib/SimpleListUIfabric/SimpleListHtmlStyles';
 
 
@@ -80,6 +80,7 @@ interface IRestCountriesExampleStates {
   isCompactMode: boolean;
   language: string;
   theme: IRCTheme;
+  hiddenInfo: boolean;
 }
 
 export interface IRestCountriesExampleProps {
@@ -146,10 +147,8 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       isCompactMode: true,
       language: language,
       theme: this._themes[this._defaultThemeKey],
+      hiddenInfo: false,
     }
-
-    // this._themes.push({ key: "themeVoid", slStyle: themeVoid, name: 'Sin tema' });
-
 
     // inicializar columnas para SimpeListHtml
     this._loadColumns(this.state.dataSource != dataSources.fromURL);
@@ -157,6 +156,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     // Binds de funciones
     this._renderTitle = this._renderTitle.bind(this);
     this._onClickButtonConfig = this._onClickButtonConfig.bind(this);
+    this._onClickButtonInfo = this._onClickButtonInfo.bind(this);
     this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
     this._onChangeComboIdiomas = this._onChangeComboIdiomas.bind(this);
     this._onChangeCheckBoxIsUrl = this._onChangeCheckBoxIsUrl.bind(this);
@@ -236,8 +236,11 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
   }
 
   private _onClickButtonConfig(event: any): void {
-    // console.log('_onClickButtonConfig');
     this.setState({ hiddenConfig: !this.state.hiddenConfig });
+  }
+
+  private _onClickButtonInfo(event: any): void {
+    this.setState({ hiddenInfo: !this.state.hiddenInfo });
   }
 
   private _onChangeCheckBoxCompactMode(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -291,7 +294,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       display: 'flex',
       flexWrap: 'wrap',
       alignItems: 'center',
-      justifyContent: 'space-evenly',
+      justifyContent: 'space-around',
     };
 
     let cssConfigBody: React.CSSProperties = {
@@ -319,7 +322,17 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
         // borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
         // borderWidth: '1px',
       }}>
+        {/* Barra de Título */}
         <div style={cssTitleHeader}>
+          {/* Icono INFO */}
+          <span
+            style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer', margin: '2px' }}
+            onClick={this._onClickButtonInfo}
+            title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
+          >
+            <IconoInfo fill={this.state.theme.slStyle.tableContainerBackgroundColor} />
+          </span>
+          {/* Título */}
           <div style={{ verticalAlign: 'middle', width: '100%' }} >
             {strings.title_App}
             <small>
@@ -330,17 +343,41 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
               </a>{')'}
             </small>
           </div>
+          {/* Icono Configuración */}
           <span
-            style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer', }}
+            style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer', margin: '2px', }}
             onClick={this._onClickButtonConfig}
             title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
           >
             <IconoConfig fill={this.state.theme.slStyle.tableContainerBackgroundColor} />
           </span>
         </div>
-        {/* Configuración */}
-        {(this.state.hiddenConfig ? null :
+        {/* Créditos */}
+        {(this.state.hiddenInfo) ? null :
           <div style={cssConfigHeader}>
+            {/* Icono Info */}
+            <span
+              style={{ verticalAlign: 'baseline', width: '40px', cursor: 'pointer', margin: '2px' }}
+              onClick={this._onClickButtonInfo}
+              title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
+            >
+              <IconoInfo fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
+            </span>
+
+          </div>
+        }
+        {/* Configuración */}
+        {(this.state.hiddenConfig) ? null :
+          <div style={cssConfigHeader}>
+            {/* Icono Configuración */}
+            <span
+              style={{ verticalAlign: 'baseline', width: '40px', cursor: 'pointer', margin: '2px', }}
+              onClick={this._onClickButtonConfig}
+              title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
+            >
+              <IconoConfig fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
+            </span>
+
             {/* Checkbox isCompactMode */}
             <label style={cssConfigBody}>
               {strings.config_CompactMode}
@@ -392,7 +429,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
             </label>
 
           </div>
-        )}
+        }
       </div>
     );
   }
