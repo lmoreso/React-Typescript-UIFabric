@@ -1,6 +1,7 @@
 import { IRestCountriesStrings } from './RestCountriesStrings';
 
 export const strings: IRestCountriesStrings = {
+    label_LoadFromRestcountries: 'Téléchargez les Drapeaux sur restcountries.eu',
     click_ToViewTimeZones: "Maintenez votre souris immobile pour voir les Fuseaux horaires",
     click_ToSeeFlag: "Cliquez pour voir le Drapeau",
     click_ToGoWikipediaInSpanish: "Cliquez pour aller à la 'Wikipedia' en Espagnol",
@@ -21,7 +22,7 @@ export const strings: IRestCountriesStrings = {
     header_ShowConfig: 'Ouvrir les Paramètres',
     header_HideConfig: 'Fermer les Paramètres',
     config_CompactMode: 'Affiche la liste en mode "Compact"',
-    agradecimiento: 'grâce au Service Rest de',
+    agradecimiento: 'grâce au',
     model_Loading: 'Attendez quelques secondes',
     title_App: 'Pays et Drapeaux du Monde',
     label_Paises: 'Pays',

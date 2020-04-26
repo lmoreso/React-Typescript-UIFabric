@@ -1,6 +1,7 @@
 import { IRestCountriesStrings } from './RestCountriesStrings';
 
 export const strings: IRestCountriesStrings = {
+    label_LoadFromRestcountries: 'Download the Flags from restcountries.eu',
     click_ToViewTimeZones: "Hold your mouse still to see Time zones",
     click_ToSeeFlag: "Click to see the Flag",
     click_ToGoWikipediaInSpanish: "Click to go to the 'Wikipedia' in Spanish",
@@ -21,7 +22,7 @@ export const strings: IRestCountriesStrings = {
     header_ShowConfig: 'Show Settings',
     header_HideConfig: 'Hide Settings',
     config_CompactMode: 'Displays the list in "Compact" mode',
-    agradecimiento: 'thanks to the Rest Service ',
+    agradecimiento: 'thanks to',
     model_Loading: 'Loading ...',
     title_App: 'Countries and Flags of the World',
     label_Paises: 'Countries',

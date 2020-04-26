@@ -142,7 +142,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       fetchResult: fetchResults.loading,
       fetchResultMessage: '',
       dataSource: DATA_SOURCE_DEF,
-      hiddenConfig: false,
+      hiddenConfig: true,
       isCompactMode: true,
       language: language,
       theme: this._themes[this._defaultThemeKey],
@@ -368,7 +368,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
 
             {/* Checkbox dataSource */}
             <label style={cssConfigBody}>
-              {'Descargar Banderas de restCountries.eu'}
+              {strings.label_LoadFromRestcountries}
               <input style={{ textAlign: 'center', marginLeft: '2px' }}
                 name="ToggleIsUrl"
                 type="checkbox"

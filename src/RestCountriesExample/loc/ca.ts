@@ -1,6 +1,7 @@
 import { IRestCountriesStrings } from './RestCountriesStrings';
 
 export const strings: IRestCountriesStrings = {
+    label_LoadFromRestcountries: 'Descarregueu les Banderes de restcountries.eu',
     click_ToViewTimeZones: "Deixa quiet el ratolí para veure els Fusos Horaris",
     click_ToSeeFlag: "Fes clic per veure la Bandera",
     click_ToGoWikipediaInSpanish: "Fes clic per anar a la 'Wikipedia' en Espanyol",
@@ -21,7 +22,7 @@ export const strings: IRestCountriesStrings = {
     header_ShowConfig: 'Mostra la Configuració',
     header_HideConfig: 'Amaga la Configuració',
     config_CompactMode: 'Mostra la llista en mode "Compacte"',
-    agradecimiento: 'agraiments als Serveis Rest de',
+    agradecimiento: 'agraiments a',
     model_Loading: 'Carregant els Països ...',
     title_App: 'Països i Banderes del Món',
     label_Paises: 'Països',

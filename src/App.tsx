@@ -8,7 +8,10 @@ import { Sticky, StickyPositionType } from 'office-ui-fabric-react/lib/Sticky';
 
 // La primera opció no funciona en producció si la aplicació no està al arrel.
 // import logo from './logo.svg';
-let logo = window.location.origin + window.location.pathname + 'img/logo.svg'; // Tiene que estar en la carpeta public.
+// La segona opció si que funciona, sempre que no vingui res estrany a la URL ...
+// let logo = window.location.origin + window.location.pathname + 'img/logo.svg'; // Tiene que estar en la carpeta public.
+// la tercera opció també funciona:
+let logo = process.env.PUBLIC_URL + 'img/logo.svg'; // Tiene que estar en la carpeta public.
 
 interface IAppStates {
 
@@ -27,6 +30,7 @@ class App extends React.Component<{}, IAppStates> {
     // @uifabric/icons: Register icons and pull the fonts from the default SharePoint CDN:
     initializeIcons();
   }
+
 
   public render() {
     return (
