@@ -5,7 +5,7 @@ import { ISimpleListCol } from '../lib/SimpleListUIfabric/ISimpleListLib';
 import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
 import { ChangeEvent } from 'react';
-import { IconoConfig, IconoSpinner, IconoInfo } from './recursos/svgs';
+import { IconoConfig, IconoSpinner, IconoInfo, IconoCerrar, IconoGithub } from './recursos/svgs';
 import { themeRed, themeGreen, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles } from 'src/lib/SimpleListUIfabric/SimpleListHtmlStyles';
 
 
@@ -143,11 +143,11 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       fetchResult: fetchResults.loading,
       fetchResultMessage: '',
       dataSource: DATA_SOURCE_DEF,
-      hiddenConfig: true,
+      hiddenConfig: false,
+      hiddenInfo: false,
       isCompactMode: true,
       language: language,
       theme: this._themes[this._defaultThemeKey],
-      hiddenInfo: false,
     }
 
     // inicializar columnas para SimpeListHtml
@@ -282,38 +282,55 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
   }
 
   private _renderTitle(styleHeader: React.CSSProperties): JSX.Element {
-    let cssConfigHeader: React.CSSProperties = {
-      verticalAlign: 'middle',
-      // padding: '4px',
-      height: '40px',
-      borderStyle: 'solid',
-      borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
-      borderWidth: '1px',
-      backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
-      width: '100%',
-      display: 'flex',
-      flexWrap: 'wrap',
-      alignItems: 'center',
-      justifyContent: 'space-around',
-    };
-
     let cssConfigBody: React.CSSProperties = {
       margin: '2px 2px 2px 2px',
       verticalAlign: 'baseline',
     }
 
-    let cssTitleHeader: React.CSSProperties = {
-      fontSize: 'large', display: 'flex', justifyContent: 'flex-end',
-      // padding: '4px', 
-      paddingTop: '4px',
-      alignSelf: 'center',
-      color: this.state.theme.slStyle.tableContainerBackgroundColor,
-      backgroundColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+    let cssTitleContainer: React.CSSProperties = {
+      fontSize: 'large',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignContent: 'center',
+      alignItems: 'center',
+      paddingTop: '2px',
       width: '100%',
+      height: '40px',
       borderStyle: 'solid',
       borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       borderWidth: '1px',
+      color: this.state.theme.slStyle.tableContainerBackgroundColor,
+      backgroundColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
     }
+
+    let cssInfoContainer: React.CSSProperties = {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignContent: 'center',
+      alignItems: 'center',
+      paddingTop: '2px',
+      width: '100%',
+      height: '40px',
+      borderStyle: 'solid',
+      borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+      borderWidth: '1px',
+      backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
+    }
+
+    let cssConfigContainer: React.CSSProperties = {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignContent: 'center',
+      alignItems: 'center',
+      paddingTop: '2px',
+      width: '100%',
+      height: '40px',
+      borderStyle: 'solid',
+      borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+      borderWidth: '1px',
+      backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
+    };
+
 
     return (
       <div style={{
@@ -323,10 +340,10 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
         // borderWidth: '1px',
       }}>
         {/* Barra de Título */}
-        <div style={cssTitleHeader}>
+        <div style={cssTitleContainer}>
           {/* Icono INFO */}
           <span
-            style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer', margin: '2px' }}
+            style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
             onClick={this._onClickButtonInfo}
             title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
           >
@@ -354,80 +371,138 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
         </div>
         {/* Créditos */}
         {(this.state.hiddenInfo) ? null :
-          <div style={cssConfigHeader}>
+          <div style={cssInfoContainer}>
             {/* Icono Info */}
             <span
-              style={{ verticalAlign: 'baseline', width: '40px', cursor: 'pointer', margin: '2px' }}
+              style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
               onClick={this._onClickButtonInfo}
               title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
             >
               <IconoInfo fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
             </span>
-
+            {/* Contenido de los créditos */}
+            <div style={{
+              verticalAlign: 'middle',
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'space-around',
+              alignContent: 'center',
+              alignItems: 'center',
+            }} >
+              <span style={{ verticalAlign: 'middle' }}>
+                ©2020 <a target="_blank" href="mailto:lmoreso@yahoo.com" title="Envía un e-mail al autor">Lluís Moreso Bosch</a>
+              </span>
+              <span style={{ verticalAlign: 'middle' }}>
+                <a target="_blank" href="https://es.linkedin.com/pub/lluis-moreso-bosch/3b/381/663">
+                  <img src={`${process.env.PUBLIC_URL}img/btn_viewmy_linkedin_160x33_es_ES.png`} width="160" 
+                    title="Ver el perfil de Lluis Moreso Bosch en LinkedIn" />
+                </a>
+              </span>
+              <span style={{ verticalAlign: 'middle' }}>
+                <a
+                  style={{ verticalAlign: 'middle', height: '100%', display: 'flex', justifyContent: 'space-around', alignContent: 'center', alignItems: 'center', }}
+                  target="_blank" href="https://github.com/lmoreso/React-Typescript-UIFabric"
+                  title="Clona la App en GitHub" 
+                >
+                  {/* <img src="img/Github.png" width="35px"
+                    title="Clona la App en GitHub" /> */}
+                  <IconoGithub fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
+                  <span> Clona la App en GitHub</span>
+                </a>
+              </span>
+            </div>
+            {/* Icono Cerrar */}
+            <span
+              style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
+              onClick={this._onClickButtonInfo}
+              title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
+            >
+              <IconoCerrar fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
+            </span>
           </div>
         }
         {/* Configuración */}
         {(this.state.hiddenConfig) ? null :
-          <div style={cssConfigHeader}>
+          <div style={cssConfigContainer}>
             {/* Icono Configuración */}
             <span
-              style={{ verticalAlign: 'baseline', width: '40px', cursor: 'pointer', margin: '2px', }}
+              style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
+
               onClick={this._onClickButtonConfig}
               title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
             >
               <IconoConfig fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
             </span>
 
-            {/* Checkbox isCompactMode */}
-            <label style={cssConfigBody}>
-              {strings.config_CompactMode}
-              <input style={{ marginLeft: '2px' }}
-                name="ToggleCompactMode"
-                type="checkbox"
-                checked={this.state.isCompactMode}
-                onChange={this._onChangeCheckBoxCompactMode}
-              />
-            </label>
+            {/* Contenido de la configuración */}
+            <div style={{
+              verticalAlign: 'middle',
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'space-around',
+              alignContent: 'center',
+              alignItems: 'center',
+            }} >
 
-            {/* Combo idiomas */}
-            <label style={cssConfigBody}>
-              {strings.config_SelectLanguage}
-              <select style={{ textAlign: 'center', marginLeft: '2px' }} value={this.state.language} onChange={this._onChangeComboIdiomas}>
-                {languagesSupported.map((aLanguage, index) => {
-                  return (
-                    <option key={index} value={aLanguage.id}>
-                      {`${aLanguage.title}`}
-                    </option>
-                  )
-                })}
-              </select>
-            </label>
+              {/* Checkbox isCompactMode */}
+              <label style={cssConfigBody}>
+                {strings.config_CompactMode}
+                <input style={{ marginLeft: '2px' }}
+                  name="ToggleCompactMode"
+                  type="checkbox"
+                  checked={this.state.isCompactMode}
+                  onChange={this._onChangeCheckBoxCompactMode}
+                />
+              </label>
 
-            {/* Checkbox dataSource */}
-            <label style={cssConfigBody}>
-              {strings.label_LoadFromRestcountries}
-              <input style={{ textAlign: 'center', marginLeft: '2px' }}
-                name="ToggleIsUrl"
-                type="checkbox"
-                checked={this.state.dataSource == dataSources.fromURL}
-                onChange={this._onChangeCheckBoxIsUrl}
-              />
-            </label>
+              {/* Combo idiomas */}
+              <label style={cssConfigBody}>
+                {strings.config_SelectLanguage}
+                <select style={{ textAlign: 'center', marginLeft: '2px' }} value={this.state.language} onChange={this._onChangeComboIdiomas}>
+                  {languagesSupported.map((aLanguage, index) => {
+                    return (
+                      <option key={index} value={aLanguage.id}>
+                        {`${aLanguage.title}`}
+                      </option>
+                    )
+                  })}
+                </select>
+              </label>
 
-            {/* Combo colores */}
-            <label style={cssConfigBody}>
-              {strings.config_SelectColors}
-              <select style={{ textAlign: 'center', marginLeft: '2px' }} value={(this.state.theme.key)} onChange={this._onChangeComboColores}>
-                {this._themes.map((aTheme, index) => {
-                  return (
-                    <option key={aTheme.key} value={aTheme.key}>
-                      {`${aTheme.name}`}
-                    </option>
-                  )
-                })}
-              </select>
-            </label>
+              {/* Checkbox dataSource */}
+              <label style={cssConfigBody}>
+                {strings.label_LoadFromRestcountries}
+                <input style={{ textAlign: 'center', marginLeft: '2px' }}
+                  name="ToggleIsUrl"
+                  type="checkbox"
+                  checked={this.state.dataSource == dataSources.fromURL}
+                  onChange={this._onChangeCheckBoxIsUrl}
+                />
+              </label>
 
+              {/* Combo colores */}
+              <label style={cssConfigBody}>
+                {strings.config_SelectColors}
+                <select style={{ textAlign: 'center', marginLeft: '2px' }} value={(this.state.theme.key)} onChange={this._onChangeComboColores}>
+                  {this._themes.map((aTheme, index) => {
+                    return (
+                      <option key={aTheme.key} value={aTheme.key}>
+                        {`${aTheme.name}`}
+                      </option>
+                    )
+                  })}
+                </select>
+              </label>
+            </div>
+
+            {/* Icono Cerrar */}
+            <span
+              style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
+              onClick={this._onClickButtonConfig}
+              title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
+            >
+              <IconoCerrar fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
+            </span>
           </div>
         }
       </div>
