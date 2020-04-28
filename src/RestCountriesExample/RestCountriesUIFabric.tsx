@@ -6,9 +6,9 @@ import { ChangeEvent } from 'react';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 
 // Aplicattion imports
-import { ISimpleListCol } from '../lib/SimpleListUIfabric/ISimpleListLib';
-import { SimpleListUIFabric } from '../lib/SimpleListUIfabric/SimpleListUIFabric';
-import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
+import { ISimpleListCol } from '../lib/SimpleList/ISimpleListLib';
+import { SimpleListUIFabric } from '../lib/SimpleList/SimpleListUIFabric';
+import { SimpleListHtml } from 'src/lib/SimpleList/SimpleListHtml';
 // import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from '../lib/SimpleListUIfabric/SimpleList';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
 import { IconoConfig, } from './recursos/svgs';

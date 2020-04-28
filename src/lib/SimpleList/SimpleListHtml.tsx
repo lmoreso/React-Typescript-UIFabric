@@ -8,6 +8,9 @@ import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountrie
 import { Flechas } from './img/svgs';
 import { ISlStyles, themeGray } from './SimpleListHtmlStyles';
 
+const simpleListVersion = '0.1.2';
+export const simpleListVersionLabel = `SimpleList V.${simpleListVersion}`;
+
 interface ISimpleListHtmlStates {
   dataFiltered: any[];
   filterText: string;

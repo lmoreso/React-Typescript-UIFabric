@@ -2,8 +2,9 @@ import * as React from 'react';
 // Fluent UI imports
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
-// import { ScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
-import { Sticky, /* StickyPositionType */ } from 'office-ui-fabric-react/lib/Sticky';
+import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
+import { ScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
+import { Sticky, StickyPositionType } from 'office-ui-fabric-react/lib/Sticky';
 
 // Aplicattion imports
 import { DetailsListDocumentsExample } from './FluentUiExamples/DetailListDocumentsExample';
@@ -11,8 +12,22 @@ import { ScrollablePaneDetailsListExample } from './FluentUiExamples/ScrollableP
 import { RestCountriesHTML } from './RestCountriesExample/RestCountriesHTML';
 import { RestCountriesUIFabric } from './RestCountriesExample/RestCountriesUIFabric';
 
+
+// La primera opció no funciona en producció si la aplicació no està al arrel.
+// import logo from './logo.svg';
+// La segona opció si que funciona, sempre que no vingui res estrany a la URL ...
+// let logo = window.location.origin + window.location.pathname + 'img/logo.svg'; // Tiene que estar en la carpeta public.
+// la tercera opció també funciona:
+const logo = `${process.env.PUBLIC_URL}img/logo.svg`; // Tiene que estar en la carpeta public.
+
+const REACT_URL = 'https://reactjs.org/';
+const TYPESCRIPT_URL = 'https://www.typescriptlang.org/docs/home.html';
+const FLUENT_UI_URL = 'https://developer.microsoft.com/en-us/fluentui#/controls/web';
+const UI_FABRIC_URL = 'https://developer.microsoft.com/en-us/office/blogs/ui-fabric-is-evolving-into-fluent-ui';
+
 enum menuOptionsId { restCountriesUIFabric = 1, restCountriesHtml, fabricListDocExample, scrollablePaneExample }
 const DEF_MENU_ID: menuOptionsId = menuOptionsId.restCountriesHtml;
+const menuAPiñon: menuOptionsId | undefined = menuOptionsId.restCountriesHtml;
 
 interface IMenuOptions {
   key: menuOptionsId;
@@ -68,45 +83,66 @@ export class MainView extends React.Component<IMainViewProps, IMainViewStates> {
     };
    */
   public render(): JSX.Element {
-
-    return (
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
-          <Sticky >
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', alignSelf: 'center', backgroundColor: 'rgba(150, 150, 150)', width: '100%' }}>
-              <Label style={{ padding: '5px', paddingTop: '10px' }}> Selecciona una opción: </Label>
-              <Dropdown
-                // defaultSelectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
-                selectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
-                onChange={this._onChangeComboMenu}
-                placeholder="Select an option"
-                options={this._optionsComboMenu}
-                styles={{ dropdown: { width: 400, padding: '5px' } }}
-
-              />
-            </div>
-          </Sticky>
-          <div style={{ padding: '5px', alignSelf: 'center', justifyContent: 'center' }}>
-
-            <DetailsListDocumentsExample
-              hidden={!this._isMenuActive(menuOptionsId.fabricListDocExample)}
-            />
-
-            {(this._isMenuActive(menuOptionsId.scrollablePaneExample)) ? <ScrollablePaneDetailsListExample /> : null}
-
-            {(!this._isMenuActive(menuOptionsId.restCountriesUIFabric)) ? null :
-              <RestCountriesUIFabric />
-            }
-
-            {(!this._isMenuActive(menuOptionsId.restCountriesHtml)) ? null :
-              <RestCountriesHTML
-              />
-            }
-
-          </div>
+    if (menuAPiñon == menuOptionsId.restCountriesHtml)
+      return (
+        <Fabric>
+        <div style={{ display: 'flex', justifyContent: 'center' }} >
+          <RestCountriesHTML />
         </div>
-      </div>
-    );
+        </Fabric>
+      )
+    else
+      return (
+        <div>
+          <Fabric>
+            <ScrollablePane scrollbarVisibility={ScrollbarVisibility.auto}>
+              <Sticky stickyPosition={StickyPositionType.Header}>
+                <header className="App-header">
+                  <img src={logo} className="App-logo" alt="logo" />
+                  <span className="App-title">
+                    Exercices about <a className="App-title" href={REACT_URL} target='_blank'>React</a>, <a className="App-title" href={TYPESCRIPT_URL} target='_blank'>Typescript</a> & <a className="App-title" href={FLUENT_UI_URL} target='_blank'>Fluent UI</a> (<a className="App-title" href={UI_FABRIC_URL} target='_blank'> UIFabric</a>)
+                </span>
+                </header>
+              </Sticky>
+              <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
+                <Sticky >
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', alignSelf: 'center', backgroundColor: 'rgba(150, 150, 150)', width: '100%' }}>
+                    <Label style={{ padding: '5px', paddingTop: '10px' }}> Selecciona una opción: </Label>
+                    <Dropdown
+                      // defaultSelectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
+                      selectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
+                      onChange={this._onChangeComboMenu}
+                      placeholder="Select an option"
+                      options={this._optionsComboMenu}
+                      styles={{ dropdown: { width: 400, padding: '5px' } }}
+
+                    />
+                  </div>
+                </Sticky>
+                <div style={{ padding: '5px', alignSelf: 'center', justifyContent: 'center' }}>
+
+                  <DetailsListDocumentsExample
+                    hidden={!this._isMenuActive(menuOptionsId.fabricListDocExample)}
+                  />
+
+                  {(this._isMenuActive(menuOptionsId.scrollablePaneExample)) ? <ScrollablePaneDetailsListExample /> : null}
+
+                  {(!this._isMenuActive(menuOptionsId.restCountriesUIFabric)) ? null :
+                    <RestCountriesUIFabric />
+                  }
+
+                  {(!this._isMenuActive(menuOptionsId.restCountriesHtml)) ? null :
+                    <RestCountriesHTML
+                    />
+                  }
+
+                </div>
+              </div>
+            </ScrollablePane>
+          </Fabric>
+
+        </div>
+      );
   }
 }
 

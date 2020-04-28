@@ -1,13 +1,15 @@
 import * as React from 'react';
 
 // Aplicattion imports
-import { ISimpleListCol } from '../lib/SimpleListUIfabric/ISimpleListLib';
-import { SimpleListHtml } from 'src/lib/SimpleListUIfabric/SimpleListHtml';
+import { ISimpleListCol } from '../lib/SimpleList/ISimpleListLib';
+import { SimpleListHtml, simpleListVersionLabel } from 'src/lib/SimpleList/SimpleListHtml';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
 import { ChangeEvent } from 'react';
-import { IconoConfig, IconoSpinner, IconoInfo, IconoCerrar, IconoGithub } from './recursos/svgs';
-import { themeRed, themeGreen, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles } from 'src/lib/SimpleListUIfabric/SimpleListHtmlStyles';
+import { IconoConfig, IconoSpinner, IconoInfo, IconoCerrar, IconoGithub, IconoLinkedIn } from './recursos/svgs';
+import { themeRed, themeGreen, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles } from 'src/lib/SimpleList/SimpleListHtmlStyles';
 
+const restCountriesVersion = '0.1.2';
+const restCountriesVersionLabel = `RestCountries V.${restCountriesVersion}`;
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
 const URL_FLAGS = 'https://restcountries.eu/data/';
@@ -143,9 +145,9 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       fetchResult: fetchResults.loading,
       fetchResultMessage: '',
       dataSource: DATA_SOURCE_DEF,
-      hiddenConfig: false,
-      hiddenInfo: false,
-      isCompactMode: true,
+      hiddenConfig: true,
+      hiddenInfo: true,
+      isCompactMode: false,
       language: language,
       theme: this._themes[this._defaultThemeKey],
     }
@@ -369,6 +371,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
             <IconoConfig fill={this.state.theme.slStyle.tableContainerBackgroundColor} />
           </span>
         </div>
+
         {/* Créditos */}
         {(this.state.hiddenInfo) ? null :
           <div style={cssInfoContainer}>
@@ -389,20 +392,37 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
               alignContent: 'center',
               alignItems: 'center',
             }} >
+              <span style={{ verticalAlign: 'middle', fontSize: '0.8em', textAlign: 'left'}}>
+                {simpleListVersionLabel}<br/>{restCountriesVersionLabel}
+              </span>
+
               <span style={{ verticalAlign: 'middle' }}>
                 ©2020 <a target="_blank" href="mailto:lmoreso@yahoo.com" title="Envía un e-mail al autor">Lluís Moreso Bosch</a>
               </span>
-              <span style={{ verticalAlign: 'middle' }}>
+              {/* <span style={{ verticalAlign: 'middle' }}>
                 <a target="_blank" href="https://es.linkedin.com/pub/lluis-moreso-bosch/3b/381/663">
-                  <img src={`${process.env.PUBLIC_URL}img/btn_viewmy_linkedin_160x33_es_ES.png`} width="160" 
+                  <img src={`${process.env.PUBLIC_URL}img/btn_viewmy_linkedin_160x33_es_ES.png`} width="160"
                     title="Ver el perfil de Lluis Moreso Bosch en LinkedIn" />
                 </a>
+              </span> */}
+              <span style={{ verticalAlign: 'middle' }}>
+                <a
+                  style={{ verticalAlign: 'middle', height: '100%', display: 'flex', justifyContent: 'space-around', alignContent: 'center', alignItems: 'center', }}
+                  target="_blank" href="https://es.linkedin.com/pub/lluis-moreso-bosch/3b/381/663"
+                  title="Visita mi perfil en LinkedIn"
+                >
+                  {/* <img src="img/Github.png" width="35px"
+                    title="Clona la App en GitHub" /> */}
+                  <IconoLinkedIn fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
+                  <span> Visita mi perfil en LinkedIn</span>
+                </a>
               </span>
+
               <span style={{ verticalAlign: 'middle' }}>
                 <a
                   style={{ verticalAlign: 'middle', height: '100%', display: 'flex', justifyContent: 'space-around', alignContent: 'center', alignItems: 'center', }}
                   target="_blank" href="https://github.com/lmoreso/React-Typescript-UIFabric"
-                  title="Clona la App en GitHub" 
+                  title="Clona la App en GitHub"
                 >
                   {/* <img src="img/Github.png" width="35px"
                     title="Clona la App en GitHub" /> */}
@@ -523,11 +543,6 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
         <div style={mainStyle}>
           <this._renderTitle />
           <p> {strings.model_Loading}</p>
-          {/* <img 
-              src={imgSpinner}
-              title={strings.model_Loading}
-              style={{ color: COLOR_TITLE_AND_TABLE_HEADER }}
-            /> */}
           <IconoSpinner
             fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor}
           />
