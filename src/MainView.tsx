@@ -27,7 +27,7 @@ const UI_FABRIC_URL = 'https://developer.microsoft.com/en-us/office/blogs/ui-fab
 
 enum menuOptionsId { restCountriesUIFabric = 1, restCountriesHtml, fabricListDocExample, scrollablePaneExample }
 const DEF_MENU_ID: menuOptionsId = menuOptionsId.restCountriesHtml;
-const menuAPiñon: menuOptionsId | undefined = menuOptionsId.restCountriesHtml;
+const menuAPiñon: menuOptionsId | undefined = undefined /* menuOptionsId.restCountriesHtml */;
 
 interface IMenuOptions {
   key: menuOptionsId;

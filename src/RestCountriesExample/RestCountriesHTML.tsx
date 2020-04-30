@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as mod from './RestCountriesCommon'
 
 // Aplicattion imports
 import { ISimpleListCol } from '../lib/SimpleList/ISimpleListLib';
@@ -11,129 +12,14 @@ import { themeRed, themeGreen, themeBlue, themeCyan, themeYellow, themeMagenta, 
 const restCountriesVersion = '0.1.2';
 const restCountriesVersionLabel = `RestCountries V.${restCountriesVersion}`;
 
-const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
-const URL_FLAGS = 'https://restcountries.eu/data/';
-const URL_RESTCOUNTRIES_SITE = 'https://restcountries.eu/';
-
-const URL_FLAGS_EXT = 'svg';
-const JSON_DATA = require('./recursos/countries.json');
-
-const URL_MAPS = 'https://maps.google.com/?q=';
-const URL_WIKIPEDIA_EN = 'https://en.wikipedia.org/wiki'
-const URL_WIKIPEDIA_ES = 'https://es.wikipedia.org/wiki'
-
-const DEFAULT_HEIGHT = 600;
-const DEFAULT_WIDTH = 1100;
-
-enum dataSources { fromURL, fromJson, fromJsonWithDelay };
-enum fetchResults { loading, loadedOk, loadedErr }
-
-const DATA_SOURCE_DEF = dataSources.fromJsonWithDelay;
-
-function getRestCountriesColumns(): ISimpleListCol[] {
-  return (
-    [
-      // { titulo: "Key", campo: "key", width: 10 },
-      // { titulo: "Bandera", campo: "flag", width: 10, isImage: true },
-      { title: strings.field_Flag, field: "banderaUrl", width: 35, isImage: true },
-      {
-        title: strings.field_NativeName, field: "nativeName", width: 150, fieldUrl: "mapsPaisUrl", canSortAndFilter: true,
-        headerTooltip: strings.click_ToSeeCountryInGoogleMaps,
-      },
-      {
-        title: strings.field_EnglishName, field: "name", width: 150, fieldUrl: "wikiEnUrl", canSortAndFilter: true,
-        headerTooltip: strings.click_ToGoWikipediaInEnglish,
-      },
-      {
-        title: strings.field_SpanishName, field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSortAndFilter: true,
-        headerTooltip: strings.click_ToGoWikipediaInSpanish
-      },
-      {
-        title: strings.field_Capital, field: "capital", width: 120, fieldUrl: "mapsCapitalUrl", canSortAndFilter: true,
-        headerTooltip: strings.click_ToSeeCapitalInGoogleMaps,
-      },
-      {
-        title: strings.field_Continente, field: "region", width: 100, fieldUrl: "mapsContinenteUrl", canSortAndFilter: true, canGroup: true,
-        headerTooltip: strings.click_ToSeeContinentInGoogleMaps,
-      },
-      {
-        title: strings.field_Region, field: "subregion", width: 100, fieldUrl: "mapsRegionUrl", canSortAndFilter: true, canGroup: true,
-        headerTooltip: strings.click_ToSeeregionInGoogleMaps,
-      },
-      {
-        title: strings.field_Siglas, field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true,
-        headerTooltip: strings.click_ToSeeFlag
-      },
-      { title: strings.field_Idiomas, field: "idiomas", width: 100, canSortAndFilter: false },
-      {
-        title: strings.field_NumHusos, field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true, isNumeric: true,
-        headerTooltip: strings.click_ToViewTimeZones
-      },
-    ]
-  )
-}
-
-interface IRestCountriesExampleStates {
-  numRegs: number;
-  fetchResult: fetchResults;
-  fetchResultMessage: string;
-  dataSource: dataSources;
-  hiddenConfig: boolean;
-  isCompactMode: boolean;
-  language: string;
-  theme: IRCTheme;
-  hiddenInfo: boolean;
-}
-
-export interface IRestCountriesExampleProps {
-  language?: string;
-  height?: number;
-  width?: number;
-};
-
-async function DownloadCountries(dataSource: dataSources): Promise<any> {
-  switch (dataSource) {
-    case dataSources.fromJsonWithDelay:
-      return new Promise((resolve) => {
-        setTimeout(function () {
-          resolve(JSON_DATA);
-        }, 800);
-      })
-    case dataSources.fromJson:
-      return new Promise((resolve) => { resolve(JSON_DATA); })
-    case dataSources.fromURL:
-      return new Promise((resolve, reject) => {
-        fetch(URL_COUNTRIES)
-          .then(res => {
-            if (res) {
-              resolve(res.json());
-            } else {
-              reject(`La url ${URL_COUNTRIES}, no ha devuelto nada.`);
-            }
-          })
-          .catch(err => {
-            reject(err);
-          });
-      });
-    default:
-      throw "El Origen de Datos no es válido";
-  }
-}
-
-interface IRCTheme {
-  key: string;
-  slStyle: ISlStyles;
-  name: string;
-}
-
-export class RestCountriesHTML extends React.Component<IRestCountriesExampleProps, IRestCountriesExampleStates> {
+export class RestCountriesHTML extends React.Component<mod.IRestCountriesProps, mod.IRestCountriesStates> {
   private _data: any[];
   private _simpleListColumns: ISimpleListCol[];
   private _simpleListRef = React.createRef<SimpleListHtml>();
-  private _themes: IRCTheme[];
+  private _themes: mod.IRCTheme[];
   private _defaultThemeKey = 3 // themeGray
 
-  public constructor(props: IRestCountriesExampleProps) {
+  public constructor(props: mod.IRestCountriesProps) {
     super(props);
 
     // Cargar traducciones
@@ -142,9 +28,9 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     // Inicializar estados
     this.state = {
       numRegs: 0,
-      fetchResult: fetchResults.loading,
+      fetchResult: mod.fetchResults.loading,
       fetchResultMessage: '',
-      dataSource: DATA_SOURCE_DEF,
+      dataSource: mod.DATA_SOURCE_DEF,
       hiddenConfig: true,
       hiddenInfo: true,
       isCompactMode: false,
@@ -153,7 +39,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     }
 
     // inicializar columnas para SimpeListHtml
-    this._loadColumns(this.state.dataSource != dataSources.fromURL);
+    this._loadColumns(this.state.dataSource != mod.dataSources.fromURL);
 
     // Binds de funciones
     this._renderTitle = this._renderTitle.bind(this);
@@ -193,7 +79,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
   private _loadColumns(ignoreFlag: boolean): ISimpleListCol[] {
     // Copiar columnas y calcular su key
     this._simpleListColumns = new Array<ISimpleListCol>();
-    getRestCountriesColumns().forEach((theColumn: ISimpleListCol, indice) => {
+    mod.getRestCountriesColumns().forEach((theColumn: ISimpleListCol, indice) => {
       if (!ignoreFlag || theColumn.field != 'banderaUrl') {
         let aCol = { ...theColumn };
         aCol.key = indice.toString();
@@ -209,14 +95,14 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     this.setState({ theme: this._getTheme(event.target.value) });
   }
 
-  private _getTheme(themeKey: string): IRCTheme {
+  private _getTheme(themeKey: string): mod.IRCTheme {
     return (this._themes.find((aTheme) => (aTheme.key == themeKey)) || this._themes[this._defaultThemeKey]);
   }
 
   private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
     let checked: boolean = event.target.checked;
-    let dataSource = (checked) ? dataSources.fromURL : dataSources.fromJsonWithDelay;
-    this._loadColumns(dataSource != dataSources.fromURL);
+    let dataSource = (checked) ? mod.dataSources.fromURL : mod.dataSources.fromJsonWithDelay;
+    this._loadColumns(dataSource != mod.dataSources.fromURL);
     this._downloadCountries(dataSource);
   }
 
@@ -225,7 +111,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     if (newlanguage) {
       this._piensaUnTiempo(0.5);
       this._loadStrings(newlanguage);
-      this._loadColumns(this.state.dataSource != dataSources.fromURL);
+      this._loadColumns(this.state.dataSource != mod.dataSources.fromURL);
       this.setState({ language: newlanguage });
       // if (this._simpleListRef.current)
       //   this._simpleListRef.current.setLanguage(newlanguage);
@@ -233,8 +119,8 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
   }
 
   private _piensaUnTiempo(segundos: number): void {
-    this.setState({ fetchResult: fetchResults.loading });
-    setTimeout(() => this.setState({ fetchResult: fetchResults.loadedOk }), segundos * 1000);
+    this.setState({ fetchResult: mod.fetchResults.loading });
+    setTimeout(() => this.setState({ fetchResult: mod.fetchResults.loadedOk }), segundos * 1000);
   }
 
   private _onClickButtonConfig(event: any): void {
@@ -251,31 +137,16 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
     this._simpleListRef.current!.setState({ isCompactMode: checked, });
   }
 
-  private _downloadCountries(dataSource: dataSources) {
-    this.setState({ fetchResult: fetchResults.loading, dataSource: dataSource });
+  private _downloadCountries(dataSource: mod.dataSources) {
+    this.setState({ fetchResult: mod.fetchResults.loading, dataSource: dataSource });
     // DescargarPaises(origenesDatos.ninguno)
-    DownloadCountries(dataSource)
+    mod.DownloadCountries(dataSource)
       .then((datos) => {
         this._data = datos;
-        this._data.forEach((registro, indice) => {
-          registro.key = indice.toString();
-          registro.Pais = registro.translations.es;
-          registro.numHusos = registro.timezones.length;
-          registro.idiomas = (Array.isArray(registro.languages)) ? registro.languages.join(', ') : registro.languages;
-          registro.husosTooltip = (Array.isArray(registro.timezones) ? registro.timezones.join(', ') : '');
-          registro.wikiEnUrl = `${URL_WIKIPEDIA_EN}/${registro.name}`;
-          registro.wikiEsUrl = `${URL_WIKIPEDIA_ES}/${registro.translations.es}`;
-          registro.banderaUrl = `${URL_FLAGS}${registro.alpha3Code.toString().toLowerCase()}.${URL_FLAGS_EXT}`;
-          registro.mapsPaisUrl = `${URL_MAPS}${registro.name}, country of ${registro.subregion}`;
-          registro.mapsContinenteUrl = `${URL_MAPS}${registro.region}, continent`;
-          registro.mapsRegionUrl = `${URL_MAPS}${registro.subregion}, region of ${registro.region}`;
-          registro.mapsCapitalUrl = `${URL_MAPS}${registro.capital}, city of ${registro.name}`;
-        })
-        // console.log(this._data[5]);
-        this.setState({ numRegs: datos.length, fetchResult: fetchResults.loadedOk });
+        this.setState({ numRegs: datos.length, fetchResult: mod.fetchResults.loadedOk });
       })
       .catch((err) => {
-        this.setState({ numRegs: 0, fetchResult: fetchResults.loadedErr, fetchResultMessage: err });
+        this.setState({ numRegs: 0, fetchResult: mod.fetchResults.loadedErr, fetchResultMessage: err });
       });
   }
 
@@ -333,10 +204,9 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
       backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
     };
 
-
     return (
       <div style={{
-        width: this.props.width || DEFAULT_WIDTH,
+        width: this.props.width || mod.DEFAULT_WIDTH,
         // borderStyle: 'solid',
         // borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
         // borderWidth: '1px',
@@ -358,7 +228,8 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
               {` (${strings.agradecimiento} `}
               <a target='_blank'
                 style={{ color: this.state.theme.slStyle.tableContainerBackgroundColor }}
-                href={URL_RESTCOUNTRIES_SITE}>{URL_RESTCOUNTRIES_SITE}
+                href={mod.URL_RESTCOUNTRIES_SITE}>
+                  {mod.URL_RESTCOUNTRIES_SITE}
               </a>{')'}
             </small>
           </div>
@@ -495,7 +366,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
                 <input style={{ textAlign: 'center', marginLeft: '2px' }}
                   name="ToggleIsUrl"
                   type="checkbox"
-                  checked={this.state.dataSource == dataSources.fromURL}
+                  checked={this.state.dataSource == mod.dataSources.fromURL}
                   onChange={this._onChangeCheckBoxIsUrl}
                 />
               </label>
@@ -532,13 +403,13 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
   public render(): JSX.Element {
     // console.log('RestCountriesExample render', 'ver config?', this.state.hiddenConfig);
     let mainStyle = {
-      width: this.props.width || DEFAULT_WIDTH,
+      width: this.props.width || mod.DEFAULT_WIDTH,
       borderStyle: 'solid',
       borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       borderWidth: '1px',
     }
 
-    if (this.state.fetchResult == fetchResults.loading) {
+    if (this.state.fetchResult == mod.fetchResults.loading) {
       return (
         <div style={mainStyle}>
           <this._renderTitle />
@@ -548,7 +419,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
           />
         </div>
       );
-    } else if (this.state.fetchResult == fetchResults.loadedErr) {
+    } else if (this.state.fetchResult == mod.fetchResults.loadedErr) {
       return (
         <div style={mainStyle}>
           <this._renderTitle />
@@ -570,7 +441,7 @@ export class RestCountriesHTML extends React.Component<IRestCountriesExampleProp
             isCompactMode={this.state.isCompactMode}
             showToggleCompactMode={false}
             showLabel={false}
-            heightInPx={this.props.height || DEFAULT_HEIGHT}
+            heightInPx={this.props.height || mod.DEFAULT_HEIGHT}
             language={this.state.language}
             theme={this.state.theme.slStyle}
           />
