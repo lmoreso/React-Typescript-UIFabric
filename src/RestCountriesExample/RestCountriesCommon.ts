@@ -1,4 +1,4 @@
-import { ISlStyles } from 'src/lib/SimpleList/SimpleListHtmlStyles';
+import { ISlStyles } from 'src/lib/SimpleList/SimpleListColors';
 import { ISimpleListCol } from 'src/lib/SimpleList/ISimpleListLib';
 import { strings } from './loc/RestCountriesStrings';
 

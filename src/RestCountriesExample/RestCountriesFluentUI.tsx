@@ -9,7 +9,7 @@ import { initStrings, strings, detectLanguage, languagesSupported, stringToLangu
 import { ChangeEvent } from 'react';
 import { IconoConfig, IconoSpinner, IconoInfo, IconoCerrar, IconoGithub, IconoLinkedIn } from './recursos/svgs';
 import { themeRed, themeGreen, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles }
-  from 'src/lib/SimpleList/SimpleListHtmlStyles';
+  from 'src/lib/SimpleList/SimpleListColors';
 
 const restCountriesFluentUIVersion = '0.1.2';
 const restCountriesFluentUIVersionLabel = `RestCountries V.${restCountriesFluentUIVersion}`;
@@ -441,7 +441,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
             labelItems={strings.label_Paises}
             columns={this._simpleListColumns}
             isCompactMode={this.state.isCompactMode}
-            showToggleCompactMode={true}
+            showToggleCompactMode={false}
             showLabel={false}
             heightInPx={this.props.height || mod.DEFAULT_HEIGHT}
             language={this.state.language}

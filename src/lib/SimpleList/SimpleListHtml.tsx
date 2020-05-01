@@ -1,11 +1,11 @@
 import * as React from 'react';
 
 import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, filterByTextActionsList, IGroupedCol, ISimpleListProps } from './ISimpleListLib';
-import './SimpleListHtml.css';
+import './SimpleList.css';
 import { strings } from './loc/SimpleListStrings';
 import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
 import { Flechas } from './img/SimpleListIconos';
-import { ISlStyles, themeGray } from './SimpleListHtmlStyles';
+import { ISlStyles, themeGray } from './SimpleListColors';
 
 const simpleListVersion = '0.1.2';
 export const simpleListVersionLabel = `SimpleList V.${simpleListVersion}`;
