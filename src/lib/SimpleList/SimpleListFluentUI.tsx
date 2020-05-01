@@ -6,11 +6,14 @@ import { strings } from './loc/SimpleListStrings';
 import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
 import { Flechas } from './img/SimpleListIconos';
 import { ISlStyles, themeGray } from './SimpleListHtmlStyles';
+import { Toggle } from 'office-ui-fabric-react/lib/Toggle';
+import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
+import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 
 const simpleListVersion = '0.1.2';
 export const simpleListVersionLabel = `SimpleList V.${simpleListVersion}`;
 
-export interface ISimpleListHtmlProps extends ISimpleListProps {
+export interface ISimpleListFluentUIProps extends ISimpleListProps {
   hidden: boolean;
   isCompactMode?: boolean;
   showToggleCompactMode?: boolean;
@@ -19,7 +22,7 @@ export interface ISimpleListHtmlProps extends ISimpleListProps {
   theme?: ISlStyles;
 }
 
-interface ISimpleListHtmlStates {
+interface ISimpleListFluentUIStates {
   dataFiltered: any[];
   filterText: string;
   filterGroupedText: string;
@@ -31,14 +34,35 @@ interface ISimpleListHtmlStates {
   language: languagesSupportedIds;
 }
 
-export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpleListHtmlStates> {
+export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps, ISimpleListFluentUIStates> {
   private _simpleList: SimpleList;
   private _theme: ISlStyles;
+  private _comboFilterByTextAction: IDropdownOption[];
+  private _comboFilterByTextField: IDropdownOption[];
+  private _comboFilterByGroupField: IDropdownOption[];
 
-  public constructor(props: ISimpleListHtmlProps) {
+  public constructor(props: ISimpleListFluentUIProps) {
     super(props);
     this._theme = this.props.theme || themeGray;
     this._simpleList = new SimpleList(props);
+
+    /* Combo de Operación de filtro de texto*/
+    this._comboFilterByTextAction = new Array<IDropdownOption>();
+    filterByTextActionsList().forEach((anAction: filterByTextAction, index) => {
+      this._comboFilterByTextAction.push({ key: anAction.action, text: anAction.title });
+    });
+
+    /* Combo de Field de filtro de texto*/
+    this._comboFilterByTextField = new Array<IDropdownOption>();
+    this._simpleList.state.filterableFields.forEach((aField: ISimpleListCol, index) => {
+      this._comboFilterByTextField.push({ key: aField.field, text: aField.title });
+    });
+
+    /* Combo de Field de filtro de grupo*/
+    this._comboFilterByGroupField = new Array<IDropdownOption>();
+    this._simpleList.state.groupableFields.forEach((aField: ISimpleListCol, index) => {
+      this._comboFilterByGroupField.push({ key: aField.field, text: aField.title });
+    });
 
     this.state = {
       dataFiltered: this._simpleList.state.dataFiltered,
@@ -71,8 +95,8 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     });
   }
 
-  private _onChangeGroupField(event: React.ChangeEvent<HTMLSelectElement>): void {
-    this._simpleList.makeGroupedItemsList(event.target.value);
+  private _onChangeGroupField(event: any, option: IDropdownOption): void {
+    this._simpleList.makeGroupedItemsList(option.key.toString());
     if (this._simpleList.state.filterByGroupField)
       this.setState({
         filterByGroupField: this._simpleList.state.filterByGroupField,
@@ -80,15 +104,17 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
       });
   }
 
-  private _onChangeFilterByTextAction(event: React.ChangeEvent<HTMLSelectElement>): void {
-    this._filterByText(this.state.filterText, event.target.value as filterByTextActionsId, this.state.filterByTextField!);
+  private _onChangeFilterByTextAction(event: any, option: IDropdownOption): void {
+
+    this._filterByText(this.state.filterText, option.key as filterByTextActionsId, this.state.filterByTextField!);
   }
 
-  private _onChangeFilterByTextField(event: React.ChangeEvent<HTMLSelectElement>): void {
-    let newFilterByTextField = this._simpleList.state.filterableFields.find(aColumn => (aColumn.field == event.target.value));
+  private _onChangeFilterByTextField(event: any, option: IDropdownOption): void {
+    let newFilterByTextField = this._simpleList.state.filterableFields.find(aColumn => (aColumn.field == option.key));
     if (newFilterByTextField)
       this._filterByText(this.state.filterText, this.state.filterByTextAction, newFilterByTextField);
   }
+
 
   private _filterByText(textFilter: string, filterByTextAction: filterByTextActionsId, filterByTextField: ISimpleListCol): void {
     this._simpleList.filterByText(textFilter, filterByTextAction, filterByTextField);
@@ -103,8 +129,8 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     });
   }
 
-  private _onChangeFilterText(event: React.ChangeEvent<HTMLInputElement>): void {
-    this._filterByText(event.target.value, this.state.filterByTextAction, this.state.filterByTextField!);
+  private _onChangeFilterText(newText: string): void {
+    this._filterByText(newText, this.state.filterByTextAction, this.state.filterByTextField!);
   }
 
   private _onClickHeaderColumn(columnKey: string): void {
@@ -114,9 +140,9 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
     });
   }
 
-  private _onChangeCheckBoxCompactMode(event: React.ChangeEvent<HTMLInputElement>): void {
+  private _onChangeCheckBoxCompactMode(event: any, checked?: boolean | undefined): void {
     this.setState({
-      isCompactMode: event.target.checked,
+      isCompactMode: (checked) ? true : false,
     });
   }
 
@@ -136,12 +162,14 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
         {/* CheckBox CompactMode */}
         {(!this.props.showToggleCompactMode) ? null :
           <label className='Header-controls-container' style={styleHeaderControlsContainer} >
-            {strings.config_CompactMode}
-            <input
-              name="ToggleCompactMode"
-              type="checkbox"
+            {/* {strings.config_CompactMode} */}
+            <Toggle
+              hidden={!this.props.showToggleCompactMode}
+              label={strings.config_CompactMode}
               checked={this.state.isCompactMode}
               onChange={this._onChangeCheckBoxCompactMode}
+              onText="Compact Mode"
+              offText="Normal Mode"
             />
           </label>
         }
@@ -150,38 +178,58 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
         {(this._simpleList.state.groupableFields.length <= 0) ? null :
           <label className='Header-controls-container' style={styleHeaderControlsContainer} >
             {/* Combo de Campos Filtrables */}
-            <select style={{ textAlign: 'center' }} className='Header-controls-combos' value={this.state.filterByTextField!.field} onChange={this._onChangeFilterByTextField}>
-              {this._simpleList.state.filterableFields.map((aField: ISimpleListCol, index) => {
-                return (
-                  <option key={index} value={aField.field}>
-                    {`${aField.title}`}
-                  </option>
-                )
-              })}
-            </select>
+            <span style={{ textAlign: 'center' }} className='Header-controls-combos' >
+              <Dropdown
+                selectedKey={this.state.filterByTextField!.field}
+                onChange={this._onChangeFilterByTextField}
+                options={this._comboFilterByTextField}
+              // styles={controlStyles}
+              // style={{ width: 220 }}
+              />
+            </span>
 
             {/* Combo de operación de filtro */}
-            <select style={{ textAlign: 'center', }} className='Header-controls-combos' value={this.state.filterByTextAction} onChange={this._onChangeFilterByTextAction}>
-              {filterByTextActionsList().map((anAction: filterByTextAction, index) => {
-                return (
-                  <option key={index} value={anAction.action} style={{ textAlign: 'center' }}>
-                    {`${anAction.title}`}
-                  </option>
-                )
-              })}
-            </select>
+            <span style={{ textAlign: 'center', }} className='Header-controls-combos' >
+              <Dropdown
+                selectedKey={this.state.filterByTextAction}
+                onChange={this._onChangeFilterByTextAction}
+                options={this._comboFilterByTextAction}
+              // styles={controlStyles}
+              // style={{ width: 220 }}
+              />
+            </span>
 
             {/* Texto a filtrar */}
-            <input disabled={!this.state.requireFilterText} className='Header-controls-container' style={styleHeaderControlsContainer} type="text" value={this.state.filterText} onChange={this._onChangeFilterText} />
+            <span className='Header-controls-container' style={styleHeaderControlsContainer} >
+              <SearchBox
+                // placeholder="Filter by name"
+                // onSearch={(text: string): void => {
+                onChange={this._onChangeFilterText}
+                // styles={controlStyles}
+                // hidden={!this.state.requireFilterText}
+                disabled={!this.state.requireFilterText}
+                value={this.state.filterText}
+              />
+            </span>
+            {/* <input disabled={!this.state.requireFilterText} type="text" value={this.state.filterText} onChange={this._onChangeFilterText} /> */}
           </label>
         }
-
 
         {/* Combos de filtro por Grupos */}
         {(this._simpleList.state.groupableFields.length <= 0) ? null :
           <label className='Header-controls-container' style={styleHeaderControlsContainer}>
             {/* Combo de Campos Agrupables */}
-            <select style={{ textAlign: 'center' }} className='Header-controls-combos' value={this.state.filterByGroupField!.field} onChange={this._onChangeGroupField}>
+            <span style={{ textAlign: 'center' }} className='Header-controls-combos'>
+              <Dropdown
+                selectedKey={this.state.filterByGroupField!.field}
+                onChange={this._onChangeGroupField}
+                options={this._comboFilterByGroupField}
+                // styles={controlStyles}
+                // style={{ width: 220 }}
+              />
+            </span>
+
+            {/* <select  value={this.state.filterByGroupField!.field} onChange={this._onChangeGroupField}>
               {this._simpleList.state.groupableFields.map((aField: ISimpleListCol, index) => {
                 return (
                   <option key={index} value={aField.field}>
@@ -189,7 +237,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                   </option>
                 )
               })}
-            </select>
+            </select> */}
 
             {/* Combo del Grupo Activo */}
             <select style={{ textAlign: 'center' }} className='Header-controls-combos' value={this.state.filterGroupedText} onChange={this._onChangeGroupText}>
@@ -253,11 +301,11 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
               <thead>
                 <tr className='Table-header' key={'-1'}>
                   {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
-                    let styleCH = { 
-                      width: aColumn.width, 
-                      backgroundColor: this._theme.tableHeaderCellBackgroundColor, 
-                      borderBottomColor: this._theme.tableHeaderCellBackgroundColor, 
-                      borderLeftColor: this._theme.tableHeaderCellBackgroundColor, 
+                    let styleCH = {
+                      width: aColumn.width,
+                      backgroundColor: this._theme.tableHeaderCellBackgroundColor,
+                      borderBottomColor: this._theme.tableHeaderCellBackgroundColor,
+                      borderLeftColor: this._theme.tableHeaderCellBackgroundColor,
                       color: this._theme.tableHeaderColor,
                     };
 

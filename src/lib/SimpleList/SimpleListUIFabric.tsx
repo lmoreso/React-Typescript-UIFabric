@@ -12,7 +12,21 @@ import { Sticky, /* StickyPositionType */ } from 'office-ui-fabric-react/lib/Sti
 // import { ScrollablePane, /* ScrollbarVisibility */ } from 'office-ui-fabric-react/lib/ScrollablePane';
 
 import { copyAndSort, ISimpleListCol, copyAndSortByKey, IGroupedItem } from './ISimpleListLib';
-import { ISimpleListUIFabricProps } from './ISimpleListUIFabricProps';
+
+export interface ISimpleListUIFabricProps {
+  data: any[];
+  columns: ISimpleListCol[];
+  labelItem: string;
+  labelItems: string;
+  fieldsTextFilter?: string[];
+  fieldDropdownFilter?: { valueIfNull: string; field: string; valueNoFilter: string };
+  hidden: boolean;
+  listCompactMode?: boolean;
+  showToggleCompactMode?: boolean;
+  showLabel?: boolean;
+  fixedHeader?: boolean;
+}
+
 
 const classNames = mergeStyleSets({
   controlWrapper: {
@@ -67,7 +81,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
     this._filterByText(this.state.filterText, false);
   }
 
-    private _makeDropdownList(data: any[]): number {
+  private _makeDropdownList(data: any[]): number {
     let numItems: number = 0;
     let numGroups: number = 0;
 
@@ -105,7 +119,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
 
   private _filterByGroup(event: React.FormEvent<HTMLDivElement>, item: IDropdownOption): void {
     if (this.props.fieldDropdownFilter) {
-      let data = this._ItemsFilteredByText;    
+      let data = this._ItemsFilteredByText;
       if (item.key != ALL_ITEMS) {
         let field = this.props.fieldDropdownFilter.field;
         let fieldValue = (this._groupedItems[item.key].value == this.props.fieldDropdownFilter.valueIfNull) ?
@@ -113,8 +127,8 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
         // console.log('fieldValue', fieldValue);
         data = data.filter(item => {
           // console.log(item[field]);
-          return(item[field] == fieldValue);
-  
+          return (item[field] == fieldValue);
+
           // if (item[field] && item[field].toLowerCase() === fieldValue)
           //   return (true);
           // if (!item[field] && this.props.fieldDropdownFilter.valueIfNull === fieldValue)
@@ -123,7 +137,7 @@ export class SimpleListUIFabric extends React.Component<ISimpleListUIFabricProps
         });
       }
       this.setState({ datos: data, filterGroupedOption: item.key });
-      }
+    }
   }
 
   private _filterByText(filterText: string, refreshState: boolean = true): void {

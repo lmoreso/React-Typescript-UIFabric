@@ -11,6 +11,7 @@ import { DetailsListDocumentsExample } from './FluentUiExamples/DetailListDocume
 import { ScrollablePaneDetailsListExample } from './FluentUiExamples/ScrollablePaneExample';
 import { RestCountriesHTML } from './RestCountriesExample/RestCountriesHTML';
 import { RestCountriesUIFabric } from './RestCountriesExample/RestCountriesUIFabric';
+import { RestCountriesFluentUI } from './RestCountriesExample/RestCountriesFluentUI';
 
 
 // La primera opció no funciona en producció si la aplicació no està al arrel.
@@ -25,8 +26,8 @@ const TYPESCRIPT_URL = 'https://www.typescriptlang.org/docs/home.html';
 const FLUENT_UI_URL = 'https://developer.microsoft.com/en-us/fluentui#/controls/web';
 const UI_FABRIC_URL = 'https://developer.microsoft.com/en-us/office/blogs/ui-fabric-is-evolving-into-fluent-ui';
 
-enum menuOptionsId { restCountriesUIFabric = 1, restCountriesHtml, fabricListDocExample, scrollablePaneExample }
-const DEF_MENU_ID: menuOptionsId = menuOptionsId.restCountriesHtml;
+enum menuOptionsId { restCountriesUIFabric = 1, restCountriesHtml, fabricListDocExample, scrollablePaneExample, restCountriesFluentUI }
+const DEF_MENU_ID: menuOptionsId = menuOptionsId.restCountriesFluentUI;
 const menuAPiñon: menuOptionsId | undefined = undefined /* menuOptionsId.restCountriesHtml */;
 
 interface IMenuOptions {
@@ -39,6 +40,7 @@ interface IMenuOptions {
 const menuOptions: IMenuOptions[] = [
   { key: menuOptionsId.restCountriesUIFabric, name: 'Paises y Banderas del Mundo (UIFabric versión)', loadCountries: true, title: 'Paises y Banderas del Mundo (UIFabric versión)' },
   { key: menuOptionsId.restCountriesHtml, name: 'Paises y Banderas del Mundo (HTML versión)', loadCountries: true, title: 'Paises y Banderas del Mundo (HTML versión)' },
+  { key: menuOptionsId.restCountriesFluentUI, name: 'Paises y Banderas del Mundo (FluentUI versión)', loadCountries: false, title: 'Paises y Banderas del Mundo (FluentUI versión)' },
   { key: menuOptionsId.fabricListDocExample, name: 'Ejemplo de Lista de UI Fabric', loadCountries: false, title: 'Ejemplo de Lista de UI Fabric' },
   { key: menuOptionsId.scrollablePaneExample, name: 'Ejemplo de Scrollablepane de UI Fabric', loadCountries: false, title: 'Ejemplo de Scrollablepane de UI Fabric' },
 ]
@@ -91,6 +93,14 @@ export class MainView extends React.Component<IMainViewProps, IMainViewStates> {
         </div>
         </Fabric>
       )
+    else if (menuAPiñon == menuOptionsId.restCountriesFluentUI)
+      return (
+        <Fabric>
+        <div style={{ display: 'flex', justifyContent: 'center' }} >
+          <RestCountriesFluentUI />
+        </div>
+        </Fabric>
+      )
     else
       return (
         <div>
@@ -132,10 +142,12 @@ export class MainView extends React.Component<IMainViewProps, IMainViewStates> {
                   }
 
                   {(!this._isMenuActive(menuOptionsId.restCountriesHtml)) ? null :
-                    <RestCountriesHTML
-                    />
+                    <RestCountriesHTML />
                   }
-
+                  
+                  {(!this._isMenuActive(menuOptionsId.restCountriesFluentUI)) ? null :
+                    <RestCountriesFluentUI />
+                  }
                 </div>
               </div>
             </ScrollablePane>

@@ -6,7 +6,7 @@ export const strings: ISimpleListStrings = {
     order_CantOrder: 'Column "[%s]" cannot be sorted',
     groupAll: 'All',
     groupWithout: 'Without',
-    filterAction_notNull: 'Is Not NUll',
+    filterAction_notNull: 'Is Not Null',
     filterAction_nullValue: 'Is Null',
     filterAction_FinishBy: 'Ends in',
     filterAction_Contains: 'Contains',
