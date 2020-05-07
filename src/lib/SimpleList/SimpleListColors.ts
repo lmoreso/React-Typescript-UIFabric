@@ -94,7 +94,7 @@ export const themeMagenta: ISlStyles = {
   mainContainerBorderColor: 'rgb(64, 0, 64)',
   headerContainerBackgroundColor: 'rgb(255, 245, 255)',
   headerControlsContainerColor: 'rgb(64, 0, 64)',
-  tableContainerScrollbarColor: 'rgb(64, 0, 64) rgb(232, 189, 245)',
+  tableContainerScrollbarColor: 'rgb(64, 0, 64) rgb(232, 189, 232)',
   tableContainerBackgroundColor: 'rgb(255, 245, 255)',
   tableContainerBorderTopColor: 'rgb(64, 0, 64)',
   tableHeaderColor: 'rgb(255, 245, 255)',

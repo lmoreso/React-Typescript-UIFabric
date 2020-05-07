@@ -11,7 +11,7 @@ import { SimpleListUIFabric } from '../lib/SimpleList/SimpleListUIFabric';
 import { SimpleListHtml } from 'src/lib/SimpleList/SimpleListHtml';
 // import { IDebugListConfig, DebugList, DebugListRenderTable, DebugListRenderTxt } from '../lib/SimpleListUIfabric/SimpleList';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
-import { IconoConfig, } from './recursos/svgs';
+import { IconoConfig, } from './recursos/iconos';
 
 
 const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';

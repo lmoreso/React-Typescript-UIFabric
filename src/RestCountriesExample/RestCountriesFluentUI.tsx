@@ -3,16 +3,16 @@ import * as React from 'react';
 // Aplicattion imports
 import * as mod from './RestCountriesCommon';
 import { ISimpleListCol } from '../lib/SimpleList/ISimpleListLib';
-import { SimpleListFluentUI, simpleListVersionLabel } from 'src/lib/SimpleList/SimpleListFluentUI';
+import { SimpleListFluentUI, simpleListFluentUIVersionLabel } from 'src/lib/SimpleList/SimpleListFluentUI';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, }
   from './loc/RestCountriesStrings';
 import { ChangeEvent } from 'react';
-import { IconoConfig, IconoSpinner, IconoInfo, IconoCerrar, IconoGithub, IconoLinkedIn } from './recursos/svgs';
+import { IconoConfig, IconoSpinner, IconoInfo, IconoCerrar, IconoGithub, IconoLinkedIn } from './recursos/iconos';
 import { themeRed, themeGreen, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles }
   from 'src/lib/SimpleList/SimpleListColors';
 
-const restCountriesFluentUIVersion = '0.1.2';
-const restCountriesFluentUIVersionLabel = `RestCountries V.${restCountriesFluentUIVersion}`;
+const restCountriesFluentUIVersion = '0.0.1';
+const restCountriesFluentUIVersionLabel = `RestCountriesFluentUI V.${restCountriesFluentUIVersion}`;
 
 export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesProps, mod.IRestCountriesStates> {
   private _data: any[];
@@ -266,7 +266,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
               alignItems: 'center',
             }} >
               <span style={{ verticalAlign: 'middle', fontSize: '0.8em', textAlign: 'left' }}>
-                {simpleListVersionLabel}<br />{restCountriesFluentUIVersionLabel}
+                {simpleListFluentUIVersionLabel}<br />{restCountriesFluentUIVersionLabel}
               </span>
 
               <span style={{ verticalAlign: 'middle' }}>

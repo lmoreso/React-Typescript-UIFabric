@@ -6,7 +6,7 @@ import { ISimpleListCol } from '../lib/SimpleList/ISimpleListLib';
 import { SimpleListHtml, simpleListVersionLabel } from 'src/lib/SimpleList/SimpleListHtml';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, } from './loc/RestCountriesStrings';
 import { ChangeEvent } from 'react';
-import { IconoConfig, IconoSpinner, IconoInfo, IconoCerrar, IconoGithub, IconoLinkedIn } from './recursos/svgs';
+import { IconoConfig, IconoSpinner, IconoInfo, IconoCerrar, IconoGithub, IconoLinkedIn } from './recursos/iconos';
 import { themeRed, themeGreen, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles } from 'src/lib/SimpleList/SimpleListColors';
 
 const restCountriesVersion = '0.1.2';

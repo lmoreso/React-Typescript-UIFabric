@@ -1,6 +1,5 @@
-import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
 
-export enum languagesSupported { es = 'es', ca = 'ca', en='en', fr='fr' }
+export enum languagesSupportedIds { es = 'es', ca = 'ca', en='en', fr='fr' }
 
 export interface ISimpleListStrings {
     config_CompactMode: string;

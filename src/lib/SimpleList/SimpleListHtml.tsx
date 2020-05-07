@@ -2,8 +2,7 @@ import * as React from 'react';
 
 import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, filterByTextActionsList, IGroupedCol, ISimpleListProps } from './ISimpleListLib';
 import './SimpleList.css';
-import { strings } from './loc/SimpleListStrings';
-import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
+import { strings, languagesSupportedIds} from './loc/SimpleListStrings';
 import { Flechas } from './img/SimpleListIconos';
 import { ISlStyles, themeGray } from './SimpleListColors';
 
@@ -108,6 +107,8 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
   }
 
   private _onClickHeaderColumn(columnKey: string): void {
+    // console.log("_onClickHeaderColumn", "columnKey=", columnKey);
+
     this._simpleList.orderByColumn(columnKey);
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,

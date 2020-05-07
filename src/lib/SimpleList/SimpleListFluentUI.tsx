@@ -1,17 +1,22 @@
 import * as React from 'react';
 
-import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, filterByTextActionsList, IGroupedCol, ISimpleListProps, IGroupedItem } from './ISimpleListLib';
 import './SimpleList.css';
 import { strings } from './loc/SimpleListStrings';
 import { languagesSupportedIds } from 'src/RestCountriesExample/loc/RestCountriesStrings';
-import { Flechas } from './img/SimpleListIconos';
 import { ISlStyles, themeGray } from './SimpleListColors';
+
+// FluentUI Imports
+import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, filterByTextActionsList, IGroupedCol, ISimpleListProps, IGroupedItem } from './ISimpleListLib';
 import { Toggle } from 'office-ui-fabric-react/lib/Toggle';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
+import { IColumn, ColumnActionsMode, SelectionMode, DetailsList } from 'office-ui-fabric-react/lib/DetailsList';
+import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
+import { Link } from 'office-ui-fabric-react/lib/Link';
+import { Image } from 'office-ui-fabric-react/lib/Image';
 
-const simpleListVersion = '0.1.2';
-export const simpleListVersionLabel = `SimpleList V.${simpleListVersion}`;
+const simpleListFluentUIVersion = '0.0.4';
+export const simpleListFluentUIVersionLabel = `SimpleListFluentUI V.${simpleListFluentUIVersion}`;
 
 export interface ISimpleListFluentUIProps extends ISimpleListProps {
   hidden: boolean;
@@ -41,10 +46,15 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
   private _comboFilterByTextField: IDropdownOption[];
   private _comboFilterByGroupField: IDropdownOption[];
   private _comboFilterByGroupItems: IDropdownOption[];
+  private _columnsDetailList: IColumn[];
 
   public constructor(props: ISimpleListFluentUIProps) {
     super(props);
+
+    /* Color gris por defecto */
     this._theme = this.props.theme || themeGray;
+
+    /* Creación de la Lista */
     this._simpleList = new SimpleList(props);
 
     /* Combo de Operación de filtro de texto*/
@@ -67,6 +77,9 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
 
     /* Combo de Items de grupo*/
     this._makeComboFilterByGroupItems();
+
+    /* Columnas para el DetailList de FluentUI */
+    this._columnsDetailList = this._makeFluentUIColumns(this.props.columns);
 
     this.state = {
       dataFiltered: this._simpleList.state.dataFiltered,
@@ -158,6 +171,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
   }
 
   private _onClickHeaderColumn(columnKey: string): void {
+    // console.log("_onClickHeaderColumn", "columnKey=", columnKey);
     this._simpleList.orderByColumn(columnKey);
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,
@@ -279,21 +293,112 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     );
   }
 
+  private _makeFluentUIColumns(simpleListCols: ISimpleListCol[]): IColumn[] {
+    let columns: IColumn[] = new Array<IColumn>();
+
+    simpleListCols.forEach((aSlColumn: ISimpleListCol, indice) => {
+
+      let theNewIColumn: IColumn = {
+        // key: indice.toString(),
+        key: aSlColumn.key!,
+        name: aSlColumn.title,
+        fieldName: aSlColumn.field,
+        minWidth: aSlColumn.width / 3,
+        maxWidth: aSlColumn.width * 0.70,
+        // isRowHeader: true,
+        isResizable: true,
+        columnActionsMode: ColumnActionsMode.clickable,
+        // isSorted: true,
+        // isSortedDescending: false,
+        // sortAscendingAriaLabel: 'Sorted A to Z',
+        // sortDescendingAriaLabel: 'Sorted Z to A',
+        onColumnClick: (ev: any, aColumn: IColumn) => {
+          this._onClickHeaderColumn(aColumn.key)
+        },
+        data: 'string',
+        isPadded: true
+      };
+      if (aSlColumn.fieldUrl || aSlColumn.fieldTooltip || aSlColumn.isImage) {
+        if (aSlColumn.fieldUrl && aSlColumn.fieldTooltip) {
+          theNewIColumn.onRender = (item) => {
+            return (
+              <TooltipHost
+                content={item[(aSlColumn.fieldTooltip) ? aSlColumn.fieldTooltip : 0]}
+                // id={this._hostId}
+                calloutProps={{ gapSpace: 0 }}
+                styles={{ root: { display: 'inline-block' } }}
+              >
+                <Link hRef={item[(aSlColumn.fieldUrl) ? aSlColumn.fieldUrl : 0]} target='_blank'>
+                  {item[aSlColumn.field]}
+                </Link>
+              </TooltipHost>
+            );
+          }
+        } else if (aSlColumn.fieldTooltip) {
+          theNewIColumn.onRender = (item) => {
+            return (
+              <TooltipHost
+                content={item[(aSlColumn.fieldTooltip) ? aSlColumn.fieldTooltip : 0]}
+                // id={this._hostId}
+                calloutProps={{ gapSpace: 0 }}
+                styles={{ root: { display: 'inline-block' } }}
+              >
+                {item[aSlColumn.field]}
+              </TooltipHost>
+            );
+          }
+        } else if (aSlColumn.isImage == true) {
+          theNewIColumn.onRender = (item) => {
+            return (
+              <TooltipHost
+                content={item[aSlColumn.field]}
+                // id={this._hostId}
+                calloutProps={{ gapSpace: 0 }}
+                styles={{ root: { display: 'inline-block' } }}
+              >
+                <Image
+                  src={item[aSlColumn.field]}
+                  width={aSlColumn.width}
+                />
+              </TooltipHost>
+            );
+          }
+        } else {
+          theNewIColumn.onRender = (item) => {
+            return (
+              <TooltipHost
+                content={item[(aSlColumn.fieldUrl) ? aSlColumn.fieldUrl : 0]}
+                // id={this._hostId}
+                calloutProps={{ gapSpace: 0 }}
+                styles={{ root: { display: 'inline-block' } }}
+              >
+                <a href={item[(aSlColumn.fieldUrl) ? aSlColumn.fieldUrl : 0]} target='_blank'>
+                  {item[aSlColumn.field]}
+                </a>
+              </TooltipHost>
+            );
+          }
+        }
+      }
+      columns.push(theNewIColumn);
+    });
+
+    return (columns);
+  }
+
   public render(): JSX.Element {
     // console.log('SimpleListHtml render:');
     if (this.props.hidden) {
       return (<div></div>);
     } else {
-      let cellClassName = (this.state.isCompactMode) ? 'Table-cell' : 'Table-cell Table-cell-no-compact';
-      let cellStyle = {};
-      if (!this.state.isCompactMode)
-        cellStyle = { borderBottomColor: this._theme.tableCellNoCompactBorderBottomColor }
 
-      let styleMainContainer: React.CSSProperties = {
-        backgroundColor: this._theme.mainContainerBackgroundColor,
-        borderColor: this._theme.mainContainerBorderColor,
-      };
-
+      /*       
+            let cellClassName = (this.state.isCompactMode) ? 'Table-cell' : 'Table-cell Table-cell-no-compact';
+            let cellStyle = {};
+            if (!this.state.isCompactMode)
+              cellStyle = { borderBottomColor: this._theme.tableCellNoCompactBorderBottomColor }
+      
+       */
       let styleTableContainer: React.CSSProperties = {
         backgroundColor: this._theme.tableContainerBackgroundColor,
         borderTopColor: this._theme.tableContainerBorderTopColor,
@@ -307,105 +412,25 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
         styleTableContainer.maxHeight = `${heightInPx}px`;
       }
 
+      let styleMainContainer: React.CSSProperties = {
+        backgroundColor: this._theme.mainContainerBackgroundColor,
+        borderColor: this._theme.mainContainerBorderColor,
+      };
+
       return (
         <div className='Main-container' style={styleMainContainer}>
           <this._renderHeader />
+          {/* {(this.props.fixedHeader) ? <Sticky> <this._renderHeader /> </Sticky> : <this._renderHeader />} */}
           <div style={styleTableContainer} className='Table-container'>
-            <table>
-              <thead>
-                <tr className='Table-header' key={'-1'}>
-                  {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
-                    let styleCH = {
-                      width: aColumn.width,
-                      backgroundColor: this._theme.tableHeaderCellBackgroundColor,
-                      borderBottomColor: this._theme.tableHeaderCellBackgroundColor,
-                      borderLeftColor: this._theme.tableHeaderCellBackgroundColor,
-                      color: this._theme.tableHeaderColor,
-                    };
-
-                    return (
-                      <th
-                        // key={aColumn.key}
-                        key={`-1_${indice.toString()}`}
-                        style={styleCH} className='Table-header-cell'
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                          <span style={{ verticalAlign: 'baseline', width: '100%', }}
-                            title={(aColumn.headerTooltip) ? aColumn.headerTooltip : ''}
-                          >
-                            {aColumn.title}
-                          </span>
-                          {(!aColumn.canSortAndFilter) ? null :
-                            <span
-                              onClick={(!aColumn.canSortAndFilter) ? undefined : (event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>) => {
-                                this._onClickHeaderColumn(aColumn.key!);
-                              }}
-                              style={{ verticalAlign: 'baseline', width: '20px', cursor: 'pointer' }}
-                              title={strings.order_ClickToOrder.replace('[%s]', aColumn.title)}
-                            >
-                              {/* <img
-                                style={{ alignSelf: 'baseline' }}
-                                src={
-                                  (aColumn.isSorted) ?
-                                    (aColumn.isSortedDescending) ? imgArrowDown : imgArrowUp
-                                    :
-                                    imgArrowScroll
-                                }
-                              /> */}
-                              <Flechas
-                                name={
-                                  (aColumn.isSorted) ?
-                                    (aColumn.isSortedDescending) ? 'down' : 'up'
-                                    :
-                                    ''
-                                }
-                                fill={this._theme.tableHeaderColor}
-                              />
-                            </span>
-                          }
-                        </div>
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {this.state.dataFiltered.map((dato: any) => {
-                  return (
-                    <tr key={dato.key} className='Table-row'>
-                      {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
-                        if (aColumn.fieldUrl) {
-                          return (
-                            <td key={`${dato.key}_${indice.toString()}`} className={cellClassName} style={cellStyle} >
-                              <a href={dato[aColumn.fieldUrl]} target="_blank">
-                                <span title={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : dato[aColumn.fieldUrl]}>
-                                  {Array.isArray(dato[aColumn.field]) ? dato[aColumn.field].join(', ') : dato[aColumn.field]}
-                                </span>
-                              </a>
-                            </td>
-                          );
-                        } else if (aColumn.isImage) {
-                          return (
-                            <td key={`${dato.key}_${indice.toString()}`} className={cellClassName} style={cellStyle} >
-                              <img src={dato[aColumn.field]} width={aColumn.width} alt={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : dato[aColumn.field]} />
-                            </td>
-                          );
-                        } else {
-                          return (
-                            <td key={`${dato.key}_${indice.toString()}`} className={cellClassName} style={cellStyle} >
-                              <span title={(aColumn.fieldTooltip) ? dato[aColumn.fieldTooltip] : ''}>
-                                {Array.isArray(dato[aColumn.field]) ? dato[aColumn.field].join(', ') : dato[aColumn.field]}
-                              </span>
-                            </td>
-                          );
-                        }
-                      })}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <DetailsList
+              items={this.state.dataFiltered}
+              compact={this.state.isCompactMode}
+              columns={this._columnsDetailList}
+              selectionMode={SelectionMode.none}
+            // onColumnHeaderClick={this._onColumnClick}
+            />
           </div>
+
         </div>
       );
     }
