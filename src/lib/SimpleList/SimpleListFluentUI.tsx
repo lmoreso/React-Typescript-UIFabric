@@ -10,10 +10,17 @@ import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, 
 import { Toggle } from 'office-ui-fabric-react/lib/Toggle';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
-import { IColumn, ColumnActionsMode, SelectionMode, DetailsList } from 'office-ui-fabric-react/lib/DetailsList';
+import { IColumn, ColumnActionsMode, SelectionMode, DetailsList, IDetailsHeaderProps } from 'office-ui-fabric-react/lib/DetailsList';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { Image } from 'office-ui-fabric-react/lib/Image';
+import { mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
+import { ScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
+import { IRenderFunction } from 'office-ui-fabric-react/lib/Utilities';
+import { Sticky, StickyPositionType } from 'office-ui-fabric-react/lib/Sticky';
+// import { ScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
+// import { Sticky, StickyPositionType } from 'office-ui-fabric-react/lib/Sticky';
+
 
 const simpleListFluentUIVersion = '0.0.4';
 export const simpleListFluentUIVersionLabel = `SimpleListFluentUI V.${simpleListFluentUIVersion}`;
@@ -386,6 +393,23 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     return (columns);
   }
 
+  private onRenderDetailsHeader: IRenderFunction<IDetailsHeaderProps> = (props, defaultRender) => {
+    if (!props) {
+      return null;
+    }
+    const onRenderColumnHeaderTooltip: IRenderFunction<{}> = tooltipHostProps => (
+      <TooltipHost {...tooltipHostProps} />
+    );
+    return (
+      <Sticky stickyPosition={StickyPositionType.Header} isScrollSynced>
+        {defaultRender!({
+          ...props,
+          onRenderColumnHeaderTooltip,
+        })}
+      </Sticky>
+    );
+  };
+  
   public render(): JSX.Element {
     // console.log('SimpleListHtml render:');
     if (this.props.hidden) {
@@ -402,14 +426,15 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
       let styleTableContainer: React.CSSProperties = {
         backgroundColor: this._theme.tableContainerBackgroundColor,
         borderTopColor: this._theme.tableContainerBorderTopColor,
-        scrollbarColor: this._theme.tableContainerScrollbarColor,
+        // scrollbarColor: this._theme.tableContainerScrollbarColor,
       };
 
       if (this.props.heightInPx && this.props.heightInPx > 0) {
         let heightInPx = (this.props.heightInPx < 500) ? 500 : this.props.heightInPx;
-        styleTableContainer.overflowY = 'scroll';
+        styleTableContainer.overflowY = 'hidden';
         styleTableContainer.height = `${heightInPx}px`;
         styleTableContainer.maxHeight = `${heightInPx}px`;
+        styleTableContainer.position = 'relative';
       }
 
       let styleMainContainer: React.CSSProperties = {
@@ -417,20 +442,34 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
         borderColor: this._theme.mainContainerBorderColor,
       };
 
+      const classNames = mergeStyleSets({
+        detailList: {
+          backgroundColor: this._theme.mainContainerBackgroundColor,
+        },
+      });
+
+
       return (
         <div className='Main-container' style={styleMainContainer}>
+          {/* <ScrollablePane scrollbarVisibility={ScrollbarVisibility.auto}> */}
           <this._renderHeader />
           {/* {(this.props.fixedHeader) ? <Sticky> <this._renderHeader /> </Sticky> : <this._renderHeader />} */}
-          <div style={styleTableContainer} className='Table-container'>
-            <DetailsList
-              items={this.state.dataFiltered}
-              compact={this.state.isCompactMode}
-              columns={this._columnsDetailList}
-              selectionMode={SelectionMode.none}
-            // onColumnHeaderClick={this._onColumnClick}
-            />
+          <div style={styleTableContainer} className='Table-container' data-is-scrollable="true">
+            <ScrollablePane scrollbarVisibility={ScrollbarVisibility.auto}
+              data-is-scrollable="true"
+              style={{ scrollbarColor: this._theme.tableContainerScrollbarColor }}
+            >
+              <DetailsList
+                items={this.state.dataFiltered}
+                compact={this.state.isCompactMode}
+                columns={this._columnsDetailList}
+                selectionMode={SelectionMode.none}
+                className={classNames.detailList}
+                onRenderDetailsHeader={this.onRenderDetailsHeader}
+              />
+            </ScrollablePane>
           </div>
-
+          {/* </ScrollablePane> */}
         </div>
       );
     }
