@@ -179,25 +179,28 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     this._filterByText(newText, this.state.filterByTextAction, this.state.filterByTextField!);
   }
 
-  private _onClickHeaderColumn(ev: any, theColumn: IColumn): void {
-    console.log("_onClickHeaderColumn", "theColumn=", theColumn, "ISLColumns=", this._simpleList.columns, "IColumns=", this.state.columnsDetailList);
-    // Se ordena
-    this._simpleList.orderByColumn(theColumn.key);
-    // Actualizo las IColumns
-    this._updateDetailListColumns();
-
-    // Actualizo el estado
-    this.setState({
-      dataFiltered: this._simpleList.state.dataFiltered,
-      columnsDetailList: this.state.columnsDetailList.slice(0),
-    });
-  }
-
   private _updateDetailListColumns() {
     this.state.columnsDetailList.forEach((aCol: IColumn, index) => {
       aCol.isSorted = this._simpleList.columns[index].isSorted;
       aCol.isSortedDescending = this._simpleList.columns[index].isSortedDescending;
     });
+  }
+
+  private _onClickHeaderColumn(ev: any, theColumn: IColumn): void {
+    // Se mira si la columna es ordenable
+    let slCol = this._simpleList.columns.find((aCol) => (aCol.key == theColumn.key));
+    if (slCol && slCol.canSortAndFilter) {
+      // Se ordena
+      this._simpleList.orderByColumn(theColumn.key);
+      // Actualizo las IColumns
+      this._updateDetailListColumns();
+
+      // Actualizo el estado
+      this.setState({
+        dataFiltered: this._simpleList.state.dataFiltered,
+        columnsDetailList: this.state.columnsDetailList.slice(0), // La copia es necesaria para que DetailList se renderize.
+      });
+    }
   }
 
   private _onChangeCheckBoxCompactMode(event: any, checked?: boolean | undefined): void {
