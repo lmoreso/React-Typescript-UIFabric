@@ -36,6 +36,7 @@ export interface ISimpleListFluentUIProps extends ISimpleListProps {
 
 interface ISimpleListFluentUIStates {
   dataFiltered: any[];
+  columnsDetailList: IColumn[];
   filterText: string;
   filterGroupedText: string;
   isCompactMode: boolean;
@@ -53,7 +54,6 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
   private _comboFilterByTextField: IDropdownOption[];
   private _comboFilterByGroupField: IDropdownOption[];
   private _comboFilterByGroupItems: IDropdownOption[];
-  private _columnsDetailList: IColumn[];
 
   public constructor(props: ISimpleListFluentUIProps) {
     super(props);
@@ -85,11 +85,9 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     /* Combo de Items de grupo*/
     this._makeComboFilterByGroupItems();
 
-    /* Columnas para el DetailList de FluentUI */
-    this._columnsDetailList = this._makeFluentUIColumns(this.props.columns);
-
     this.state = {
       dataFiltered: this._simpleList.state.dataFiltered,
+      columnsDetailList: this._makeFluentUIColumns(this.props.columns),
       filterText: this._simpleList.state.filterText,
       filterGroupedText: this._simpleList.state.filterByGroupField!.valueNoFilter,
       isCompactMode: (this.props.isCompactMode) ? true : false,
@@ -113,6 +111,9 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
   private _onChangeGroupText(event: any, option: IDropdownOption): void {
     this._simpleList.filterByGroup(option.key.toString());
     this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
+    // Actualizo las IColumns
+    this._updateDetailListColumns();
+
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,
       filterGroupedText: this._simpleList.state.filterByGroupText,
@@ -162,7 +163,8 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
   private _filterByText(textFilter: string, filterByTextAction: filterByTextActionsId, filterByTextField: ISimpleListCol): void {
     this._simpleList.filterByText(textFilter, filterByTextAction, filterByTextField);
     this._makeComboFilterByGroupItems();
-    // this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
+    // Actualizo las IColumns
+    this._updateDetailListColumns();
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,
       filterText: this._simpleList.state.filterText,
@@ -177,11 +179,24 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     this._filterByText(newText, this.state.filterByTextAction, this.state.filterByTextField!);
   }
 
-  private _onClickHeaderColumn(columnKey: string): void {
-    // console.log("_onClickHeaderColumn", "columnKey=", columnKey);
-    this._simpleList.orderByColumn(columnKey);
+  private _onClickHeaderColumn(ev: any, theColumn: IColumn): void {
+    console.log("_onClickHeaderColumn", "theColumn=", theColumn, "ISLColumns=", this._simpleList.columns, "IColumns=", this.state.columnsDetailList);
+    // Se ordena
+    this._simpleList.orderByColumn(theColumn.key);
+    // Actualizo las IColumns
+    this._updateDetailListColumns();
+
+    // Actualizo el estado
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,
+      columnsDetailList: this.state.columnsDetailList.slice(0),
+    });
+  }
+
+  private _updateDetailListColumns() {
+    this.state.columnsDetailList.forEach((aCol: IColumn, index) => {
+      aCol.isSorted = this._simpleList.columns[index].isSorted;
+      aCol.isSortedDescending = this._simpleList.columns[index].isSortedDescending;
     });
   }
 
@@ -319,9 +334,10 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
         // isSortedDescending: false,
         // sortAscendingAriaLabel: 'Sorted A to Z',
         // sortDescendingAriaLabel: 'Sorted Z to A',
-        onColumnClick: (ev: any, aColumn: IColumn) => {
-          this._onClickHeaderColumn(aColumn.key)
-        },
+        // onColumnClick: (ev: any, aColumn: IColumn) => {
+        //   this._onClickHeaderColumn(aColumn.key)
+        // },
+        // onColumnClick: this._onClickHeaderColumn,
         data: 'string',
         isPadded: true
       };
@@ -409,7 +425,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
       </Sticky>
     );
   };
-  
+
   public render(): JSX.Element {
     // console.log('SimpleListHtml render:');
     if (this.props.hidden) {
@@ -451,9 +467,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
 
       return (
         <div className='Main-container' style={styleMainContainer}>
-          {/* <ScrollablePane scrollbarVisibility={ScrollbarVisibility.auto}> */}
           <this._renderHeader />
-          {/* {(this.props.fixedHeader) ? <Sticky> <this._renderHeader /> </Sticky> : <this._renderHeader />} */}
           <div style={styleTableContainer} className='Table-container' data-is-scrollable="true">
             <ScrollablePane scrollbarVisibility={ScrollbarVisibility.auto}
               data-is-scrollable="true"
@@ -462,14 +476,14 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
               <DetailsList
                 items={this.state.dataFiltered}
                 compact={this.state.isCompactMode}
-                columns={this._columnsDetailList}
+                columns={this.state.columnsDetailList}
                 selectionMode={SelectionMode.none}
                 className={classNames.detailList}
                 onRenderDetailsHeader={this.onRenderDetailsHeader}
+                onColumnHeaderClick={this._onClickHeaderColumn}
               />
             </ScrollablePane>
           </div>
-          {/* </ScrollablePane> */}
         </div>
       );
     }

@@ -172,6 +172,9 @@ export class SimpleList {
     public get state() {
         return (this._state);
     };
+    public get columns() {
+        return (this.props.columns);
+    };
 
     public constructor(props: ISimpleListProps) {
         this.props = props;
@@ -234,11 +237,11 @@ export class SimpleList {
 
         if (mustOrder && currColumn) {
             if (currColumn.isNumeric)
-                sortByNumber(this._state.dataFiltered, currColumn.field, currColumn.isSortedDescending)
+                this._state.dataFiltered = sortByNumber(this._state.dataFiltered, currColumn.field, currColumn.isSortedDescending)
             else
-                sortByText(this._state.dataFiltered, currColumn.field, currColumn.isSortedDescending)
+                this._state.dataFiltered = sortByText(this._state.dataFiltered, currColumn.field, currColumn.isSortedDescending)
         } else
-            sortByNumber(this._state.dataFiltered, 'key', false)
+            this._state.dataFiltered = sortByNumber(this._state.dataFiltered, 'key', false)
     }
 
     public filterByText(filterText: string, filterByTextActionId: filterByTextActionsId, filterByTextField: ISimpleListCol): void {
@@ -334,15 +337,15 @@ export function copyAndSort<T>(items: T[], columnKey: string, isSortedDescending
     return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
 }
 
+export function copyAndSortByKey<T>(items: T[], isSortedDescending?: boolean): T[] {
+    const key = 'key';
+    return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[key]) < parseInt(b[key]) : parseInt(a[key]) > parseInt(b[key])) ? 1 : -1));
+}
+
 function sortByText<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
     const key = columnKey as keyof T;
     items.sort((a: T, b: T) => ((isSortedDescending ? a[key] < b[key] : a[key] > b[key]) ? 1 : -1));
     return items;
-}
-
-export function copyAndSortByKey<T>(items: T[], isSortedDescending?: boolean): T[] {
-    const key = 'key';
-    return items.slice(0).sort((a: T, b: T) => ((isSortedDescending ? parseInt(a[key]) < parseInt(b[key]) : parseInt(a[key]) > parseInt(b[key])) ? 1 : -1));
 }
 
 function sortByNumber<T>(items: T[], columnKey: string, isSortedDescending?: boolean): T[] {
