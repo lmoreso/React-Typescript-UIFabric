@@ -175,6 +175,11 @@ export class SimpleList {
     public get columns() {
         return (this.props.columns);
     };
+    public get isListSorted(): boolean {
+        if (this.props.columns.find((aCol) => (aCol.isSorted) ? true : false))
+            return(true);
+        return(false);
+    }
 
     public constructor(props: ISimpleListProps) {
         this.props = props;
@@ -214,12 +219,26 @@ export class SimpleList {
 
     }
 
+    private _applyOrder(): boolean {
+        let colSorted = this.props.columns.find((aCol) => (aCol.isSorted) ? true : false);
+        if (colSorted) {
+            if (colSorted.isNumeric)
+                this._state.dataFiltered = sortByNumber(this._state.dataFiltered, colSorted.field, colSorted.isSortedDescending)
+            else
+                this._state.dataFiltered = sortByText(this._state.dataFiltered, colSorted.field, colSorted.isSortedDescending)
+        } else {
+            this._state.dataFiltered = sortByNumber(this._state.dataFiltered, 'key', false)
+        }
+
+        return(true);
+    }
+
     public orderByColumn(keyColumn: string): void {
-        let mustOrder: boolean = false;
-        let currColumn = this.props.columns.find(aColumn => aColumn.key === keyColumn);
+        // let mustOrder: boolean = false;
+        // let currColumn = this.props.columns.find(aColumn => aColumn.key === keyColumn);
         this.props.columns.forEach((aColumn: ISimpleListCol) => {
             if (aColumn.key === keyColumn) {
-                mustOrder = true;
+                // mustOrder = true;
                 if (!aColumn.isSorted) {
                     aColumn.isSorted = true;
                     aColumn.isSortedDescending = false
@@ -227,7 +246,7 @@ export class SimpleList {
                     aColumn.isSortedDescending = true
                 } else {
                     aColumn.isSorted = false;
-                    mustOrder = false;
+                    // mustOrder = false;
                 }
             } else {
                 aColumn.isSorted = false;
@@ -235,13 +254,15 @@ export class SimpleList {
             }
         });
 
-        if (mustOrder && currColumn) {
-            if (currColumn.isNumeric)
-                this._state.dataFiltered = sortByNumber(this._state.dataFiltered, currColumn.field, currColumn.isSortedDescending)
-            else
-                this._state.dataFiltered = sortByText(this._state.dataFiltered, currColumn.field, currColumn.isSortedDescending)
-        } else
-            this._state.dataFiltered = sortByNumber(this._state.dataFiltered, 'key', false)
+        this._applyOrder();
+        // if (mustOrder && currColumn) {
+        //     thi
+        //     if (currColumn.isNumeric)
+        //         this._state.dataFiltered = sortByNumber(this._state.dataFiltered, currColumn.field, currColumn.isSortedDescending)
+        //     else
+        //         this._state.dataFiltered = sortByText(this._state.dataFiltered, currColumn.field, currColumn.isSortedDescending)
+        // } else
+        //     this._state.dataFiltered = sortByNumber(this._state.dataFiltered, 'key', false)
     }
 
     public filterByText(filterText: string, filterByTextActionId: filterByTextActionsId, filterByTextField: ISimpleListCol): void {
@@ -267,8 +288,9 @@ export class SimpleList {
         this._state.filterText = filterText;
         this._state.filterByTextField = filterByTextField;
         this._state.requireFilterText = (filterByTextActionLabel.notRequireText) ? false : true;
+
         // Quitar el órden de las columnas
-        this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
+        // this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
 
         if (mustFilter) {
             if (filterText.length > 0 || filterByTextActionLabel.notRequireText) {
@@ -279,6 +301,10 @@ export class SimpleList {
             this._state.dataFiltered = this._ItemsFilteredByText;
             this._state.filterByGroupText = '';
             this._makeGroupedItemsList();
+            // // Quitar el órden de las columnas
+            // if (this.isListSorted) this.orderByColumn('key');
+            // Aplico el orden
+            this._applyOrder();
         }
     }
 
@@ -328,6 +354,7 @@ export class SimpleList {
             }
             this._state.dataFiltered = data;
             this._state.filterByGroupText = filterGroupedItem;
+            this._applyOrder();
         }
     }
 }

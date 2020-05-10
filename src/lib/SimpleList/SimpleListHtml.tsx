@@ -2,11 +2,15 @@ import * as React from 'react';
 
 import { ISimpleListCol, SimpleList, filterByTextActionsId, filterByTextAction, filterByTextActionsList, IGroupedCol, ISimpleListProps } from './ISimpleListLib';
 import './SimpleList.css';
-import { strings, languagesSupportedIds} from './loc/SimpleListStrings';
+import { strings, languagesSupportedIds } from './loc/SimpleListStrings';
 import { Flechas } from './img/SimpleListIconos';
 import { ISlStyles, themeGray } from './SimpleListColors';
 
-const simpleListVersion = '0.1.2';
+const simpleListVersion = '0.2.0';
+/*
+  0.2.0: Se mantiene el órden despues de una operación de filtro.
+*/
+
 export const simpleListVersionLabel = `SimpleList V.${simpleListVersion}`;
 
 export interface ISimpleListHtmlProps extends ISimpleListProps {
@@ -63,7 +67,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
 
   private _onChangeGroupText(event: React.ChangeEvent<HTMLSelectElement>): void {
     this._simpleList.filterByGroup(event.target.value);
-    this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
+    // this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,
       filterGroupedText: this._simpleList.state.filterByGroupText,
@@ -254,11 +258,11 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
               <thead>
                 <tr className='Table-header' key={'-1'}>
                   {this.props.columns.map((aColumn: ISimpleListCol, indice: number) => {
-                    let styleCH = { 
-                      width: aColumn.width, 
-                      backgroundColor: this._theme.tableHeaderCellBackgroundColor, 
-                      borderBottomColor: this._theme.tableHeaderCellBackgroundColor, 
-                      borderLeftColor: this._theme.tableHeaderCellBackgroundColor, 
+                    let styleCH = {
+                      width: aColumn.width,
+                      backgroundColor: this._theme.tableHeaderCellBackgroundColor,
+                      borderBottomColor: this._theme.tableHeaderCellBackgroundColor,
+                      borderLeftColor: this._theme.tableHeaderCellBackgroundColor,
                       color: this._theme.tableHeaderColor,
                     };
 
@@ -276,21 +280,12 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                           </span>
                           {(!aColumn.canSortAndFilter) ? null :
                             <span
-                              onClick={(!aColumn.canSortAndFilter) ? undefined : (event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>) => {
+                              onClick={(event: React.MouseEvent<HTMLTableHeaderCellElement, MouseEvent>) => {
                                 this._onClickHeaderColumn(aColumn.key!);
                               }}
                               style={{ verticalAlign: 'baseline', width: '20px', cursor: 'pointer' }}
                               title={strings.order_ClickToOrder.replace('[%s]', aColumn.title)}
                             >
-                              {/* <img
-                                style={{ alignSelf: 'baseline' }}
-                                src={
-                                  (aColumn.isSorted) ?
-                                    (aColumn.isSortedDescending) ? imgArrowDown : imgArrowUp
-                                    :
-                                    imgArrowScroll
-                                }
-                              /> */}
                               <Flechas
                                 name={
                                   (aColumn.isSorted) ?

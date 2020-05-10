@@ -110,9 +110,9 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
 
   private _onChangeGroupText(event: any, option: IDropdownOption): void {
     this._simpleList.filterByGroup(option.key.toString());
-    this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
-    // Actualizo las IColumns
-    this._updateDetailListColumns();
+    // this.props.columns.forEach((aColumn: ISimpleListCol) => { aColumn.isSorted = false; aColumn.isSortedDescending = true });
+    // // Actualizo las IColumns
+    // this._updateDetailListColumns();
 
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,
@@ -163,8 +163,8 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
   private _filterByText(textFilter: string, filterByTextAction: filterByTextActionsId, filterByTextField: ISimpleListCol): void {
     this._simpleList.filterByText(textFilter, filterByTextAction, filterByTextField);
     this._makeComboFilterByGroupItems();
-    // Actualizo las IColumns
-    this._updateDetailListColumns();
+    // // Actualizo las IColumns
+    // this._updateDetailListColumns();
     this.setState({
       dataFiltered: this._simpleList.state.dataFiltered,
       filterText: this._simpleList.state.filterText,
