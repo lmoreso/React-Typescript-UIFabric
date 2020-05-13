@@ -33,7 +33,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
   private _themes: mod.IRCTheme[];
   private _defaultThemeKey = 3 // themeGray
   private _comboIdiomas: IDropdownOption[];
-  // private _comboColores: IDropdownOption[];
+  private _comboColores: IDropdownOption[];
 
   public constructor(props: mod.IRestCountriesProps) {
     super(props);
@@ -45,6 +45,12 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     this._comboIdiomas = new Array<IDropdownOption>();
     languagesSupported.forEach((anLang: ILanguagesSupported, index) => {
       this._comboIdiomas.push({ key: anLang.id, text: anLang.title });
+    });
+
+    /* Combo de Colores*/
+    this._comboColores = new Array<IDropdownOption>();
+    this._themes.forEach((anColor: mod.IRCTheme, index) => {
+      this._comboColores.push({ key: anColor.key, text: anColor.name });
     });
 
     // Inicializar estados
@@ -72,7 +78,6 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     this._onClickButtonConfig = this._onClickButtonConfig.bind(this);
     this._onClickButtonInfo = this._onClickButtonInfo.bind(this);
     this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
-    this._onChangeComboIdiomas = this._onChangeComboIdiomas.bind(this);
     this._onChangeComboColores = this._onChangeComboColores.bind(this);
   }
 
@@ -146,19 +151,6 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       this._loadColumns(this.state.dataSource != mod.dataSources.fromURL);
       this.setState({ language: newLanguage });
     }
-  }
-
-  private _onChangeComboIdiomas(event: ChangeEvent<HTMLSelectElement>): void {
-    this._changeLanguage(event.target.value)
-    // let newlanguage = stringToLanguagesSupported(event.target.value);
-    // if (newlanguage) {
-    //   this._piensaUnTiempo(0.5);
-    //   this._loadStrings(newlanguage);
-    //   this._loadColumns(this.state.dataSource != mod.dataSources.fromURL);
-    //   this.setState({ language: newlanguage });
-    //   // if (this._simpleListRef.current)
-    //   //   this._simpleListRef.current.setLanguage(newlanguage);
-    // }
   }
 
   private _piensaUnTiempo(segundos: number): void {
@@ -289,6 +281,17 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
           items: menuColores,
         },
       },
+      {
+        key: 'divider_2',
+        itemType: ContextualMenuItemType.Divider,
+      },
+      {
+        key: 'showInfo',
+        text: strings.header_ShowInfo,
+        onClick: () => { this.setState({ hiddenInfo: !this.state.hiddenInfo }) },
+        canCheck: true,
+        isChecked: !this.state.hiddenInfo,
+      },
     ]
 
     return (
@@ -344,9 +347,10 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       width: '100%',
       height: '40px',
       borderStyle: 'solid',
-      borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+      borderBottomColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       borderWidth: '1px',
       backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
+      
     }
 
     const iconClass = mergeStyles({
@@ -369,9 +373,8 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
         <span
           style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
           onClick={this._onClickButtonInfo}
-        // title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
+          title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
         >
-          {/* <IconoInfo fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} /> */}
           <Icon iconName="Info" className={iconClass} />
         </span>
         {/* Contenido de los créditos */}
@@ -397,9 +400,6 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
               target="_blank" href="https://es.linkedin.com/pub/lluis-moreso-bosch/3b/381/663"
               title="Visita mi perfil en LinkedIn"
             >
-              {/* <img src="img/Github.png" width="35px"
-                    title="Clona la App en GitHub" /> */}
-              {/* <IconoLinkedIn fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} /> */}
               <Icon iconName="LinkedInLogo" className={iconClass} />
               <span> Visita mi perfil en LinkedIn</span>
             </a>
@@ -422,8 +422,8 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
         <span
           style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
           onClick={this._onClickButtonInfo}
-        >
-          {/* <IconoCerrar fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} /> */}
+          title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
+          >
           <Icon iconName="Cancel" className={iconClass} />
         </span>
       </div>
@@ -449,7 +449,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       height: '60px',
       borderStyle: 'solid',
       borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
-      borderWidth: '1px',
+      borderWidth:'1px',
       backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
     };
 
@@ -537,7 +537,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
           {/* Combo colores */}
           <label style={cssConfigBody}>
             {strings.config_SelectColors}
-            <select style={{ textAlign: 'center', marginLeft: '2px' }} value={(this.state.theme.key)} onChange={this._onChangeComboColores}>
+            {/* <select style={{ textAlign: 'center', marginLeft: '2px' }} value={(this.state.theme.key)} onChange={this._onChangeComboColores}>
               {this._themes.map((aTheme, index) => {
                 return (
                   <option key={aTheme.key} value={aTheme.key}>
@@ -545,7 +545,14 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
                   </option>
                 )
               })}
-            </select>
+            </select> */}
+            <Dropdown
+              selectedKey={this.state.theme.key}
+              onChange={(ev: any, option: IDropdownOption) => { this._changeColor(option.key.toString()) }}
+              options={this._comboColores}
+              // styles={controlStyles}
+              style={{ minWidth: 140 }}
+            />
           </label>
         </div>
 
@@ -593,8 +600,8 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       width: this.props.width || mod.DEFAULT_WIDTH,
       borderStyle: 'solid',
       borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
-      borderWidth: '1px',
-      padding: '2px',
+      borderWidth: '2px',
+      backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
     }
 
     if (this.state.fetchResult == mod.fetchResults.loading) {
@@ -602,14 +609,12 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
         <div style={mainStyle}>
           <this._renderHeader />
           <Label> {strings.model_Loading}</Label>
-          <Spinner
-            size={SpinnerSize.large}
-            style={{ color: this.state.theme.slStyle.tableHeaderCellBackgroundColor }}
-          />
-          {/* <p> {strings.model_Loading}</p>
-          <IconoSpinner
-            fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor}
-          /> */}
+          <div style={{ height: '60px' }}>
+            <Spinner
+              size={SpinnerSize.large}
+              style={{ color: this.state.theme.slStyle.tableHeaderCellBackgroundColor }}
+            />
+          </div>
         </div>
       );
     } else if (this.state.fetchResult == mod.fetchResults.loadedErr) {
