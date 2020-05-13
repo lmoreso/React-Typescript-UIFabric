@@ -5,9 +5,9 @@ import { ChangeEvent } from 'react';
 import * as mod from './RestCountriesCommon';
 import { ISimpleListCol } from '../lib/SimpleList/ISimpleListLib';
 import { SimpleListFluentUI, simpleListFluentUIVersionLabel } from 'src/lib/SimpleList/SimpleListFluentUI';
-import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, }
+import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, ILanguagesSupported, }
   from './loc/RestCountriesStrings';
-import { IconoConfig, IconoSpinner, IconoCerrar, IconoGithub, } from './recursos/iconos';
+import { IconoGithub, } from './recursos/iconos';
 import { themeRed, themeGreen, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles }
   from 'src/lib/SimpleList/SimpleListColors';
 // FluentUI imports
@@ -17,6 +17,10 @@ import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { mergeStyles } from 'office-ui-fabric-react/lib/Styling';
 import { IContextualMenuItem, ContextualMenuItemType } from 'office-ui-fabric-react/lib/ContextualMenu';
 import { IconButton } from 'office-ui-fabric-react/lib/Button';
+import { Label } from 'office-ui-fabric-react/lib/Label';
+import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
+import { Toggle } from 'office-ui-fabric-react/lib/Toggle';
+import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 // import { mergeStyles, mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
 
 const restCountriesFluentUIVersion = '0.0.1';
@@ -28,6 +32,8 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
   private _simpleListRef = React.createRef<SimpleListFluentUI>();
   private _themes: mod.IRCTheme[];
   private _defaultThemeKey = 3 // themeGray
+  private _comboIdiomas: IDropdownOption[];
+  // private _comboColores: IDropdownOption[];
 
   public constructor(props: mod.IRestCountriesProps) {
     super(props);
@@ -35,13 +41,19 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     // Cargar traducciones
     let language = this._loadStrings(stringToLanguagesSupported(this.props.language));
 
+    /* Combo de Idiomas*/
+    this._comboIdiomas = new Array<IDropdownOption>();
+    languagesSupported.forEach((anLang: ILanguagesSupported, index) => {
+      this._comboIdiomas.push({ key: anLang.id, text: anLang.title });
+    });
+
     // Inicializar estados
     this.state = {
       numRegs: 0,
       fetchResult: mod.fetchResults.loading,
       fetchResultMessage: '',
       dataSource: mod.DATA_SOURCE_DEF,
-      hiddenConfig: true,
+      hiddenConfig: false,
       hiddenInfo: true,
       isCompactMode: false,
       language: language,
@@ -61,7 +73,6 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     this._onClickButtonInfo = this._onClickButtonInfo.bind(this);
     this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
     this._onChangeComboIdiomas = this._onChangeComboIdiomas.bind(this);
-    this._onChangeCheckBoxIsUrl = this._onChangeCheckBoxIsUrl.bind(this);
     this._onChangeComboColores = this._onChangeComboColores.bind(this);
   }
 
@@ -125,10 +136,6 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     let dataSource = (checked) ? mod.dataSources.fromURL : mod.dataSources.fromJsonWithDelay;
     this._loadColumns(dataSource != mod.dataSources.fromURL);
     this._downloadCountries(dataSource);
-  }
-
-  private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
-    this._showFlags(event.target.checked)
   }
 
   private _changeLanguage(language: string): void {
@@ -219,7 +226,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
         text: aLanguage.title,
         canCheck: true,
         isChecked: this.state.language == aLanguage.id,
-        onClick: ()=>{this._changeLanguage(aLanguage.id)}
+        onClick: () => { this._changeLanguage(aLanguage.id) }
       })
     })
 
@@ -230,8 +237,8 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
         text: aTheme.name,
         canCheck: true,
         isChecked: this.state.theme.key == aTheme.key,
-        onClick: ()=>{this._changeColor(aTheme.key)},
-        style: {backgroundColor: aTheme.slStyle.mainContainerBorderColor, color: aTheme.slStyle.mainContainerBackgroundColor}
+        onClick: () => { this._changeColor(aTheme.key) },
+        style: { backgroundColor: aTheme.slStyle.mainContainerBorderColor, color: aTheme.slStyle.mainContainerBackgroundColor }
       })
     })
 
@@ -239,7 +246,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       {
         key: 'showConfig',
         text: strings.header_ShowConfig,
-        onClick: ()=>{this.setState({hiddenConfig: !this.state.hiddenConfig})},
+        onClick: () => { this.setState({ hiddenConfig: !this.state.hiddenConfig }) },
         canCheck: true,
         isChecked: !this.state.hiddenConfig,
       },
@@ -257,14 +264,14 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       {
         key: 'label',
         text: 'Show Label "N. Countries"',
-        onClick: ()=>{this.setState({hiddenLabel: !this.state.hiddenLabel})},
+        onClick: () => { this.setState({ hiddenLabel: !this.state.hiddenLabel }) },
         canCheck: true,
         isChecked: !this.state.hiddenLabel,
       },
       {
         key: 'flags',
         text: strings.label_LoadFromRestcountries,
-        onClick: ()=>{this._showFlags(this.state.dataSource != mod.dataSources.fromURL)},
+        onClick: () => { this._showFlags(this.state.dataSource != mod.dataSources.fromURL) },
         canCheck: true,
         isChecked: this.state.dataSource == mod.dataSources.fromURL,
       },
@@ -282,19 +289,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
           items: menuColores,
         },
       },
-
-/*       {strings.config_SelectLanguage}
-      <select style={{ textAlign: 'center', marginLeft: '2px' }} value={this.state.language} onChange={this._onChangeComboIdiomas}>
-        {languagesSupported.map((aLanguage, index) => {
-          return (
-            <option key={index} value={aLanguage.id}>
-              {`${aLanguage.title}`}
-            </option>
-          )
-        })}
-      </select>
-
- */    ]
+    ]
 
     return (
       <div style={cssTitleContainer}>
@@ -451,23 +446,44 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       alignItems: 'center',
       paddingTop: '2px',
       width: '100%',
-      height: '40px',
+      height: '60px',
       borderStyle: 'solid',
       borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       borderWidth: '1px',
       backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
     };
 
+    const iconClass = mergeStyles({
+      fontSize: 28,
+      // height: 40,
+      // width: '100%', 
+      color: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+      // margin: '3 0 3 3',
+    });
+
+    const styleToggle = (checked: boolean): React.CSSProperties => {
+      if (checked)
+        return ({
+          color: this.state.theme.slStyle.tableContainerBackgroundColor,
+          backgroundColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+        })
+      else
+        return ({
+          backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
+          color: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+        })
+    }
+
     return (
       <div style={cssConfigContainer}>
         {/* Icono Configuración */}
         <span
           style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
-
           onClick={this._onClickButtonConfig}
           title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
         >
-          <IconoConfig fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
+          {/* <IconoConfig fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} /> */}
+          <Icon iconName="Settings" className={iconClass} />
         </span>
 
         {/* Contenido de la configuración */}
@@ -481,40 +497,42 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
         }} >
 
           {/* Checkbox isCompactMode */}
-          <label style={cssConfigBody}>
-            {strings.config_CompactMode}
-            <input style={{ marginLeft: '2px' }}
-              name="ToggleCompactMode"
-              type="checkbox"
+          <span style={cssConfigBody}>
+            <Toggle
+              // hidden={!this.props.showToggleCompactMode}
+              label={strings.config_CompactMode}
               checked={this.state.isCompactMode}
               onChange={this._onChangeCheckBoxCompactMode}
+              // onText={strings.config_CompactMode}
+              // offText={strings.config_CompactMode}
+              style={styleToggle(this.state.isCompactMode)}
             />
-          </label>
+          </span>
 
           {/* Combo idiomas */}
           <label style={cssConfigBody}>
             {strings.config_SelectLanguage}
-            <select style={{ textAlign: 'center', marginLeft: '2px' }} value={this.state.language} onChange={this._onChangeComboIdiomas}>
-              {languagesSupported.map((aLanguage, index) => {
-                return (
-                  <option key={index} value={aLanguage.id}>
-                    {`${aLanguage.title}`}
-                  </option>
-                )
-              })}
-            </select>
+            <Dropdown
+              selectedKey={this.state.language}
+              onChange={(ev: any, option: IDropdownOption) => { this._changeLanguage(option.key.toString()) }}
+              options={this._comboIdiomas}
+              // styles={controlStyles}
+              style={{ minWidth: 140 }}
+            />
           </label>
 
           {/* Checkbox dataSource */}
-          <label style={cssConfigBody}>
-            {strings.label_LoadFromRestcountries}
-            <input style={{ textAlign: 'center', marginLeft: '2px' }}
-              name="ToggleIsUrl"
-              type="checkbox"
+          <span style={cssConfigBody}>
+            <Toggle
+              // hidden={!this.props.showToggleCompactMode}
+              label={strings.label_LoadFromRestcountries}
               checked={this.state.dataSource == mod.dataSources.fromURL}
-              onChange={this._onChangeCheckBoxIsUrl}
+              onChange={() => this._showFlags(this.state.dataSource != mod.dataSources.fromURL)}
+              // onText={strings.config_CompactMode}
+              // offText={strings.config_CompactMode}
+              style={styleToggle(this.state.dataSource == mod.dataSources.fromURL)}
             />
-          </label>
+          </span>
 
           {/* Combo colores */}
           <label style={cssConfigBody}>
@@ -537,7 +555,8 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
           onClick={this._onClickButtonConfig}
           title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
         >
-          <IconoCerrar fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
+          {/* <IconoCerrar fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} /> */}
+          <Icon iconName="Cancel" className={iconClass} />
         </span>
       </div>
 
@@ -558,10 +577,9 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       <div style={cssMainContainer}>
         {/* Barra de Título */}
         <this._renderTitle />
+
         {/* Créditos */}
-        <div>
-          {this.state.hiddenInfo ? null : <this._renderInfo />}
-        </div>
+        {this.state.hiddenInfo ? null : <this._renderInfo />}
 
         {/* Configuración */}
         {(this.state.hiddenConfig) ? null : <this._renderConfig />}
@@ -576,16 +594,22 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       borderStyle: 'solid',
       borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       borderWidth: '1px',
+      padding: '2px',
     }
 
     if (this.state.fetchResult == mod.fetchResults.loading) {
       return (
         <div style={mainStyle}>
           <this._renderHeader />
-          <p> {strings.model_Loading}</p>
+          <Label> {strings.model_Loading}</Label>
+          <Spinner
+            size={SpinnerSize.large}
+            style={{ color: this.state.theme.slStyle.tableHeaderCellBackgroundColor }}
+          />
+          {/* <p> {strings.model_Loading}</p>
           <IconoSpinner
             fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor}
-          />
+          /> */}
         </div>
       );
     } else if (this.state.fetchResult == mod.fetchResults.loadedErr) {

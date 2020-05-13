@@ -1,6 +1,11 @@
 export enum languagesSupportedIds { es = 'es', ca = 'ca', en = 'en', fr = 'fr' }
 
-export let languagesSupported: {id: languagesSupportedIds; title: string;}[] = [
+export interface ILanguagesSupported {
+  id: languagesSupportedIds; 
+  title: string;
+}
+
+export let languagesSupported: ILanguagesSupported[] = [
   {id: languagesSupportedIds.es, title: 'Español'},
   {id: languagesSupportedIds.ca, title: 'Català'},
   {id: languagesSupportedIds.en, title: 'English'},
