@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ChangeEvent } from 'react';
 
 // Aplicattion imports
 import * as mod from './RestCountriesCommon';
@@ -6,10 +7,17 @@ import { ISimpleListCol } from '../lib/SimpleList/ISimpleListLib';
 import { SimpleListFluentUI, simpleListFluentUIVersionLabel } from 'src/lib/SimpleList/SimpleListFluentUI';
 import { initStrings, strings, detectLanguage, languagesSupported, stringToLanguagesSupported, languagesSupportedIds, }
   from './loc/RestCountriesStrings';
-import { ChangeEvent } from 'react';
-import { IconoConfig, IconoSpinner, IconoInfo, IconoCerrar, IconoGithub, IconoLinkedIn } from './recursos/iconos';
+import { IconoConfig, IconoSpinner, IconoCerrar, IconoGithub, } from './recursos/iconos';
 import { themeRed, themeGreen, themeBlue, themeCyan, themeYellow, themeMagenta, themeGray, ISlStyles }
   from 'src/lib/SimpleList/SimpleListColors';
+// FluentUI imports
+// import { Callout } from 'office-ui-fabric-react/lib/Callout';
+// import { IconButton } from 'office-ui-fabric-react/lib/Button';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
+import { mergeStyles } from 'office-ui-fabric-react/lib/Styling';
+import { IContextualMenuItem, ContextualMenuItemType } from 'office-ui-fabric-react/lib/ContextualMenu';
+import { IconButton } from 'office-ui-fabric-react/lib/Button';
+// import { mergeStyles, mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
 
 const restCountriesFluentUIVersion = '0.0.1';
 const restCountriesFluentUIVersionLabel = `RestCountriesFluentUI V.${restCountriesFluentUIVersion}`;
@@ -38,19 +46,27 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       isCompactMode: false,
       language: language,
       theme: this._themes[this._defaultThemeKey],
+      hiddenLabel: true,
     }
 
     // inicializar columnas para SimpeListHtml
     this._loadColumns(this.state.dataSource != mod.dataSources.fromURL);
 
     // Binds de funciones
+    this._renderHeader = this._renderHeader.bind(this);
     this._renderTitle = this._renderTitle.bind(this);
+    this._renderInfo = this._renderInfo.bind(this);
+    this._renderConfig = this._renderConfig.bind(this);
     this._onClickButtonConfig = this._onClickButtonConfig.bind(this);
     this._onClickButtonInfo = this._onClickButtonInfo.bind(this);
     this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
     this._onChangeComboIdiomas = this._onChangeComboIdiomas.bind(this);
     this._onChangeCheckBoxIsUrl = this._onChangeCheckBoxIsUrl.bind(this);
     this._onChangeComboColores = this._onChangeComboColores.bind(this);
+  }
+
+  public componentDidMount() {
+    this._downloadCountries(this.state.dataSource);
   }
 
   private _initColors() {
@@ -92,32 +108,50 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     return (this._simpleListColumns);
   }
 
-  private _onChangeComboColores(event: ChangeEvent<HTMLSelectElement>): void {
+  private _changeColor(color: string): void {
     this._piensaUnTiempo(0.1);
-    this.setState({ theme: this._getTheme(event.target.value) });
+    this.setState({ theme: this._getTheme(color) });
+  }
+
+  private _onChangeComboColores(event: ChangeEvent<HTMLSelectElement>): void {
+    this._changeColor(event.target.value);
   }
 
   private _getTheme(themeKey: string): mod.IRCTheme {
     return (this._themes.find((aTheme) => (aTheme.key == themeKey)) || this._themes[this._defaultThemeKey]);
   }
 
-  private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
-    let checked: boolean = event.target.checked;
+  private _showFlags(checked: boolean): void {
     let dataSource = (checked) ? mod.dataSources.fromURL : mod.dataSources.fromJsonWithDelay;
     this._loadColumns(dataSource != mod.dataSources.fromURL);
     this._downloadCountries(dataSource);
   }
 
-  private _onChangeComboIdiomas(event: ChangeEvent<HTMLSelectElement>): void {
-    let newlanguage = stringToLanguagesSupported(event.target.value);
-    if (newlanguage) {
+  private _onChangeCheckBoxIsUrl(event: React.ChangeEvent<HTMLInputElement>): void {
+    this._showFlags(event.target.checked)
+  }
+
+  private _changeLanguage(language: string): void {
+    let newLanguage = stringToLanguagesSupported(language);
+    if (newLanguage) {
       this._piensaUnTiempo(0.5);
-      this._loadStrings(newlanguage);
+      this._loadStrings(newLanguage);
       this._loadColumns(this.state.dataSource != mod.dataSources.fromURL);
-      this.setState({ language: newlanguage });
-      // if (this._simpleListRef.current)
-      //   this._simpleListRef.current.setLanguage(newlanguage);
+      this.setState({ language: newLanguage });
     }
+  }
+
+  private _onChangeComboIdiomas(event: ChangeEvent<HTMLSelectElement>): void {
+    this._changeLanguage(event.target.value)
+    // let newlanguage = stringToLanguagesSupported(event.target.value);
+    // if (newlanguage) {
+    //   this._piensaUnTiempo(0.5);
+    //   this._loadStrings(newlanguage);
+    //   this._loadColumns(this.state.dataSource != mod.dataSources.fromURL);
+    //   this.setState({ language: newlanguage });
+    //   // if (this._simpleListRef.current)
+    //   //   this._simpleListRef.current.setLanguage(newlanguage);
+    // }
   }
 
   private _piensaUnTiempo(segundos: number): void {
@@ -133,7 +167,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     this.setState({ hiddenInfo: !this.state.hiddenInfo });
   }
 
-  private _onChangeCheckBoxCompactMode(event: React.ChangeEvent<HTMLInputElement>): void {
+  private _onChangeCheckBoxCompactMode(): void {
     let checked: boolean = !this.state.isCompactMode;  // event.target.checked
     this.setState({ isCompactMode: checked, });
     this._simpleListRef.current!.setState({ isCompactMode: checked, });
@@ -152,15 +186,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       });
   }
 
-  public componentDidMount() {
-    this._downloadCountries(this.state.dataSource);
-  }
-
-  private _renderTitle(styleHeader: React.CSSProperties): JSX.Element {
-    let cssConfigBody: React.CSSProperties = {
-      margin: '2px 2px 2px 2px',
-      verticalAlign: 'baseline',
-    }
+  private _renderTitle(): JSX.Element {
 
     let cssTitleContainer: React.CSSProperties = {
       fontSize: 'large',
@@ -178,6 +204,142 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       backgroundColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
     }
 
+    const iconClass = mergeStyles({
+      fontSize: 28,
+      // height: 40,
+      // width: '100%', 
+      color: this.state.theme.slStyle.tableContainerBackgroundColor,
+      // margin: '3 0 3 3',
+    });
+
+    let menuIdiomas = new Array<IContextualMenuItem>();
+    languagesSupported.forEach((aLanguage, index) => {
+      menuIdiomas.push({
+        key: aLanguage.id,
+        text: aLanguage.title,
+        canCheck: true,
+        isChecked: this.state.language == aLanguage.id,
+        onClick: ()=>{this._changeLanguage(aLanguage.id)}
+      })
+    })
+
+    let menuColores = new Array<IContextualMenuItem>();
+    this._themes.forEach((aTheme) => {
+      menuColores.push({
+        key: aTheme.key,
+        text: aTheme.name,
+        canCheck: true,
+        isChecked: this.state.theme.key == aTheme.key,
+        onClick: ()=>{this._changeColor(aTheme.key)},
+        style: {backgroundColor: aTheme.slStyle.mainContainerBorderColor, color: aTheme.slStyle.mainContainerBackgroundColor}
+      })
+    })
+
+    const menuItems: IContextualMenuItem[] = [
+      {
+        key: 'showConfig',
+        text: strings.header_ShowConfig,
+        onClick: ()=>{this.setState({hiddenConfig: !this.state.hiddenConfig})},
+        canCheck: true,
+        isChecked: !this.state.hiddenConfig,
+      },
+      {
+        key: 'divider_1',
+        itemType: ContextualMenuItemType.Divider,
+      },
+      {
+        key: 'compactMode',
+        text: strings.config_CompactMode,
+        onClick: this._onChangeCheckBoxCompactMode,
+        canCheck: true,
+        isChecked: this.state.isCompactMode,
+      },
+      {
+        key: 'label',
+        text: 'Show Label "N. Countries"',
+        onClick: ()=>{this.setState({hiddenLabel: !this.state.hiddenLabel})},
+        canCheck: true,
+        isChecked: !this.state.hiddenLabel,
+      },
+      {
+        key: 'flags',
+        text: strings.label_LoadFromRestcountries,
+        onClick: ()=>{this._showFlags(this.state.dataSource != mod.dataSources.fromURL)},
+        canCheck: true,
+        isChecked: this.state.dataSource == mod.dataSources.fromURL,
+      },
+      {
+        key: 'idiomas',
+        text: strings.config_SelectLanguage,
+        subMenuProps: {
+          items: menuIdiomas,
+        },
+      },
+      {
+        key: 'colors',
+        text: strings.config_SelectColors,
+        subMenuProps: {
+          items: menuColores,
+        },
+      },
+
+/*       {strings.config_SelectLanguage}
+      <select style={{ textAlign: 'center', marginLeft: '2px' }} value={this.state.language} onChange={this._onChangeComboIdiomas}>
+        {languagesSupported.map((aLanguage, index) => {
+          return (
+            <option key={index} value={aLanguage.id}>
+              {`${aLanguage.title}`}
+            </option>
+          )
+        })}
+      </select>
+
+ */    ]
+
+    return (
+      <div style={cssTitleContainer}>
+        {/* Icono INFO */}
+        <span
+          id='spanIconinfoTitle'
+          style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
+          onClick={this._onClickButtonInfo}
+          title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
+        >
+          {/* <IconoInfo fill={this.state.theme.slStyle.tableContainerBackgroundColor} /> */}
+          <Icon iconName="Info" className={iconClass} />
+        </span>
+        {/* Título */}
+        <div style={{ verticalAlign: 'middle', width: '100%' }} >
+          {strings.title_App} (versión FluentUI en construcción)
+          <small>
+            {` (${strings.agradecimiento} `}
+            <a target='_blank'
+              style={{ color: this.state.theme.slStyle.tableContainerBackgroundColor }}
+              href={mod.URL_RESTCOUNTRIES_SITE}>
+              {mod.URL_RESTCOUNTRIES_SITE}
+            </a>{')'}
+          </small>
+        </div>
+        {/* Icono Configuración */}
+        <span
+          style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer', margin: '2px', }}
+          // onClick={this._onClickButtonConfig}
+          title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
+        >
+          {/* <IconoConfig fill={this.state.theme.slStyle.tableContainerBackgroundColor} /> */}
+          {/* <Icon iconName="CollapseMenu" className={iconClass} /> */}
+          <IconButton
+            iconProps={{ iconName: 'CollapseMenu', className: iconClass }}
+            menuProps={{ items: menuItems }}
+            menuIconProps={{ iconName: '', hidden: true }}
+            title="Show Menu" ariaLabel="Show Menu"
+          />
+        </span>
+      </div>
+    )
+  }
+
+  private _renderInfo(): JSX.Element {
     let cssInfoContainer: React.CSSProperties = {
       display: 'flex',
       justifyContent: 'space-between',
@@ -190,6 +352,96 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       borderWidth: '1px',
       backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
+    }
+
+    const iconClass = mergeStyles({
+      fontSize: 28,
+      // height: 40,
+      // width: '100%', 
+      color: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+      margin: 3,
+    });
+
+
+    return (
+      // <Callout
+      //   onDismiss={this._onClickButtonInfo}
+      //   coverTarget={true}
+      //   target='#spanIconinfoTitle'
+      // >
+      <div style={cssInfoContainer}>
+        {/* Icono Info */}
+        <span
+          style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
+          onClick={this._onClickButtonInfo}
+        // title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
+        >
+          {/* <IconoInfo fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} /> */}
+          <Icon iconName="Info" className={iconClass} />
+        </span>
+        {/* Contenido de los créditos */}
+        <div style={{
+          verticalAlign: 'middle',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-around',
+          alignContent: 'center',
+          alignItems: 'center',
+        }} >
+          <span style={{ verticalAlign: 'middle', fontSize: '0.8em', textAlign: 'left' }}>
+            {simpleListFluentUIVersionLabel}<br />{restCountriesFluentUIVersionLabel}
+          </span>
+
+          <span style={{ verticalAlign: 'middle' }}>
+            ©2020 <a target="_blank" href="mailto:lmoreso@yahoo.com" title="Envía un e-mail al autor">Lluís Moreso Bosch</a>
+          </span>
+
+          <span style={{ verticalAlign: 'middle' }}>
+            <a
+              style={{ verticalAlign: 'middle', height: '100%', display: 'flex', justifyContent: 'space-around', alignContent: 'center', alignItems: 'center', }}
+              target="_blank" href="https://es.linkedin.com/pub/lluis-moreso-bosch/3b/381/663"
+              title="Visita mi perfil en LinkedIn"
+            >
+              {/* <img src="img/Github.png" width="35px"
+                    title="Clona la App en GitHub" /> */}
+              {/* <IconoLinkedIn fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} /> */}
+              <Icon iconName="LinkedInLogo" className={iconClass} />
+              <span> Visita mi perfil en LinkedIn</span>
+            </a>
+          </span>
+
+          <span style={{ verticalAlign: 'middle' }}>
+            <a
+              style={{ verticalAlign: 'middle', height: '100%', display: 'flex', justifyContent: 'space-around', alignContent: 'center', alignItems: 'center', }}
+              target="_blank" href="https://github.com/lmoreso/React-Typescript-UIFabric"
+              title="Clona la App en GitHub"
+            >
+              {/* <img src="img/Github.png" width="35px"
+                    title="Clona la App en GitHub" /> */}
+              <IconoGithub fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
+              <span> Clona la App en GitHub</span>
+            </a>
+          </span>
+        </div>
+        {/* Icono Cerrar */}
+        <span
+          style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
+          onClick={this._onClickButtonInfo}
+        >
+          {/* <IconoCerrar fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} /> */}
+          <Icon iconName="Cancel" className={iconClass} />
+        </span>
+      </div>
+      // </Callout>
+
+    )
+
+  }
+
+  private _renderConfig(): JSX.Element {
+    let cssConfigBody: React.CSSProperties = {
+      margin: '2px 2px 2px 2px',
+      verticalAlign: 'baseline',
     }
 
     let cssConfigContainer: React.CSSProperties = {
@@ -207,197 +459,112 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     };
 
     return (
-      <div style={{
-        width: this.props.width || mod.DEFAULT_WIDTH,
-        // borderStyle: 'solid',
-        // borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
-        // borderWidth: '1px',
-      }}>
-        {/* Barra de Título */}
-        <div style={cssTitleContainer}>
-          {/* Icono INFO */}
-          <span
-            style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
-            onClick={this._onClickButtonInfo}
-            title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
-          >
-            <IconoInfo fill={this.state.theme.slStyle.tableContainerBackgroundColor} />
-          </span>
-          {/* Título */}
-          <div style={{ verticalAlign: 'middle', width: '100%' }} >
-            {strings.title_App} (versión FluentUI en construcción)
-            <small>
-              {` (${strings.agradecimiento} `}
-              <a target='_blank'
-                style={{ color: this.state.theme.slStyle.tableContainerBackgroundColor }}
-                href={mod.URL_RESTCOUNTRIES_SITE}>
-                {mod.URL_RESTCOUNTRIES_SITE}
-              </a>{')'}
-            </small>
-          </div>
-          {/* Icono Configuración */}
-          <span
-            style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer', margin: '2px', }}
-            onClick={this._onClickButtonConfig}
-            title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
-          >
-            <IconoConfig fill={this.state.theme.slStyle.tableContainerBackgroundColor} />
-          </span>
+      <div style={cssConfigContainer}>
+        {/* Icono Configuración */}
+        <span
+          style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
+
+          onClick={this._onClickButtonConfig}
+          title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
+        >
+          <IconoConfig fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
+        </span>
+
+        {/* Contenido de la configuración */}
+        <div style={{
+          verticalAlign: 'middle',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-around',
+          alignContent: 'center',
+          alignItems: 'center',
+        }} >
+
+          {/* Checkbox isCompactMode */}
+          <label style={cssConfigBody}>
+            {strings.config_CompactMode}
+            <input style={{ marginLeft: '2px' }}
+              name="ToggleCompactMode"
+              type="checkbox"
+              checked={this.state.isCompactMode}
+              onChange={this._onChangeCheckBoxCompactMode}
+            />
+          </label>
+
+          {/* Combo idiomas */}
+          <label style={cssConfigBody}>
+            {strings.config_SelectLanguage}
+            <select style={{ textAlign: 'center', marginLeft: '2px' }} value={this.state.language} onChange={this._onChangeComboIdiomas}>
+              {languagesSupported.map((aLanguage, index) => {
+                return (
+                  <option key={index} value={aLanguage.id}>
+                    {`${aLanguage.title}`}
+                  </option>
+                )
+              })}
+            </select>
+          </label>
+
+          {/* Checkbox dataSource */}
+          <label style={cssConfigBody}>
+            {strings.label_LoadFromRestcountries}
+            <input style={{ textAlign: 'center', marginLeft: '2px' }}
+              name="ToggleIsUrl"
+              type="checkbox"
+              checked={this.state.dataSource == mod.dataSources.fromURL}
+              onChange={this._onChangeCheckBoxIsUrl}
+            />
+          </label>
+
+          {/* Combo colores */}
+          <label style={cssConfigBody}>
+            {strings.config_SelectColors}
+            <select style={{ textAlign: 'center', marginLeft: '2px' }} value={(this.state.theme.key)} onChange={this._onChangeComboColores}>
+              {this._themes.map((aTheme, index) => {
+                return (
+                  <option key={aTheme.key} value={aTheme.key}>
+                    {`${aTheme.name}`}
+                  </option>
+                )
+              })}
+            </select>
+          </label>
         </div>
 
+        {/* Icono Cerrar */}
+        <span
+          style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
+          onClick={this._onClickButtonConfig}
+          title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
+        >
+          <IconoCerrar fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
+        </span>
+      </div>
+
+    )
+  }
+
+  private _renderHeader(): JSX.Element {
+
+
+    let cssMainContainer: React.CSSProperties = {
+      width: this.props.width || mod.DEFAULT_WIDTH,
+      // borderStyle: 'solid',
+      // borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
+      // borderWidth: '1px',
+    }
+
+    return (
+      <div style={cssMainContainer}>
+        {/* Barra de Título */}
+        <this._renderTitle />
         {/* Créditos */}
-        {(this.state.hiddenInfo) ? null :
-          <div style={cssInfoContainer}>
-            {/* Icono Info */}
-            <span
-              style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
-              onClick={this._onClickButtonInfo}
-              title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
-            >
-              <IconoInfo fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
-            </span>
-            {/* Contenido de los créditos */}
-            <div style={{
-              verticalAlign: 'middle',
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'space-around',
-              alignContent: 'center',
-              alignItems: 'center',
-            }} >
-              <span style={{ verticalAlign: 'middle', fontSize: '0.8em', textAlign: 'left' }}>
-                {simpleListFluentUIVersionLabel}<br />{restCountriesFluentUIVersionLabel}
-              </span>
+        <div>
+          {this.state.hiddenInfo ? null : <this._renderInfo />}
+        </div>
 
-              <span style={{ verticalAlign: 'middle' }}>
-                ©2020 <a target="_blank" href="mailto:lmoreso@yahoo.com" title="Envía un e-mail al autor">Lluís Moreso Bosch</a>
-              </span>
-              {/* <span style={{ verticalAlign: 'middle' }}>
-                <a target="_blank" href="https://es.linkedin.com/pub/lluis-moreso-bosch/3b/381/663">
-                  <img src={`${process.env.PUBLIC_URL}img/btn_viewmy_linkedin_160x33_es_ES.png`} width="160"
-                    title="Ver el perfil de Lluis Moreso Bosch en LinkedIn" />
-                </a>
-              </span> */}
-              <span style={{ verticalAlign: 'middle' }}>
-                <a
-                  style={{ verticalAlign: 'middle', height: '100%', display: 'flex', justifyContent: 'space-around', alignContent: 'center', alignItems: 'center', }}
-                  target="_blank" href="https://es.linkedin.com/pub/lluis-moreso-bosch/3b/381/663"
-                  title="Visita mi perfil en LinkedIn"
-                >
-                  {/* <img src="img/Github.png" width="35px"
-                    title="Clona la App en GitHub" /> */}
-                  <IconoLinkedIn fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
-                  <span> Visita mi perfil en LinkedIn</span>
-                </a>
-              </span>
-
-              <span style={{ verticalAlign: 'middle' }}>
-                <a
-                  style={{ verticalAlign: 'middle', height: '100%', display: 'flex', justifyContent: 'space-around', alignContent: 'center', alignItems: 'center', }}
-                  target="_blank" href="https://github.com/lmoreso/React-Typescript-UIFabric"
-                  title="Clona la App en GitHub"
-                >
-                  {/* <img src="img/Github.png" width="35px"
-                    title="Clona la App en GitHub" /> */}
-                  <IconoGithub fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
-                  <span> Clona la App en GitHub</span>
-                </a>
-              </span>
-            </div>
-            {/* Icono Cerrar */}
-            <span
-              style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
-              onClick={this._onClickButtonInfo}
-              title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
-            >
-              <IconoCerrar fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
-            </span>
-          </div>
-        }
         {/* Configuración */}
-        {(this.state.hiddenConfig) ? null :
-          <div style={cssConfigContainer}>
-            {/* Icono Configuración */}
-            <span
-              style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
-
-              onClick={this._onClickButtonConfig}
-              title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
-            >
-              <IconoConfig fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
-            </span>
-
-            {/* Contenido de la configuración */}
-            <div style={{
-              verticalAlign: 'middle',
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'space-around',
-              alignContent: 'center',
-              alignItems: 'center',
-            }} >
-
-              {/* Checkbox isCompactMode */}
-              <label style={cssConfigBody}>
-                {strings.config_CompactMode}
-                <input style={{ marginLeft: '2px' }}
-                  name="ToggleCompactMode"
-                  type="checkbox"
-                  checked={this.state.isCompactMode}
-                  onChange={this._onChangeCheckBoxCompactMode}
-                />
-              </label>
-
-              {/* Combo idiomas */}
-              <label style={cssConfigBody}>
-                {strings.config_SelectLanguage}
-                <select style={{ textAlign: 'center', marginLeft: '2px' }} value={this.state.language} onChange={this._onChangeComboIdiomas}>
-                  {languagesSupported.map((aLanguage, index) => {
-                    return (
-                      <option key={index} value={aLanguage.id}>
-                        {`${aLanguage.title}`}
-                      </option>
-                    )
-                  })}
-                </select>
-              </label>
-
-              {/* Checkbox dataSource */}
-              <label style={cssConfigBody}>
-                {strings.label_LoadFromRestcountries}
-                <input style={{ textAlign: 'center', marginLeft: '2px' }}
-                  name="ToggleIsUrl"
-                  type="checkbox"
-                  checked={this.state.dataSource == mod.dataSources.fromURL}
-                  onChange={this._onChangeCheckBoxIsUrl}
-                />
-              </label>
-
-              {/* Combo colores */}
-              <label style={cssConfigBody}>
-                {strings.config_SelectColors}
-                <select style={{ textAlign: 'center', marginLeft: '2px' }} value={(this.state.theme.key)} onChange={this._onChangeComboColores}>
-                  {this._themes.map((aTheme, index) => {
-                    return (
-                      <option key={aTheme.key} value={aTheme.key}>
-                        {`${aTheme.name}`}
-                      </option>
-                    )
-                  })}
-                </select>
-              </label>
-            </div>
-
-            {/* Icono Cerrar */}
-            <span
-              style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
-              onClick={this._onClickButtonConfig}
-              title={(this.state.hiddenConfig) ? strings.header_ShowConfig : strings.header_HideConfig}
-            >
-              <IconoCerrar fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor} />
-            </span>
-          </div>
-        }
+        {(this.state.hiddenConfig) ? null : <this._renderConfig />}
       </div>
     );
   }
@@ -414,7 +581,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     if (this.state.fetchResult == mod.fetchResults.loading) {
       return (
         <div style={mainStyle}>
-          <this._renderTitle />
+          <this._renderHeader />
           <p> {strings.model_Loading}</p>
           <IconoSpinner
             fill={this.state.theme.slStyle.tableHeaderCellBackgroundColor}
@@ -424,7 +591,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     } else if (this.state.fetchResult == mod.fetchResults.loadedErr) {
       return (
         <div style={mainStyle}>
-          <this._renderTitle />
+          <this._renderHeader />
           <h1>Se ha producido un error:</h1>
           <p>{this.state.fetchResultMessage}</p>
         </div>
@@ -432,7 +599,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     } else {
       return (
         <div style={mainStyle}>
-          <this._renderTitle />
+          <this._renderHeader />
           <SimpleListFluentUI
             ref={this._simpleListRef}
             hidden={false}
@@ -442,7 +609,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
             columns={this._simpleListColumns}
             isCompactMode={this.state.isCompactMode}
             showToggleCompactMode={false}
-            showLabel={false}
+            showLabel={!this.state.hiddenLabel}
             heightInPx={this.props.height || mod.DEFAULT_HEIGHT}
             language={this.state.language}
             theme={this.state.theme.slStyle}
@@ -452,5 +619,6 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     }
   }
 }
+
 
 

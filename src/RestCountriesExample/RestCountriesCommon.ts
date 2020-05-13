@@ -75,12 +75,14 @@ export interface IRestCountriesStates {
     language: string;
     theme: IRCTheme;
     hiddenInfo: boolean;
+    hiddenLabel: boolean;
 }
 
 export interface IRestCountriesProps {
     language?: string;
     height?: number;
     width?: number;
+    
 };
 
 export async function DownloadCountries(dataSource: dataSources): Promise<any[]> {

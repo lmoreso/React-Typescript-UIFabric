@@ -36,6 +36,7 @@ export class RestCountriesHTML extends React.Component<mod.IRestCountriesProps, 
       isCompactMode: false,
       language: language,
       theme: this._themes[this._defaultThemeKey],
+      hiddenLabel: true,
     }
 
     // inicializar columnas para SimpeListHtml
@@ -440,7 +441,7 @@ export class RestCountriesHTML extends React.Component<mod.IRestCountriesProps, 
             columns={this._simpleListColumns}
             isCompactMode={this.state.isCompactMode}
             showToggleCompactMode={false}
-            showLabel={false}
+            showLabel={!this.state.hiddenLabel}
             heightInPx={this.props.height || mod.DEFAULT_HEIGHT}
             language={this.state.language}
             theme={this.state.theme.slStyle}
