@@ -1,6 +1,7 @@
 import { ISlStyles } from 'src/lib/SimpleList/SimpleListColors';
 import { ISimpleListCol } from 'src/lib/SimpleList/ISimpleListLib';
 import { strings } from './loc/RestCountriesStrings';
+// import {getIsoLang} from './recursos/languages';
 
 /* Modelo */
 export const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
