@@ -1,6 +1,7 @@
 import { ISlStyles } from 'src/lib/SimpleList/SimpleListColors';
 import { ISimpleListCol } from 'src/lib/SimpleList/ISimpleListLib';
 import { strings } from './loc/RestCountriesStrings';
+import { getIsoLang, IIsoLanguages } from './recursos/languages';
 // import {getIsoLang} from './recursos/languages';
 
 /* Modelo */
@@ -57,7 +58,7 @@ export function getRestCountriesColumns(): ISimpleListCol[] {
                 title: strings.field_Siglas, field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true,
                 headerTooltip: strings.click_ToSeeFlag
             },
-            { title: strings.field_Idiomas, field: "idiomas", width: 100, canSortAndFilter: false },
+            { title: strings.field_Idiomas, field: "idiomas", width: 100, canSortAndFilter: false, fieldTooltip: 'idiomasTooltip' },
             {
                 title: strings.field_NumHusos, field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true, isNumeric: true,
                 headerTooltip: strings.click_ToViewTimeZones
@@ -83,7 +84,7 @@ export interface IRestCountriesProps {
     language?: string;
     height?: number;
     width?: number;
-    
+
 };
 
 export async function DownloadCountries(dataSource: dataSources): Promise<any[]> {
@@ -101,7 +102,25 @@ export async function DownloadCountries(dataSource: dataSources): Promise<any[]>
             registro.mapsContinenteUrl = `${URL_MAPS}${registro.region}, continent`;
             registro.mapsRegionUrl = `${URL_MAPS}${registro.subregion}, region of ${registro.region}`;
             registro.mapsCapitalUrl = `${URL_MAPS}${registro.capital}, city of ${registro.name}`;
+            // Buscar información de los lenguajes
+            registro.listLanguages = new Array<IIsoLanguages>();
+            if (Array.isArray(registro.languages)) {
+                if (registro.languages.length > 0) {
+                    registro.languages.forEach((aLanguage: string) => {
+                        let theIsoLang = getIsoLang(aLanguage);
+                        if (theIsoLang) registro.listLanguages.push(theIsoLang);
+                    });
+                }
+            } else if (registro.languages) {
+                let theIsoLang = getIsoLang(registro.languages.toString());
+                if (theIsoLang) registro.listLanguages.push(theIsoLang);
+            }
+            if (registro.listLanguages && registro.listLanguages.length > 0)
+                registro.idiomasTooltip = `${registro.listLanguages[0].key}: ${registro.listLanguages[0].name} (${registro.listLanguages[0].nativeName})`;
+            for (let i = 1; i < registro.listLanguages.length; i++)
+                registro.idiomasTooltip = registro.idiomasTooltip + '\n\r' + `${registro.listLanguages[i].key}: ${registro.listLanguages[i].name} (${registro.listLanguages[i].nativeName})`;
         })
+        console.log(data);
         return (data);
     }
 
