@@ -18,9 +18,9 @@ import { mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
 import { ScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
 import { IRenderFunction } from 'office-ui-fabric-react/lib/Utilities';
 import { Sticky, StickyPositionType } from 'office-ui-fabric-react/lib/Sticky';
-// import { ScrollablePane, ScrollbarVisibility } from 'office-ui-fabric-react/lib/ScrollablePane';
-// import { Sticky, StickyPositionType } from 'office-ui-fabric-react/lib/Sticky';
-
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
+import { Label } from 'office-ui-fabric-react/lib/Label';
+import { StringsToJsx } from './LmbUtiles';
 
 const simpleListFluentUIVersion = '0.0.4';
 export const simpleListFluentUIVersionLabel = `SimpleListFluentUI V.${simpleListFluentUIVersion}`;
@@ -324,33 +324,39 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     simpleListCols.forEach((aSlColumn: ISimpleListCol, indice) => {
 
       let theNewIColumn: IColumn = {
-        // key: indice.toString(),
         key: aSlColumn.key!,
         name: aSlColumn.title,
         fieldName: aSlColumn.field,
         minWidth: aSlColumn.width / 3,
         maxWidth: aSlColumn.width * 0.70,
-        // isRowHeader: true,
         isResizable: true,
         columnActionsMode: ColumnActionsMode.clickable,
-        // isSorted: true,
-        // isSortedDescending: false,
-        // sortAscendingAriaLabel: 'Sorted A to Z',
-        // sortDescendingAriaLabel: 'Sorted Z to A',
-        // onColumnClick: (ev: any, aColumn: IColumn) => {
-        //   this._onClickHeaderColumn(aColumn.key)
-        // },
-        // onColumnClick: this._onClickHeaderColumn,
         data: 'string',
         isPadded: true
       };
+      if (aSlColumn.headerTooltip) {
+        theNewIColumn.name =
+          <div style={{ alignItems: 'baseline' }}>
+            <TooltipHost content={
+              <div>
+                <Label style={{textAlign: 'center'}}>{aSlColumn.title}</Label>
+                <StringsToJsx strings={[aSlColumn.headerTooltip, (aSlColumn.canSortAndFilter) ? '\nClica en el Título de la columna para ordenar la lista' : '']} />
+                {/* {aSlColumn.headerTooltip}
+                {(aSlColumn.canSortAndFilter)? '\nClica en el Título de la columna para ordenar la lista' : null } */}
+              </div> as any}
+            >
+              <Icon iconName="Info" style={{ margin: '0px 3px' }} />
+            </TooltipHost>
+            {aSlColumn.title}
+          </div> as any
+      }
+
       if (aSlColumn.fieldUrl || aSlColumn.fieldTooltip || aSlColumn.isImage) {
         if (aSlColumn.fieldUrl && aSlColumn.fieldTooltip) {
           theNewIColumn.onRender = (item) => {
             return (
               <TooltipHost
                 content={item[(aSlColumn.fieldTooltip) ? aSlColumn.fieldTooltip : 0]}
-                // id={this._hostId}
                 calloutProps={{ gapSpace: 0 }}
                 styles={{ root: { display: 'inline-block' } }}
               >
@@ -416,14 +422,16 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     if (!props) {
       return null;
     }
-    const onRenderColumnHeaderTooltip: IRenderFunction<{}> = tooltipHostProps => (
-      <TooltipHost {...tooltipHostProps} />
-    );
+    // const onRenderColumnHeaderTooltip: IRenderFunction<{}> = tooltipHostProps => (
+    //   // <TooltipHost {...tooltipHostProps} />
+    // <span>{props.columns[props.].name}</span>
+    // );
+    console.log('IDetailsHeaderProps', props)
     return (
       <Sticky stickyPosition={StickyPositionType.Header} isScrollSynced>
         {defaultRender!({
           ...props,
-          onRenderColumnHeaderTooltip,
+          // onRenderColumnHeaderTooltip,
         })}
       </Sticky>
     );

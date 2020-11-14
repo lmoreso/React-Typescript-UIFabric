@@ -58,9 +58,12 @@ export function getRestCountriesColumns(): ISimpleListCol[] {
                 title: strings.field_Siglas, field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true,
                 headerTooltip: strings.click_ToSeeFlag
             },
-            { title: strings.field_Idiomas, field: "idiomas", width: 100, canSortAndFilter: false, fieldTooltip: 'idiomasTooltip' },
+            {   
+                title: strings.field_Idiomas, field: "idiomas", width: 100, canSortAndFilter: false, fieldTooltip: 'idiomasTooltip',
+                headerTooltip: 'Manten el ratón quieto para ver el detalle de los idiomas'
+             },
             {
-                title: strings.field_NumHusos, field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: true, isNumeric: true,
+                title: strings.field_NumHusos, field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: false, isNumeric: true,
                 headerTooltip: strings.click_ToViewTimeZones
             },
         ]
