@@ -295,7 +295,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
 
             {/* Combo de Items de Grupo */}
             <span style={{ textAlign: 'center', }} className='Header-controls-combos' >
-              {console.log('this.state.filterGroupedText', this.state.filterGroupedText)}
+              {/* {console.log('this.state.filterGroupedText', this.state.filterGroupedText)} */}
               <Dropdown
                 selectedKey={this.state.filterGroupedText}
                 onChange={this._onChangeGroupText}
@@ -336,22 +336,22 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
       };
       if (aSlColumn.headerTooltip) {
         theNewColumn.name =
-          <div style={{ alignItems: 'baseline' }}>
+          <span style={{ alignItems: 'baseline' }}>
             <TooltipHost content={
-              <div>
-                <Label style={{ textAlign: 'center' }}>{aSlColumn.title}</Label>
+              <span>
+                <Label>{aSlColumn.title}</Label>
                 <StringsToJsx
                   strings={[
                     aSlColumn.headerTooltip,
                     (aSlColumn.canSortAndFilter) ? '*Clica en el Título de la columna para ordenar la lista*' : ''
                   ]}
                 />
-              </div> as any}
+              </span> as any}
             >
               <Icon iconName="Info" style={{ margin: '0px 3px' }} />
             </TooltipHost>
             {aSlColumn.title}
-          </div> as any
+          </span> as any
       }
 
       if (aSlColumn.fieldUrl || aSlColumn.fieldTooltip || aSlColumn.isImage) {
@@ -429,7 +429,6 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     //   // <TooltipHost {...tooltipHostProps} />
     // <span>{props.columns[props.].name}</span>
     // );
-    console.log('IDetailsHeaderProps', props)
     return (
       <Sticky stickyPosition={StickyPositionType.Header} isScrollSynced>
         {defaultRender!({

@@ -94,6 +94,22 @@ export interface IRestCountriesProps {
 
 };
 
+/* export interface ICountries {
+    key: string;
+    numHusos: string;
+    husosTooltip: string;
+    idiomas: string;
+    listLanguages: IIsoLanguages[];
+    wikiEnUrl: string;
+    wikiEsUrl: string;
+    banderaUrl: string;
+    mapsPaisUrl: string;
+    mapsContinenteUrl: string;
+    mapsRegionUrl: string;
+    mapsCapitalUrl: string;
+    idiomasTooltip: string;
+}
+ */
 export async function DownloadCountries(dataSource: dataSources): Promise<any[]> {
     let transformCountries = (data: any[]): any[] => {
         data.forEach((registro, indice) => {
@@ -104,7 +120,7 @@ export async function DownloadCountries(dataSource: dataSources): Promise<any[]>
                 if (registro.timezones.length == 1) {
                     registro.numHusos = registro.timezones[0];
                 } else {
-                    registro.numHusos = `${registro.timezones[0]}  + ${registro.timezones.length}`;
+                    registro.numHusos = `${registro.timezones[0]} (${registro.timezones.length - 1}+)`;
                     registro.husosTooltip = registro.timezones.join(', ');
                 }
             }
@@ -139,7 +155,7 @@ export async function DownloadCountries(dataSource: dataSources): Promise<any[]>
             // for (let i = 1; i < registro.listLanguages.length; i++)
             //     registro.idiomasTooltip = registro.idiomasTooltip + '\n\r' + `${registro.listLanguages[i].key}: ${registro.listLanguages[i].name} (${registro.listLanguages[i].nativeName})`;
         })
-        console.log(data);
+        // console.log(data);
         return (data);
     }
 
