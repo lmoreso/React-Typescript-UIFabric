@@ -3,6 +3,9 @@ import { ISimpleListCol } from 'src/lib/SimpleList/ISimpleListLib';
 import { strings } from './loc/RestCountriesStrings';
 import { getIsoLang, IIsoLanguages } from './recursos/languages';
 // import {getIsoLang} from './recursos/languages';
+import { StringsToJsx } from 'src/lib/SimpleList/LmbUtiles';
+
+
 
 /* Modelo */
 export const URL_COUNTRIES = 'http://restcountries.eu/rest/v1/all';
@@ -17,7 +20,8 @@ export const URL_WIKIPEDIA_EN = 'https://en.wikipedia.org/wiki'
 export const URL_WIKIPEDIA_ES = 'https://es.wikipedia.org/wiki'
 
 export const DEFAULT_HEIGHT = 600;
-export const DEFAULT_WIDTH = 1100;
+export const DEFAULT_WIDTH = 1125;
+export const DEFAULT_WIDTH_WIHT_FLAG = 1175;
 
 export enum dataSources { fromURL, fromJson, fromJsonWithDelay };
 export enum fetchResults { loading, loadedOk, loadedErr }
@@ -59,11 +63,11 @@ export function getRestCountriesColumns(): ISimpleListCol[] {
                 headerTooltip: strings.click_ToSeeFlag
             },
             {   
-                title: strings.field_Idiomas, field: "idiomas", width: 100, canSortAndFilter: false, fieldTooltip: 'idiomasTooltip',
-                headerTooltip: 'Manten el ratón quieto para ver el detalle de los idiomas'
+                title: strings.field_Idiomas, field: "idiomas", width: 70, canSortAndFilter: false, fieldTooltip: 'idiomasTooltip',
+                headerTooltip: '*Manten el ratón quieto para ver el detalle de los idiomas*'
              },
             {
-                title: strings.field_NumHusos, field: "numHusos", width: 50, fieldTooltip: 'husosTooltip', canSortAndFilter: false, isNumeric: true,
+                title: strings.field_NumHusos, field: "numHusos", width: 90, fieldTooltip: 'husosTooltip', canSortAndFilter: false,
                 headerTooltip: strings.click_ToViewTimeZones
             },
         ]
@@ -95,9 +99,16 @@ export async function DownloadCountries(dataSource: dataSources): Promise<any[]>
         data.forEach((registro, indice) => {
             registro.key = indice.toString();
             registro.Pais = registro.translations.es;
-            registro.numHusos = registro.timezones.length;
+            // Husos horarios
+            if (Array.isArray(registro.timezones)) {
+                if (registro.timezones.length == 1) {
+                    registro.numHusos = registro.timezones[0];
+                } else {
+                    registro.numHusos = `${registro.timezones[0]}  + ${registro.timezones.length}`;
+                    registro.husosTooltip = registro.timezones.join(', ');
+                }
+            }
             registro.idiomas = (Array.isArray(registro.languages)) ? registro.languages.join(', ') : registro.languages;
-            registro.husosTooltip = (Array.isArray(registro.timezones) ? registro.timezones.join(', ') : '');
             registro.wikiEnUrl = `${URL_WIKIPEDIA_EN}/${registro.name}`;
             registro.wikiEsUrl = `${URL_WIKIPEDIA_ES}/${registro.translations.es}`;
             registro.banderaUrl = `${URL_FLAGS}${registro.alpha3Code.toString().toLowerCase()}.${URL_FLAGS_EXT}`;
@@ -118,10 +129,15 @@ export async function DownloadCountries(dataSource: dataSources): Promise<any[]>
                 let theIsoLang = getIsoLang(registro.languages.toString());
                 if (theIsoLang) registro.listLanguages.push(theIsoLang);
             }
-            if (registro.listLanguages && registro.listLanguages.length > 0)
-                registro.idiomasTooltip = `${registro.listLanguages[0].key}: ${registro.listLanguages[0].name} (${registro.listLanguages[0].nativeName})`;
-            for (let i = 1; i < registro.listLanguages.length; i++)
-                registro.idiomasTooltip = registro.idiomasTooltip + '\n\r' + `${registro.listLanguages[i].key}: ${registro.listLanguages[i].name} (${registro.listLanguages[i].nativeName})`;
+            if (registro.listLanguages && registro.listLanguages.length > 0) {
+                let aux: string[] = [registro.idiomasTooltip = `${registro.listLanguages[0].key}: ${registro.listLanguages[0].name} (${registro.listLanguages[0].nativeName})`];
+                for (let i = 1; i < registro.listLanguages.length; i++)
+                    aux.push(`${registro.listLanguages[i].key}: ${registro.listLanguages[i].name} (${registro.listLanguages[i].nativeName})`);
+                    registro.idiomasTooltip = StringsToJsx({strings: aux}) as any;
+            }
+            //     registro.idiomasTooltip = `${registro.listLanguages[0].key}: ${registro.listLanguages[0].name} (${registro.listLanguages[0].nativeName})`;
+            // for (let i = 1; i < registro.listLanguages.length; i++)
+            //     registro.idiomasTooltip = registro.idiomasTooltip + '\n\r' + `${registro.listLanguages[i].key}: ${registro.listLanguages[i].name} (${registro.listLanguages[i].nativeName})`;
         })
         console.log(data);
         return (data);

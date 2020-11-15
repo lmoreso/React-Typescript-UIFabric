@@ -323,7 +323,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
 
     simpleListCols.forEach((aSlColumn: ISimpleListCol, indice) => {
 
-      let theNewIColumn: IColumn = {
+      let theNewColumn: IColumn = {
         key: aSlColumn.key!,
         name: aSlColumn.title,
         fieldName: aSlColumn.field,
@@ -335,14 +335,17 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
         isPadded: true
       };
       if (aSlColumn.headerTooltip) {
-        theNewIColumn.name =
+        theNewColumn.name =
           <div style={{ alignItems: 'baseline' }}>
             <TooltipHost content={
               <div>
-                <Label style={{textAlign: 'center'}}>{aSlColumn.title}</Label>
-                <StringsToJsx strings={[aSlColumn.headerTooltip, (aSlColumn.canSortAndFilter) ? '\nClica en el Título de la columna para ordenar la lista' : '']} />
-                {/* {aSlColumn.headerTooltip}
-                {(aSlColumn.canSortAndFilter)? '\nClica en el Título de la columna para ordenar la lista' : null } */}
+                <Label style={{ textAlign: 'center' }}>{aSlColumn.title}</Label>
+                <StringsToJsx
+                  strings={[
+                    aSlColumn.headerTooltip,
+                    (aSlColumn.canSortAndFilter) ? '*Clica en el Título de la columna para ordenar la lista*' : ''
+                  ]}
+                />
               </div> as any}
             >
               <Icon iconName="Info" style={{ margin: '0px 3px' }} />
@@ -353,7 +356,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
 
       if (aSlColumn.fieldUrl || aSlColumn.fieldTooltip || aSlColumn.isImage) {
         if (aSlColumn.fieldUrl && aSlColumn.fieldTooltip) {
-          theNewIColumn.onRender = (item) => {
+          theNewColumn.onRender = (item) => {
             return (
               <TooltipHost
                 content={item[(aSlColumn.fieldTooltip) ? aSlColumn.fieldTooltip : 0]}
@@ -367,7 +370,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
             );
           }
         } else if (aSlColumn.fieldTooltip) {
-          theNewIColumn.onRender = (item) => {
+          theNewColumn.onRender = (item) => {
             return (
               <TooltipHost
                 content={item[(aSlColumn.fieldTooltip) ? aSlColumn.fieldTooltip : 0]}
@@ -380,7 +383,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
             );
           }
         } else if (aSlColumn.isImage == true) {
-          theNewIColumn.onRender = (item) => {
+          theNewColumn.onRender = (item) => {
             return (
               <TooltipHost
                 content={item[aSlColumn.field]}
@@ -396,7 +399,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
             );
           }
         } else {
-          theNewIColumn.onRender = (item) => {
+          theNewColumn.onRender = (item) => {
             return (
               <TooltipHost
                 content={item[(aSlColumn.fieldUrl) ? aSlColumn.fieldUrl : 0]}
@@ -412,7 +415,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
           }
         }
       }
-      columns.push(theNewIColumn);
+      columns.push(theNewColumn);
     });
 
     return (columns);

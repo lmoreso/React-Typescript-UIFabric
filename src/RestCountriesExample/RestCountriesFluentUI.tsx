@@ -574,7 +574,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
 
 
     let cssMainContainer: React.CSSProperties = {
-      width: this.props.width || mod.DEFAULT_WIDTH,
+      width: this.props.width || ((this.state.dataSource == mod.dataSources.fromURL) ? mod.DEFAULT_WIDTH_WIHT_FLAG :  mod.DEFAULT_WIDTH),
       // borderStyle: 'solid',
       // borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       // borderWidth: '1px',
@@ -597,7 +597,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
   public render(): JSX.Element {
     // console.log('RestCountriesExample render', 'ver config?', this.state.hiddenConfig);
     let mainStyle = {
-      width: this.props.width || mod.DEFAULT_WIDTH,
+      width: this.props.width || ((this.state.dataSource == mod.dataSources.fromURL) ? mod.DEFAULT_WIDTH_WIHT_FLAG :  mod.DEFAULT_WIDTH),
       borderStyle: 'solid',
       borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       borderWidth: '2px',
