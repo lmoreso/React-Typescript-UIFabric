@@ -21,6 +21,9 @@ import { Sticky, StickyPositionType } from 'office-ui-fabric-react/lib/Sticky';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { StringsToJsx } from './LmbUtiles';
+import { useBoolean } from '@uifabric/react-hooks';
+import { Panel } from 'office-ui-fabric-react';
+
 
 const simpleListFluentUIVersion = '0.0.4';
 export const simpleListFluentUIVersionLabel = `SimpleListFluentUI V.${simpleListFluentUIVersion}`;
@@ -106,6 +109,8 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     this._onChangeGroupField = this._onChangeGroupField.bind(this);
     this._onChangeFilterByTextField = this._onChangeFilterByTextField.bind(this);
     this._onChangeFilterByTextAction = this._onChangeFilterByTextAction.bind(this);
+    this._renderPanel = this._renderPanel.bind(this);
+
   }
 
   private _onChangeGroupText(event: any, option: IDropdownOption): void {
@@ -318,6 +323,31 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     );
   }
 
+  private _renderPanel(props: { jsxTarget: JSX.Element; jsxModal: JSX.Element; jsxTooltip: JSX.Element }): JSX.Element {
+    const [isModalOpen, { setTrue: showModal, setFalse: hideModal }] = useBoolean(false);
+    return (
+      <div>
+        <Panel
+          isOpen={isModalOpen}
+          onDismiss={hideModal}
+          isLightDismiss={true}
+        >
+          {props.jsxModal}
+        </ Panel>
+        <TooltipHost
+          content={props.jsxTooltip as any}
+          calloutProps={{ gapSpace: 0 }}
+          styles={{ root: { display: 'inline-block' } }}
+        >
+          <div style={{ cursor: 'pointer' }} onClick={showModal}>
+            {props.jsxTarget}
+          </div>
+        </TooltipHost>
+
+      </div>
+    );
+  }
+
   private _makeFluentUIColumns(simpleListCols: ISimpleListCol[]): IColumn[] {
     let columns: IColumn[] = new Array<IColumn>();
 
@@ -334,6 +364,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
         data: 'string',
         isPadded: true
       };
+      // Cabecera de Columna
       if (aSlColumn.headerTooltip) {
         theNewColumn.name =
           <span style={{ alignItems: 'baseline' }}>
@@ -353,8 +384,20 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
             {aSlColumn.title}
           </span> as any
       }
-
-      if (aSlColumn.fieldUrl || aSlColumn.fieldTooltip || aSlColumn.isImage) {
+      // Contenido de la Celda
+      if (aSlColumn.fieldOnRenderModal) {
+        theNewColumn.onRender = (item) => {
+          return (
+            <div>
+              <this._renderPanel
+                jsxModal={item[aSlColumn.fieldOnRenderModal!]}
+                jsxTarget={item[aSlColumn.field]}
+                jsxTooltip={item[(aSlColumn.fieldTooltip) ? aSlColumn.fieldTooltip : 0]}
+              />
+            </div>
+          );
+        }
+      } else if (aSlColumn.fieldUrl || aSlColumn.fieldTooltip || aSlColumn.isImage) {
         if (aSlColumn.fieldUrl && aSlColumn.fieldTooltip) {
           theNewColumn.onRender = (item) => {
             return (

@@ -23,7 +23,8 @@ export class RestCountriesHTML extends React.Component<mod.IRestCountriesProps, 
     super(props);
 
     // Cargar traducciones
-    let language = this._loadStrings(stringToLanguagesSupported(this.props.language));
+    // let language = this._loadStrings(stringToLanguagesSupported(this.props.language));
+    let language = this._loadStrings();
 
     // Inicializar estados
     this.state = {
@@ -67,7 +68,7 @@ export class RestCountriesHTML extends React.Component<mod.IRestCountriesProps, 
     this._themes.push({ key: "themeBlue", slStyle: themeBlue, name: strings.color_Blue });
   }
 
-  private _loadStrings(languageProposed: languagesSupportedIds | undefined): languagesSupportedIds {
+  private _loadStrings(languageProposed?: languagesSupportedIds): languagesSupportedIds {
     let languageDetected = detectLanguage(languageProposed);
     initStrings(languageDetected);
 

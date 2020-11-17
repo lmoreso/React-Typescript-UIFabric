@@ -133,6 +133,7 @@ export interface ISimpleListCol {
     isSortedDescending?: boolean;
     canGroup?: boolean;
     isNumeric?: boolean;
+    fieldOnRenderModal?: string;
 }
 
 export interface IGroupedCol extends ISimpleListCol {

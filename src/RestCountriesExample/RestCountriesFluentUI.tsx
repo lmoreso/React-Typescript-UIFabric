@@ -22,6 +22,7 @@ import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { Toggle } from 'office-ui-fabric-react/lib/Toggle';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 // import { mergeStyles, mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
+import { Image } from 'office-ui-fabric-react/lib/Image';
 
 const restCountriesFluentUIVersion = '0.0.1';
 const restCountriesFluentUIVersionLabel = `RestCountriesFluentUI V.${restCountriesFluentUIVersion}`;
@@ -39,7 +40,8 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     super(props);
 
     // Cargar traducciones
-    let language = this._loadStrings(stringToLanguagesSupported(this.props.language));
+    // let language = this._loadStrings(stringToLanguagesSupported(this.props.language));
+    let language = this._loadStrings();
 
     /* Combo de Idiomas*/
     this._comboIdiomas = new Array<IDropdownOption>();
@@ -100,7 +102,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     this._themes.push({ key: "themeBlue", slStyle: themeBlue, name: strings.color_Blue });
   }
 
-  private _loadStrings(languageProposed: languagesSupportedIds | undefined): languagesSupportedIds {
+  private _loadStrings(languageProposed?: languagesSupportedIds): languagesSupportedIds {
     let languageDetected = detectLanguage(languageProposed);
     initStrings(languageDetected);
 
@@ -174,10 +176,40 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
 
   private _downloadCountries(dataSource: mod.dataSources) {
     this.setState({ fetchResult: mod.fetchResults.loading, dataSource: dataSource });
-    // DescargarPaises(origenesDatos.ninguno)
     mod.DownloadCountries(dataSource)
       .then((datos) => {
         this._data = datos;
+        this._data.forEach((aCountry) => {
+          aCountry.alpha3CodeTooltip = strings.click_ToSeeFlag;
+          aCountry.banderaJSX =
+            <div style={{ padding: '4px', width: '400' }}>
+              <Label style={{ fontSize: 'large', fontWeight: 'lighter' }}>{`*Bandera de ${aCountry.Pais}*`}</Label>
+              <div style={{ borderColor: 'black', borderWidth: '1px', borderStyle: 'solid', width: '100%' }}>
+                <Image
+                  src={aCountry.banderaUrl}
+                  width={'100%'}
+                />
+              </div>
+            </div>
+          if (aCountry.listLanguages && aCountry.listLanguages.length > 0 && Array.isArray(aCountry.listLanguages)) {
+            aCountry.idiomasTooltip =
+              <span>
+                <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }}>{`*Lenguas habladas en ${aCountry.name}*`}</Label>
+                {
+                  aCountry.listLanguages.map((aLanguaje: any) => <span key={aLanguaje.key}>{`${aLanguaje.key}: ${aLanguaje.name} (${aLanguaje.nativeName})`}<br/></span>)
+                }
+              </span>
+
+          }
+        })
+
+        /*             if (registro.listLanguages && registro.listLanguages.length > 0) {
+                let aux: string[] = [registro.idiomasTooltip = `${registro.listLanguages[0].key}: ${registro.listLanguages[0].name} (${registro.listLanguages[0].nativeName})`];
+                for (let i = 1; i < registro.listLanguages.length; i++)
+                    aux.push(`${registro.listLanguages[i].key}: ${registro.listLanguages[i].name} (${registro.listLanguages[i].nativeName})`);
+                    registro.idiomasTooltip = StringsToJsx({strings: aux}) as any;
+            }
+ */
         this.setState({ numRegs: datos.length, fetchResult: mod.fetchResults.loadedOk });
       })
       .catch((err) => {
@@ -350,7 +382,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       borderBottomColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       borderWidth: '1px',
       backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
-      
+
     }
 
     const iconClass = mergeStyles({
@@ -423,7 +455,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
           style={{ verticalAlign: 'middle', width: '40px', cursor: 'pointer' }}
           onClick={this._onClickButtonInfo}
           title={(this.state.hiddenInfo) ? strings.header_ShowInfo : strings.header_HideInfo}
-          >
+        >
           <Icon iconName="Cancel" className={iconClass} />
         </span>
       </div>
@@ -449,7 +481,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       height: '60px',
       borderStyle: 'solid',
       borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
-      borderWidth:'1px',
+      borderWidth: '1px',
       backgroundColor: this.state.theme.slStyle.tableContainerBackgroundColor,
     };
 
@@ -574,7 +606,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
 
 
     let cssMainContainer: React.CSSProperties = {
-      width: this.props.width || ((this.state.dataSource == mod.dataSources.fromURL) ? mod.DEFAULT_WIDTH_WIHT_FLAG :  mod.DEFAULT_WIDTH),
+      width: this.props.width || ((this.state.dataSource == mod.dataSources.fromURL) ? mod.DEFAULT_WIDTH_WIHT_FLAG : mod.DEFAULT_WIDTH),
       // borderStyle: 'solid',
       // borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       // borderWidth: '1px',
@@ -597,7 +629,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
   public render(): JSX.Element {
     // console.log('RestCountriesExample render', 'ver config?', this.state.hiddenConfig);
     let mainStyle = {
-      width: this.props.width || ((this.state.dataSource == mod.dataSources.fromURL) ? mod.DEFAULT_WIDTH_WIHT_FLAG :  mod.DEFAULT_WIDTH),
+      width: this.props.width || ((this.state.dataSource == mod.dataSources.fromURL) ? mod.DEFAULT_WIDTH_WIHT_FLAG : mod.DEFAULT_WIDTH),
       borderStyle: 'solid',
       borderColor: this.state.theme.slStyle.tableHeaderCellBackgroundColor,
       borderWidth: '2px',

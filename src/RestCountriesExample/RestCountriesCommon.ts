@@ -3,7 +3,7 @@ import { ISimpleListCol } from 'src/lib/SimpleList/ISimpleListLib';
 import { strings } from './loc/RestCountriesStrings';
 import { getIsoLang, IIsoLanguages } from './recursos/languages';
 // import {getIsoLang} from './recursos/languages';
-import { StringsToJsx } from 'src/lib/SimpleList/LmbUtiles';
+// import { StringsToJsx } from 'src/lib/SimpleList/LmbUtiles';
 
 
 
@@ -59,8 +59,8 @@ export function getRestCountriesColumns(): ISimpleListCol[] {
                 headerTooltip: strings.click_ToSeeregionInGoogleMaps,
             },
             {
-                title: strings.field_Siglas, field: "alpha3Code", width: 50, fieldUrl: "banderaUrl", canSortAndFilter: true,
-                headerTooltip: strings.click_ToSeeFlag
+                title: strings.field_Siglas, field: "alpha3Code", width: 50, canSortAndFilter: true, fieldTooltip: 'alpha3CodeTooltip',
+                headerTooltip: strings.click_ToSeeFlag, fieldOnRenderModal: "banderaJSX",
             },
             {   
                 title: strings.field_Idiomas, field: "idiomas", width: 70, canSortAndFilter: false, fieldTooltip: 'idiomasTooltip',
@@ -88,7 +88,7 @@ export interface IRestCountriesStates {
 }
 
 export interface IRestCountriesProps {
-    language?: string;
+    // language?: string;
     height?: number;
     width?: number;
 
@@ -145,13 +145,13 @@ export async function DownloadCountries(dataSource: dataSources): Promise<any[]>
                 let theIsoLang = getIsoLang(registro.languages.toString());
                 if (theIsoLang) registro.listLanguages.push(theIsoLang);
             }
-            if (registro.listLanguages && registro.listLanguages.length > 0) {
+/*             if (registro.listLanguages && registro.listLanguages.length > 0) {
                 let aux: string[] = [registro.idiomasTooltip = `${registro.listLanguages[0].key}: ${registro.listLanguages[0].name} (${registro.listLanguages[0].nativeName})`];
                 for (let i = 1; i < registro.listLanguages.length; i++)
                     aux.push(`${registro.listLanguages[i].key}: ${registro.listLanguages[i].name} (${registro.listLanguages[i].nativeName})`);
                     registro.idiomasTooltip = StringsToJsx({strings: aux}) as any;
             }
-            //     registro.idiomasTooltip = `${registro.listLanguages[0].key}: ${registro.listLanguages[0].name} (${registro.listLanguages[0].nativeName})`;
+ */            //     registro.idiomasTooltip = `${registro.listLanguages[0].key}: ${registro.listLanguages[0].name} (${registro.listLanguages[0].nativeName})`;
             // for (let i = 1; i < registro.listLanguages.length; i++)
             //     registro.idiomasTooltip = registro.idiomasTooltip + '\n\r' + `${registro.listLanguages[i].key}: ${registro.listLanguages[i].name} (${registro.listLanguages[i].nativeName})`;
         })
