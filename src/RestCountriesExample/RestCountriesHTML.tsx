@@ -38,6 +38,7 @@ export class RestCountriesHTML extends React.Component<mod.IRestCountriesProps, 
       language: language,
       theme: this._themes[this._defaultThemeKey],
       hiddenLabel: true,
+      showFilter: false,
     }
 
     // inicializar columnas para SimpeListHtml
@@ -446,6 +447,7 @@ export class RestCountriesHTML extends React.Component<mod.IRestCountriesProps, 
             heightInPx={this.props.height || mod.DEFAULT_HEIGHT}
             language={this.state.language}
             theme={this.state.theme.slStyle}
+            showFilter={this.state.showFilter}
           />
         </div>
       )

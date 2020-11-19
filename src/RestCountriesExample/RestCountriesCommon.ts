@@ -85,6 +85,7 @@ export interface IRestCountriesStates {
     theme: IRCTheme;
     hiddenInfo: boolean;
     hiddenLabel: boolean;
+    showFilter: boolean;
 }
 
 export interface IRestCountriesProps {

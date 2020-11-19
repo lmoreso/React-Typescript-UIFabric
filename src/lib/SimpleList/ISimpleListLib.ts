@@ -7,6 +7,8 @@ export interface ISimpleListProps {
     labelItem: string;
     labelItems: string;
     language?: string;
+    showFilter: boolean;
+    showItemPanel?: boolean;
 }
 
 export enum filterByTextActionsId {

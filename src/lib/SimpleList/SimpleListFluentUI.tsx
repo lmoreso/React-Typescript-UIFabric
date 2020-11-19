@@ -48,6 +48,7 @@ interface ISimpleListFluentUIStates {
   filterByTextAction: filterByTextActionsId;
   requireFilterText: boolean;
   language: languagesSupportedIds;
+  showFilter: boolean;
 }
 
 export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps, ISimpleListFluentUIStates> {
@@ -99,6 +100,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
       filterByTextAction: this._simpleList.state.filterByTextActionId,
       requireFilterText: this._simpleList.state.requireFilterText,
       language: this._simpleList.state.language,
+      showFilter: this.props.showFilter,
     }
 
     this._renderHeader = this._renderHeader.bind(this);
@@ -109,7 +111,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     this._onChangeGroupField = this._onChangeGroupField.bind(this);
     this._onChangeFilterByTextField = this._onChangeFilterByTextField.bind(this);
     this._onChangeFilterByTextAction = this._onChangeFilterByTextAction.bind(this);
-    this._renderPanel = this._renderPanel.bind(this);
+    this._renderCellPanel = this._renderCellPanel.bind(this);
 
   }
 
@@ -215,6 +217,8 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
   }
 
   private _renderHeader(): JSX.Element {
+    if (!this.state.showFilter) return <span></span>;
+
     let styleHeaderControlsContainer: React.CSSProperties = {
       color: this._theme.headerControlsContainerColor,
     };
@@ -323,13 +327,37 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     );
   }
 
-  private _renderPanel(props: { jsxTarget: JSX.Element; jsxModal: JSX.Element; jsxTooltip: JSX.Element }): JSX.Element {
-    const [isModalOpen, { setTrue: showModal, setFalse: hideModal }] = useBoolean(false);
+// private _renderItemPanel(props: { jsxTarget: JSX.Element; jsxModal: JSX.Element; jsxTooltip: JSX.Element }): JSX.Element {
+//     const [isPanelOpen, { setTrue: showPanel, setFalse: hidePanel }] = useBoolean(false);
+//     return (
+//       <div>
+//         <Panel
+//           isOpen={isPanelOpen}
+//           onDismiss={hidePanel}
+//           isLightDismiss={true}
+//         >
+//           {props.jsxModal}
+//         </ Panel>
+//         <TooltipHost
+//           content={props.jsxTooltip as any}
+//           calloutProps={{ gapSpace: 0 }}
+//           styles={{ root: { display: 'inline-block' } }}
+//         >
+//           <div style={{ cursor: 'pointer' }} onClick={showPanel}>
+//             {props.jsxTarget}
+//           </div>
+//         </TooltipHost>
+//       </div>
+//     );
+//   }
+
+  private _renderCellPanel(props: { jsxTarget: JSX.Element; jsxModal: JSX.Element; jsxTooltip: JSX.Element }): JSX.Element {
+    const [isPanelOpen, { setTrue: showPanel, setFalse: hidePanel }] = useBoolean(false);
     return (
       <div>
         <Panel
-          isOpen={isModalOpen}
-          onDismiss={hideModal}
+          isOpen={isPanelOpen}
+          onDismiss={hidePanel}
           isLightDismiss={true}
         >
           {props.jsxModal}
@@ -339,11 +367,10 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
           calloutProps={{ gapSpace: 0 }}
           styles={{ root: { display: 'inline-block' } }}
         >
-          <div style={{ cursor: 'pointer' }} onClick={showModal}>
+          <div style={{ cursor: 'pointer' }} onClick={showPanel}>
             {props.jsxTarget}
           </div>
         </TooltipHost>
-
       </div>
     );
   }
@@ -389,7 +416,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
         theNewColumn.onRender = (item) => {
           return (
             <div>
-              <this._renderPanel
+              <this._renderCellPanel
                 jsxModal={item[aSlColumn.fieldOnRenderModal!]}
                 jsxTarget={item[aSlColumn.field]}
                 jsxTooltip={item[(aSlColumn.fieldTooltip) ? aSlColumn.fieldTooltip : 0]}

@@ -67,6 +67,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       language: language,
       theme: this._themes[this._defaultThemeKey],
       hiddenLabel: true,
+      showFilter: false,
     }
 
     // inicializar columnas para SimpeListHtml
@@ -74,13 +75,15 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
 
     // Binds de funciones
     this._renderHeader = this._renderHeader.bind(this);
-    this._renderTitle = this._renderTitle.bind(this);
+    this._renderTitleBar = this._renderTitleBar.bind(this);
     this._renderInfo = this._renderInfo.bind(this);
     this._renderConfig = this._renderConfig.bind(this);
     this._onClickButtonConfig = this._onClickButtonConfig.bind(this);
     this._onClickButtonInfo = this._onClickButtonInfo.bind(this);
     this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
     this._onChangeComboColores = this._onChangeComboColores.bind(this);
+    this._onChangeCheckBoxShowFilter = this._onChangeCheckBoxShowFilter.bind(this);
+    
   }
 
   public componentDidMount() {
@@ -174,6 +177,12 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     this._simpleListRef.current!.setState({ isCompactMode: checked, });
   }
 
+  private _onChangeCheckBoxShowFilter(): void {
+    let checked: boolean = !this.state.showFilter;  // event.target.checked
+    this.setState({ showFilter: checked, });
+    this._simpleListRef.current!.setState({ showFilter: checked, });
+  }
+
   private _downloadCountries(dataSource: mod.dataSources) {
     this.setState({ fetchResult: mod.fetchResults.loading, dataSource: dataSource });
     mod.DownloadCountries(dataSource)
@@ -217,7 +226,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       });
   }
 
-  private _renderTitle(): JSX.Element {
+  private _renderTitleBar(): JSX.Element {
 
     let cssTitleContainer: React.CSSProperties = {
       fontSize: 'large',
@@ -284,6 +293,13 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
         onClick: this._onChangeCheckBoxCompactMode,
         canCheck: true,
         isChecked: this.state.isCompactMode,
+      },
+      {
+        key: 'showFilter',
+        text: '*Mostra els Filtres*',
+        onClick: this._onChangeCheckBoxShowFilter,
+        canCheck: true,
+        isChecked: this.state.showFilter,
       },
       {
         key: 'label',
@@ -615,7 +631,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     return (
       <div style={cssMainContainer}>
         {/* Barra de Título */}
-        <this._renderTitle />
+        <this._renderTitleBar />
 
         {/* Créditos */}
         {this.state.hiddenInfo ? null : <this._renderInfo />}
@@ -674,6 +690,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
             heightInPx={this.props.height || mod.DEFAULT_HEIGHT}
             language={this.state.language}
             theme={this.state.theme.slStyle}
+            showFilter={this.state.showFilter}
           />
         </div>
       )

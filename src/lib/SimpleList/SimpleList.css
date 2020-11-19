@@ -38,8 +38,9 @@
   /* scrollbar-color: rgb(0, 40, 0) rgb(189, 229, 189); */
   /* background-color: rgb(229, 255, 229); */
   /* border-top-color: rgb(0, 40, 0); */
-  border-top-style: solid;
-  border-top-width: thin;
+  /* border-top-style: solid;
+  border-top-width: thin; */
+  margin: 0;
 }
 
 .Table-header {
