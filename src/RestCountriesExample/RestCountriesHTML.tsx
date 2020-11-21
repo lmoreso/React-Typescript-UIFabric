@@ -447,7 +447,6 @@ export class RestCountriesHTML extends React.Component<mod.IRestCountriesProps, 
             heightInPx={this.props.height || mod.DEFAULT_HEIGHT}
             language={this.state.language}
             theme={this.state.theme.slStyle}
-            showFilter={this.state.showFilter}
           />
         </div>
       )

@@ -35,6 +35,7 @@ export interface ISimpleListFluentUIProps extends ISimpleListProps {
   showLabel?: boolean;
   heightInPx?: number;
   theme?: ISlStyles;
+  showFilter: boolean;
 }
 
 interface ISimpleListFluentUIStates {
@@ -528,14 +529,12 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
         // scrollbarColor: this._theme.tableContainerScrollbarColor,
       };
 
-      if (this.props.heightInPx && this.props.heightInPx > 0) {
-        let heightInPx = (this.props.heightInPx < 500) ? 500 : this.props.heightInPx;
-        styleTableContainer.overflowY = 'hidden';
-        styleTableContainer.height = `${heightInPx}px`;
-        styleTableContainer.maxHeight = `${heightInPx}px`;
-        styleTableContainer.position = 'relative';
-      }
-
+      let heightInPx = (this.props.heightInPx && this.props.heightInPx > 500) ? this.props.heightInPx : 500;
+      styleTableContainer.overflowY = 'hidden';
+      styleTableContainer.height = `${heightInPx}px`;
+      styleTableContainer.maxHeight = `${heightInPx}px`;
+      styleTableContainer.position = 'relative';
+      
       let styleMainContainer: React.CSSProperties = {
         backgroundColor: this._theme.mainContainerBackgroundColor,
         borderColor: this._theme.mainContainerBorderColor,

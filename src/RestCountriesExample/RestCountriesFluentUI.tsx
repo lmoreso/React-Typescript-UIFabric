@@ -61,13 +61,13 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       fetchResult: mod.fetchResults.loading,
       fetchResultMessage: '',
       dataSource: mod.DATA_SOURCE_DEF,
-      hiddenConfig: false,
+      hiddenConfig: true,
       hiddenInfo: true,
       isCompactMode: false,
       language: language,
       theme: this._themes[this._defaultThemeKey],
       hiddenLabel: true,
-      showFilter: false,
+      showFilter: true,
     }
 
     // inicializar columnas para SimpeListHtml
@@ -303,7 +303,8 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       },
       {
         key: 'label',
-        text: 'Show Label "N. Countries"',
+        text: '*Show Label "Nº Countries"*',
+        disabled: !this.state.showFilter,
         onClick: () => { this.setState({ hiddenLabel: !this.state.hiddenLabel }) },
         canCheck: true,
         isChecked: !this.state.hiddenLabel,
