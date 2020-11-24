@@ -60,7 +60,7 @@ export function getRestCountriesColumns(): ISimpleListCol[] {
             },
             {
                 title: strings.field_Siglas, field: "alpha3Code", width: 50, canSortAndFilter: true, fieldTooltip: 'alpha3CodeTooltip',
-                headerTooltip: strings.click_ToSeeFlag, fieldOnRenderModal: "banderaJSX",
+                headerTooltip: strings.click_ToSeeFlag, fieldPanel: "banderaJSX",
             },
             {   
                 title: strings.field_Idiomas, field: "idiomas", width: 70, canSortAndFilter: false, fieldTooltip: 'idiomasTooltip',

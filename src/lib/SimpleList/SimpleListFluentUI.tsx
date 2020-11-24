@@ -413,12 +413,12 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
           </span> as any
       }
       // Contenido de la Celda
-      if (aSlColumn.fieldOnRenderModal) {
+      if (aSlColumn.fieldPanel) {
         theNewColumn.onRender = (item) => {
           return (
             <div>
               <this._renderCellPanel
-                jsxModal={item[aSlColumn.fieldOnRenderModal!]}
+                jsxModal={item[aSlColumn.fieldPanel!]}
                 jsxTarget={item[aSlColumn.field]}
                 jsxTooltip={item[(aSlColumn.fieldTooltip) ? aSlColumn.fieldTooltip : 0]}
               />
