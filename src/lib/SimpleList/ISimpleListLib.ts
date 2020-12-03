@@ -124,7 +124,7 @@ export interface ISimpleListCol {
     title: string;
     field: string;
     width: number;
-    headerTooltip?: string;
+    txtHeaderTooltip?: string;
     fieldTooltip?: string;
     fieldUrl?: string;
     isImage?: boolean;

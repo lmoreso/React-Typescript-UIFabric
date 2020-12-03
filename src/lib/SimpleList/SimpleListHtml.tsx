@@ -274,7 +274,7 @@ export class SimpleListHtml extends React.Component<ISimpleListHtmlProps, ISimpl
                       >
                         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                           <span style={{ verticalAlign: 'baseline', width: '100%', }}
-                            title={(aColumn.headerTooltip) ? aColumn.headerTooltip : ''}
+                            title={(aColumn.txtHeaderTooltip) ? aColumn.txtHeaderTooltip : ''}
                           >
                             {aColumn.title}
                           </span>

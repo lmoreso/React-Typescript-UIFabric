@@ -18,6 +18,8 @@ export interface IRestCountriesStrings {
   label_LoadFromRestcountries: string;
   click_ToViewTimeZones: string;
   click_ToSeeFlag: string;
+  click_ToSeeFlagOf: string;
+  label_FlagOf: string;
   click_ToGoWikipediaInSpanish: string;
   click_ToGoWikipediaInEnglish: string;
   click_ToSeeCountryInGoogleMaps: string;
@@ -41,6 +43,7 @@ export interface IRestCountriesStrings {
   title_App: string;
   label_Paises: string;
   label_Pais: string;
+  label_Idiomas: string;
   field_NumHusos: string;
   field_Idiomas: string;
   field_Siglas: string;

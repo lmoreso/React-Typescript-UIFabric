@@ -1,0 +1,24 @@
+{
+    "batchcomplete": "",
+    "warnings": {
+        "extracts": {
+            "*": "HTML may be malformed and/or unbalanced and may omit inline images. Use at your own risk. Known problems are listed at https://www.mediawiki.org/wiki/Special:MyLanguage/Extension:TextExtracts#Caveats."
+        }
+    },
+    "query": {
+        "pages": {
+            "55904": {
+                "pageid": 55904,
+                "ns": 0,
+                "title": "Belgrade",
+                "extract": "<p class=\"mw-empty-elt\">\n</p>\n<p><b>Belgrade</b> (<span></span> <i title=\"English pronunciation respelling\"><span>BEL</span>-grayd</i>; Serbian: <span lang=\"sr\">Београд</span>, <small>romanized:&#160;</small><i lang=\"sr-Latn\" title=\"Serbian-language romanization\">Beograd</i>, <small>lit.&#160;</small>'White City', <small>pronounced&#160;</small><span title=\"Representation in the International Phonetic Alphabet (IPA)\">[beǒɡrad]</span> <span>(<span><span><span></span>listen</span></span>)</span>; names in other languages) is the capital and largest city of Serbia. It is located at the confluence of the Sava and Danube rivers and the crossroads of the Pannonian Plain and the Balkan Peninsula. Nearly 1.7&#160;million people live within the administrative limits of the City of Belgrade, a quarter of the total population of Serbia.</p><p>Belgrade is one of the oldest continuously inhabited cities in Europe and the World. One of the most important prehistoric cultures of Europe, the Vinča culture, evolved within the Belgrade area in the 6th millennium BC. In antiquity, Thraco-Dacians inhabited the region and, after 279 BC, Celts settled the city, naming it <i>Singidūn</i>. It was conquered by the Romans under</p>...",
+                "thumbnail": {
+                    "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Beograd_collage.jpg/250px-Beograd_collage.jpg",
+                    "width": 250,
+                    "height": 500
+                },
+                "pageimage": "Beograd_collage.jpg"
+            }
+        }
+    }
+}

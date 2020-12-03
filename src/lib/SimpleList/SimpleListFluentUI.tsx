@@ -328,29 +328,29 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
     );
   }
 
-// private _renderItemPanel(props: { jsxTarget: JSX.Element; jsxModal: JSX.Element; jsxTooltip: JSX.Element }): JSX.Element {
-//     const [isPanelOpen, { setTrue: showPanel, setFalse: hidePanel }] = useBoolean(false);
-//     return (
-//       <div>
-//         <Panel
-//           isOpen={isPanelOpen}
-//           onDismiss={hidePanel}
-//           isLightDismiss={true}
-//         >
-//           {props.jsxModal}
-//         </ Panel>
-//         <TooltipHost
-//           content={props.jsxTooltip as any}
-//           calloutProps={{ gapSpace: 0 }}
-//           styles={{ root: { display: 'inline-block' } }}
-//         >
-//           <div style={{ cursor: 'pointer' }} onClick={showPanel}>
-//             {props.jsxTarget}
-//           </div>
-//         </TooltipHost>
-//       </div>
-//     );
-//   }
+  // private _renderItemPanel(props: { jsxTarget: JSX.Element; jsxModal: JSX.Element; jsxTooltip: JSX.Element }): JSX.Element {
+  //     const [isPanelOpen, { setTrue: showPanel, setFalse: hidePanel }] = useBoolean(false);
+  //     return (
+  //       <div>
+  //         <Panel
+  //           isOpen={isPanelOpen}
+  //           onDismiss={hidePanel}
+  //           isLightDismiss={true}
+  //         >
+  //           {props.jsxModal}
+  //         </ Panel>
+  //         <TooltipHost
+  //           content={props.jsxTooltip as any}
+  //           calloutProps={{ gapSpace: 0 }}
+  //           styles={{ root: { display: 'inline-block' } }}
+  //         >
+  //           <div style={{ cursor: 'pointer' }} onClick={showPanel}>
+  //             {props.jsxTarget}
+  //           </div>
+  //         </TooltipHost>
+  //       </div>
+  //     );
+  //   }
 
   private _renderCellPanel(props: { jsxTarget: JSX.Element; jsxModal: JSX.Element; jsxTooltip: JSX.Element }): JSX.Element {
     const [isPanelOpen, { setTrue: showPanel, setFalse: hidePanel }] = useBoolean(false);
@@ -393,16 +393,16 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
         isPadded: true
       };
       // Cabecera de Columna
-      if (aSlColumn.headerTooltip) {
+      if (aSlColumn.txtHeaderTooltip) {
         theNewColumn.name =
           <span style={{ alignItems: 'baseline' }}>
             <TooltipHost content={
               <span>
-                <Label>{aSlColumn.title}</Label>
+                <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }}>{aSlColumn.title}</Label>
                 <StringsToJsx
                   strings={[
-                    aSlColumn.headerTooltip,
-                    (aSlColumn.canSortAndFilter) ? '*Clica en el Título de la columna para ordenar la lista*' : ''
+                    aSlColumn.txtHeaderTooltip,
+                    (aSlColumn.canSortAndFilter) ? strings.order_ClickToOrder.replace('[%s]', aSlColumn.title) : ''
                   ]}
                 />
               </span> as any}
@@ -471,14 +471,22 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
           }
         } else {
           theNewColumn.onRender = (item) => {
+            let txtUrl: string = item[(aSlColumn.fieldUrl) ? aSlColumn.fieldUrl : 0];
+            let jsxTooltip: JSX.Element | string = txtUrl;
+            if (aSlColumn.txtHeaderTooltip && aSlColumn.txtHeaderTooltip.length > 0) {
+              jsxTooltip = 
+              <span>
+                  <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }}>{aSlColumn.txtHeaderTooltip}</Label>
+                  <Label>{txtUrl}</Label>
+              </span>
+            }
             return (
               <TooltipHost
-                content={item[(aSlColumn.fieldUrl) ? aSlColumn.fieldUrl : 0]}
-                // id={this._hostId}
+                content={jsxTooltip}
                 calloutProps={{ gapSpace: 0 }}
                 styles={{ root: { display: 'inline-block' } }}
               >
-                <a href={item[(aSlColumn.fieldUrl) ? aSlColumn.fieldUrl : 0]} target='_blank'>
+                <a href={txtUrl} target='_blank'>
                   {item[aSlColumn.field]}
                 </a>
               </TooltipHost>
@@ -534,7 +542,7 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
       styleTableContainer.height = `${heightInPx}px`;
       styleTableContainer.maxHeight = `${heightInPx}px`;
       styleTableContainer.position = 'relative';
-      
+
       let styleMainContainer: React.CSSProperties = {
         backgroundColor: this._theme.mainContainerBackgroundColor,
         borderColor: this._theme.mainContainerBorderColor,

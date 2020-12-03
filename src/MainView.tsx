@@ -12,6 +12,7 @@ import { ScrollablePaneDetailsListExample } from './FluentUiExamples/ScrollableP
 import { RestCountriesHTML } from './RestCountriesExample/RestCountriesHTML';
 import { RestCountriesUIFabric } from './RestCountriesExample/RestCountriesUIFabric';
 import { RestCountriesFluentUI } from './RestCountriesExample/RestCountriesFluentUI';
+import { SearchWiki } from './lib/SimpleList/SearchWiki';
 
 
 // La primera opció no funciona en producció si la aplicació no està al arrel.
@@ -26,9 +27,8 @@ const TYPESCRIPT_URL = 'https://www.typescriptlang.org/docs/home.html';
 const FLUENT_UI_URL = 'https://developer.microsoft.com/en-us/fluentui#/controls/web';
 const UI_FABRIC_URL = 'https://developer.microsoft.com/en-us/office/blogs/ui-fabric-is-evolving-into-fluent-ui';
 
-enum menuOptionsId { restCountriesUIFabric = 1, restCountriesHtml, fabricListDocExample, scrollablePaneExample, restCountriesFluentUI }
-const DEF_MENU_ID: menuOptionsId = menuOptionsId.restCountriesFluentUI;
-const menuAPiñon: menuOptionsId | undefined = undefined /* menuOptionsId.restCountriesHtml */;
+enum menuOptionsId { restCountriesUIFabric = 1, restCountriesHtml, fabricListDocExample, scrollablePaneExample, restCountriesFluentUI, searchWiki }
+const DEF_MENU_ID: menuOptionsId = menuOptionsId.searchWiki;
 
 interface IMenuOptions {
   key: menuOptionsId;
@@ -38,9 +38,10 @@ interface IMenuOptions {
 }
 
 const menuOptions: IMenuOptions[] = [
+  { key: menuOptionsId.restCountriesFluentUI, name: 'Paises y Banderas del Mundo (FluentUI versión)', loadCountries: false, title: 'Paises y Banderas del Mundo (FluentUI versión)' },
+  { key: menuOptionsId.searchWiki, name: 'Busca en Wikipedia', loadCountries: false, title: 'Busca en Wikipedia' },
   { key: menuOptionsId.restCountriesUIFabric, name: 'Paises y Banderas del Mundo (UIFabric versión)', loadCountries: true, title: 'Paises y Banderas del Mundo (UIFabric versión)' },
   { key: menuOptionsId.restCountriesHtml, name: 'Paises y Banderas del Mundo (HTML versión)', loadCountries: true, title: 'Paises y Banderas del Mundo (HTML versión)' },
-  { key: menuOptionsId.restCountriesFluentUI, name: 'Paises y Banderas del Mundo (FluentUI versión)', loadCountries: false, title: 'Paises y Banderas del Mundo (FluentUI versión)' },
   { key: menuOptionsId.fabricListDocExample, name: 'Ejemplo de Lista de UI Fabric', loadCountries: false, title: 'Ejemplo de Lista de UI Fabric' },
   { key: menuOptionsId.scrollablePaneExample, name: 'Ejemplo de Scrollablepane de UI Fabric', loadCountries: false, title: 'Ejemplo de Scrollablepane de UI Fabric' },
 ]
@@ -85,76 +86,71 @@ export class MainView extends React.Component<IMainViewProps, IMainViewStates> {
     };
    */
   public render(): JSX.Element {
-    if (menuAPiñon == menuOptionsId.restCountriesHtml)
-      return (
+    return (
+      <div>
         <Fabric>
-        <div style={{ display: 'flex', justifyContent: 'center' }} >
-          <RestCountriesHTML />
-        </div>
-        </Fabric>
-      )
-    else if (menuAPiñon == menuOptionsId.restCountriesFluentUI)
-      return (
-        <Fabric>
-        <div style={{ display: 'flex', justifyContent: 'center' }} >
-          <RestCountriesFluentUI />
-        </div>
-        </Fabric>
-      )
-    else
-      return (
-        <div>
-          <Fabric>
-            <ScrollablePane scrollbarVisibility={ScrollbarVisibility.auto}>
-              <Sticky stickyPosition={StickyPositionType.Header}>
-                <header className="App-header">
-                  <img src={logo} className="App-logo" alt="logo" />
-                  <span className="App-title">
-                    Exercices about <a className="App-title" href={REACT_URL} target='_blank'>React</a>, <a className="App-title" href={TYPESCRIPT_URL} target='_blank'>Typescript</a> & <a className="App-title" href={FLUENT_UI_URL} target='_blank'>Fluent UI</a> (<a className="App-title" href={UI_FABRIC_URL} target='_blank'> UIFabric</a>)
+          <ScrollablePane scrollbarVisibility={ScrollbarVisibility.auto}>
+            <Sticky stickyPosition={StickyPositionType.Header}>
+              <header className="App-header">
+                <img src={logo} className="App-logo" alt="logo" />
+                <span className="App-title">
+                  Exercices about <a className="App-title" href={REACT_URL} target='_blank'>React</a>, <a className="App-title" href={TYPESCRIPT_URL} target='_blank'>Typescript</a> & <a className="App-title" href={FLUENT_UI_URL} target='_blank'>Fluent UI</a> (<a className="App-title" href={UI_FABRIC_URL} target='_blank'> UIFabric</a>)
                 </span>
-                </header>
-              </Sticky>
-              <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
-                <Sticky >
-                  <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', alignSelf: 'center', backgroundColor: 'rgba(150, 150, 150)', width: '100%' }}>
-                    <Label style={{ padding: '5px', paddingTop: '10px' }}> Selecciona una opción: </Label>
-                    <Dropdown
-                      // defaultSelectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
-                      selectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
-                      onChange={this._onChangeComboMenu}
-                      placeholder="Select an option"
-                      options={this._optionsComboMenu}
-                      styles={{ dropdown: { width: 400, padding: '5px' } }}
+              </header>
+            </Sticky>
+            <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column' }}>
+              <Sticky >
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', alignSelf: 'center', backgroundColor: 'rgba(150, 150, 150)', width: '100%' }}>
+                  <Label style={{ padding: '5px', paddingTop: '10px' }}> Selecciona una opción: </Label>
+                  <Dropdown
+                    // defaultSelectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
+                    selectedKey={this.state.activeMenuOptionId ? this.state.activeMenuOptionId : undefined}
+                    onChange={this._onChangeComboMenu}
+                    placeholder="Select an option"
+                    options={this._optionsComboMenu}
+                    styles={{ dropdown: { width: 400, padding: '5px' } }}
 
+                  />
+                </div>
+              </Sticky>
+              <div style={{ padding: '5px', alignSelf: 'center', justifyContent: 'center' }}>
+
+                <DetailsListDocumentsExample
+                  hidden={!this._isMenuActive(menuOptionsId.fabricListDocExample)}
+                />
+
+                {(this._isMenuActive(menuOptionsId.scrollablePaneExample)) ? <ScrollablePaneDetailsListExample /> : null}
+
+                {(!this._isMenuActive(menuOptionsId.restCountriesUIFabric)) ? null :
+                  <RestCountriesUIFabric />
+                }
+
+                {(!this._isMenuActive(menuOptionsId.restCountriesHtml)) ? null :
+                  <RestCountriesHTML />
+                }
+
+                {(!this._isMenuActive(menuOptionsId.searchWiki)) ? null :
+                  <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column', maxWidth: '1600px'}}>
+                    <SearchWiki
+                      textToSearch={'Belgrade'}
+                      rootUrl={'https://en.wikipedia.org'}
+                      width={800}
+                      enDesarrollo
                     />
                   </div>
-                </Sticky>
-                <div style={{ padding: '5px', alignSelf: 'center', justifyContent: 'center' }}>
+                }
 
-                  <DetailsListDocumentsExample
-                    hidden={!this._isMenuActive(menuOptionsId.fabricListDocExample)}
-                  />
 
-                  {(this._isMenuActive(menuOptionsId.scrollablePaneExample)) ? <ScrollablePaneDetailsListExample /> : null}
-
-                  {(!this._isMenuActive(menuOptionsId.restCountriesUIFabric)) ? null :
-                    <RestCountriesUIFabric />
-                  }
-
-                  {(!this._isMenuActive(menuOptionsId.restCountriesHtml)) ? null :
-                    <RestCountriesHTML />
-                  }
-                  
-                  {(!this._isMenuActive(menuOptionsId.restCountriesFluentUI)) ? null :
-                    <RestCountriesFluentUI />
-                  }
-                </div>
+                {(!this._isMenuActive(menuOptionsId.restCountriesFluentUI)) ? null :
+                  <RestCountriesFluentUI />
+                }
               </div>
-            </ScrollablePane>
-          </Fabric>
+            </div>
+          </ScrollablePane>
+        </Fabric>
 
-        </div>
-      );
+      </div>
+    );
   }
 }
 

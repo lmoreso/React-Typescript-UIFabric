@@ -83,7 +83,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     this._onChangeCheckBoxCompactMode = this._onChangeCheckBoxCompactMode.bind(this);
     this._onChangeComboColores = this._onChangeComboColores.bind(this);
     this._onChangeCheckBoxShowFilter = this._onChangeCheckBoxShowFilter.bind(this);
-    
+
   }
 
   public componentDidMount() {
@@ -154,6 +154,7 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
       this._piensaUnTiempo(0.5);
       this._loadStrings(newLanguage);
       this._loadColumns(this.state.dataSource != mod.dataSources.fromURL);
+      this._processCountries();
       this.setState({ language: newLanguage });
     }
   }
@@ -183,42 +184,57 @@ export class RestCountriesFluentUI extends React.Component<mod.IRestCountriesPro
     this._simpleListRef.current!.setState({ showFilter: checked, });
   }
 
+  private _processCountries() {
+    this._data.forEach((aCountry) => {
+      aCountry.alpha3CodeTooltip =
+        <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }}>{`${strings.click_ToSeeFlagOf} ${aCountry.name}`}</Label>
+
+      aCountry.banderaJSX =
+        <div style={{ padding: '4px', }}>
+          <Label style={{ fontSize: 'large', fontWeight: 'lighter' }}>{`${strings.label_FlagOf} ${aCountry.name}`}</Label>
+          <div style={{ borderColor: 'black', borderWidth: '1px', borderStyle: 'solid', width: '100%' }}>
+            <Image
+              src={aCountry.banderaUrl}
+              width={'100%'}
+            />
+          </div>
+        </div>
+        
+      if (aCountry.listLanguages && aCountry.listLanguages.length > 0 && Array.isArray(aCountry.listLanguages)) {
+        aCountry.idiomasTooltip =
+          <span>
+            <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }}>{`${strings.label_Idiomas} ${aCountry.name}`}</Label>
+            {
+              aCountry.listLanguages.map((aLanguaje: any) => <span key={aLanguaje.key}>{`${aLanguaje.key}: ${aLanguaje.name} (${aLanguaje.nativeName})`}<br /></span>)
+            }
+          </span>
+      }
+      // Husos horarios
+      if (Array.isArray(aCountry.timezones)) {
+        if (aCountry.timezones.length == 1) {
+          aCountry.numHusos = aCountry.timezones[0];
+        } else {
+          aCountry.numHusos = `${aCountry.timezones[0]} (${aCountry.timezones.length - 1}+)`;
+          aCountry.husosTooltip =
+            <span>
+              <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }}>{`${strings.field_NumHusos} ${aCountry.name}`}</Label>
+              {aCountry.timezones.join(', ')}
+            </span>
+        }
+      }
+
+    })
+
+
+  }
+
+
   private _downloadCountries(dataSource: mod.dataSources) {
     this.setState({ fetchResult: mod.fetchResults.loading, dataSource: dataSource });
     mod.DownloadCountries(dataSource)
       .then((datos) => {
         this._data = datos;
-        this._data.forEach((aCountry) => {
-          aCountry.alpha3CodeTooltip = strings.click_ToSeeFlag;
-          aCountry.banderaJSX =
-            <div style={{ padding: '4px', width: '400' }}>
-              <Label style={{ fontSize: 'large', fontWeight: 'lighter' }}>{`*Bandera de ${aCountry.Pais}*`}</Label>
-              <div style={{ borderColor: 'black', borderWidth: '1px', borderStyle: 'solid', width: '100%' }}>
-                <Image
-                  src={aCountry.banderaUrl}
-                  width={'100%'}
-                />
-              </div>
-            </div>
-          if (aCountry.listLanguages && aCountry.listLanguages.length > 0 && Array.isArray(aCountry.listLanguages)) {
-            aCountry.idiomasTooltip =
-              <span>
-                <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }}>{`*Lenguas habladas en ${aCountry.name}*`}</Label>
-                {
-                  aCountry.listLanguages.map((aLanguaje: any) => <span key={aLanguaje.key}>{`${aLanguaje.key}: ${aLanguaje.name} (${aLanguaje.nativeName})`}<br/></span>)
-                }
-              </span>
-
-          }
-        })
-
-        /*             if (registro.listLanguages && registro.listLanguages.length > 0) {
-                let aux: string[] = [registro.idiomasTooltip = `${registro.listLanguages[0].key}: ${registro.listLanguages[0].name} (${registro.listLanguages[0].nativeName})`];
-                for (let i = 1; i < registro.listLanguages.length; i++)
-                    aux.push(`${registro.listLanguages[i].key}: ${registro.listLanguages[i].name} (${registro.listLanguages[i].nativeName})`);
-                    registro.idiomasTooltip = StringsToJsx({strings: aux}) as any;
-            }
- */
+        this._processCountries();
         this.setState({ numRegs: datos.length, fetchResult: mod.fetchResults.loadedOk });
       })
       .catch((err) => {

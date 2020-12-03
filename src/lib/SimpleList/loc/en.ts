@@ -2,7 +2,7 @@ import {ISimpleListStrings} from './SimpleListStrings';
 
 export const strings: ISimpleListStrings = {
     config_CompactMode: 'Displays the list in "Compact" mode',
-    order_ClickToOrder: 'Click to sort the list by "[%s]"',
+    order_ClickToOrder: 'Click on the title to sort the list by "[%s]"',
     order_CantOrder: 'Column "[%s]" cannot be sorted',
     groupAll: 'All',
     groupWithout: 'Without',
