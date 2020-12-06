@@ -12,7 +12,7 @@ import { ScrollablePaneDetailsListExample } from './FluentUiExamples/ScrollableP
 import { RestCountriesHTML } from './RestCountriesExample/RestCountriesHTML';
 import { RestCountriesUIFabric } from './RestCountriesExample/RestCountriesUIFabric';
 import { RestCountriesFluentUI } from './RestCountriesExample/RestCountriesFluentUI';
-import { SearchWiki } from './lib/SimpleList/SearchWiki';
+import { SearchWikiExample } from './SearchWikiExample';
 
 
 // La primera opció no funciona en producció si la aplicació no està al arrel.
@@ -130,16 +130,8 @@ export class MainView extends React.Component<IMainViewProps, IMainViewStates> {
                 }
 
                 {(!this._isMenuActive(menuOptionsId.searchWiki)) ? null :
-                  <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column', maxWidth: '1600px'}}>
-                    <SearchWiki
-                      textToSearch={'Belgrade'}
-                      rootUrl={'https://en.wikipedia.org'}
-                      width={800}
-                      enDesarrollo
-                    />
-                  </div>
+                  <SearchWikiExample />
                 }
-
 
                 {(!this._isMenuActive(menuOptionsId.restCountriesFluentUI)) ? null :
                   <RestCountriesFluentUI />
