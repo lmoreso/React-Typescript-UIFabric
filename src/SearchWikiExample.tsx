@@ -21,7 +21,9 @@ export interface SearchWikiExampleEstates {
   wikiUrl: IDropdownOption;
   textToSearch: string;
   maxWidth: number;
-  numChars: number;
+  plainText?: boolean;
+  numChars?: number;
+  numSentences?: number,
   enDesarrollo?: boolean;
   canUpdate?: boolean;
 }
@@ -33,6 +35,8 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, S
     textToSearch: 'Barcelona',
     maxWidth: 350,
     numChars: 900,
+    plainText: true,
+    numSentences: 0,
     enDesarrollo: true,
   };
 
@@ -54,14 +58,15 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, S
   public render(): JSX.Element {
     let estilo = { margin: '10px' };
     let estilos = { root: { margin: '10px', } };
+    console.log('render()', this.state);
     return (
-      <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', maxWidth: '1600px' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column', margin: '10px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', maxWidth: '1600px', }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', flexDirection: 'column', margin: '10px', borderStyle: 'solid', borderWidth: '1px', borderColor: 'black', }}>
           <SearchBox
             placeholder="Text a buscar"
             // onSearch={(text: string): void => {this.setState({textToSearch: text})}}
-            onChange={(newValue: any) => {
-              this.setState({ textToSearch: newValue, canUpdate: true })
+            onChange={(newValue: string) => {
+              this.setState({ textToSearch: newValue, canUpdate: (newValue && newValue.length) ? true : false })
             }}
             value={this.state.textToSearch}
             styles={estilos}
@@ -74,20 +79,44 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, S
             options={comboIdiomes}
             styles={estilos}
           />
+          <Toggle
+            // label={strings.config_CompactMode}
+            checked={this.state.plainText}
+            onChange={(event: any, checked?: boolean | undefined): void => {
+              this.setState({ plainText: checked, canUpdate: true });
+            }}
+            onText={'Devuelve Texto plano'}
+            offText={'Devuelve HTML'}
+            styles={estilos}
+          />
           <Slider
             label="Nº de caracteres a recuperar"
-            min={200}
+            min={0}
             max={1200}
             step={50}
-            defaultValue={this.state.numChars}
+            value={(this.state.numSentences) ? 0 : this.state.numChars}
             showValue
-            onChange={(value: number): void => this.setState({ numChars: value, canUpdate: true })}
+            onChange={(value: number): void => {
+              this.setState({ numChars: value, numSentences:  (value) ? 0 : 5, canUpdate: true });
+            }}
+            styles={estilos}
+          />
+          <Slider
+            label="Nº de Sentencias a recuperar"
+            min={0}
+            max={10}
+            step={1}
+            value={(this.state.numChars) ? 0 : this.state.numSentences}
+            showValue
+            onChange={(value: number): void => {
+              this.setState({ numSentences: value, numChars: (value) ? 0 : 600, canUpdate: true });
+            }}
             styles={estilos}
           />
           <DefaultButton
             onClick={(ev) => {
               this._searchWikiProps = this.state;
-              this.setState({canUpdate: false})
+              this.setState({ canUpdate: false })
               // this.forceUpdate();
             }}
             styles={estilos}
@@ -102,8 +131,8 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, S
               this._searchWikiProps.enDesarrollo = checked;
               this.setState({ enDesarrollo: checked });
             }}
-            onText={'Esconder JSON'}
-            offText={'Mostrar JSON'}
+            onText={'Mostrando JSON'}
+            offText={'JSON invisible'}
             styles={estilos}
           />
           <Slider
@@ -119,6 +148,17 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, S
             }}
             styles={estilos}
           />
+          {/* <Toggle
+            // label={strings.config_CompactMode}
+            checked={this.state.apaisado}
+            onChange={(event: any, checked?: boolean | undefined): void => {
+              this._searchWikiProps.apaisado = checked;
+              this.setState({ apaisado: checked });
+            }}
+            onText={'Apaisado'}
+            offText={'Vertical'}
+            styles={estilos}
+          /> */}
         </div>
         <div style={estilo}>
           <SearchWiki
@@ -127,6 +167,8 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, S
             maxWidth={this._searchWikiProps.maxWidth}
             numChars={this._searchWikiProps.numChars}
             enDesarrollo={this._searchWikiProps.enDesarrollo}
+            numSentences={this._searchWikiProps.numSentences}
+            plainText={this._searchWikiProps.plainText}
           />
         </div>
       </div>
