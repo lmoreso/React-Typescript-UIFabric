@@ -4,15 +4,18 @@ import { Label } from 'office-ui-fabric-react/lib/Label';
 import { Link } from 'office-ui-fabric-react/lib/Link';
 import { Image } from 'office-ui-fabric-react/lib/Image';
 
+export enum panelOrientations { landscape, portrait, auto }
+
 export interface ISearchWikiProps {
   rootUrl: string;
   textToSearch: string;
-  maxWidth: number;
+  fixedSize: number;
   plainText?: boolean;
   numChars?: number;
   numSentences?: number,
+  imageSize?: number,
   enDesarrollo?: boolean;
-  apaisado?: boolean;
+  panelOrientation?: panelOrientations;
 }
 
 enum fetchResults { loading, loadedOk, loadedErr }
@@ -24,6 +27,7 @@ export interface ISearchWikiStates {
 export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiStates> {
   private _data: any;
   private _txtError: string;
+  private _queryUrl: string;
 
   public constructor(props: ISearchWikiProps) {
     super(props);
@@ -38,25 +42,23 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
   private _searchWiki() {
     if (this.props.textToSearch && this.props.textToSearch.length > 0) {
       this.setState({ fetchResult: fetchResults.loading })
-      // Descargar el HTML del artículo
-      // Nº de caracteres a descargar (max. 1200)
-      // let numChars = (!this.props.numChars || this.props.numChars < 100 || this.props.numChars > 1200) ? 1200 : this.props.numChars;
-      let url = `${this.props.rootUrl}/w/api.php?action=query&titles=${this.props.textToSearch}&prop=extracts|pageimages&format=json&exintro=&pithumbsize=500&origin=*`;
+      // Componer la query
+      this._queryUrl = `${this.props.rootUrl}/w/api.php?action=query&titles=${this.props.textToSearch}&prop=extracts|pageimages&format=json`
+      this._queryUrl = this._queryUrl + `&exintro=&pithumbsize=${(this.props.imageSize && this.props.imageSize > 50) ? this.props.imageSize : 250}`
       if (this.props.numChars && this.props.numChars > 0)
-        url = url + `&exchars=${this.props.numChars}`;
+        this._queryUrl = this._queryUrl + `&exchars=${this.props.numChars}`;
       else if (this.props.numSentences && this.props.numSentences > 0)
-        url = url + `&exsentences=${this.props.numSentences}`;
-      if (this.props.plainText) url = url + `&explaintext=`;
-      // &exchars=${numChars}
-      // let url = `${this.props.rootUrl}/w/api.php?action=query&titles=${this.props.textToSearch}&prop=extracts|pageimages&&format=json&explaintext=&exsentences=5&exintro=&pithumbsize=500&origin=*`;
-      console.log('URL', url);
-      fetch(url)
+        this._queryUrl = this._queryUrl + `&exsentences=${this.props.numSentences}`;
+      if (this.props.plainText) this._queryUrl = this._queryUrl + `&explaintext=`;
+      this._queryUrl = this._queryUrl + `&origin=*`;
+      // Descargar el HTML del artículo
+      fetch(this._queryUrl)
         .then((res: Response) => {
           // console.log('Response', res);
           return (res.json());
         })
         .then((data) => {
-          console.log('JSON parseado', data);
+          // console.log('JSON parseado', data);
           this._data = data;
           this.setState({ fetchResult: fetchResults.loadedOk })
         })
@@ -78,6 +80,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
       || this.props.numChars !== prevProps.numChars
       || this.props.plainText !== prevProps.plainText
       || this.props.numSentences !== prevProps.numSentences
+      || this.props.imageSize !== prevProps.imageSize
     ) {
       this._searchWiki();
     }
@@ -86,14 +89,14 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
   public render(): JSX.Element {
     if (this.state.fetchResult === fetchResults.loadedErr) {
       return (
-        <div style={{ width: `${this.props.maxWidth}px` }}>
+        <div style={{ width: `${this.props.fixedSize}px` }}>
           <Label>{'ERROR'}</Label>
           <Label>{this._txtError}</Label>
         </div>
       )
     } else if (this.state.fetchResult === fetchResults.loading) {
       return (
-        <div style={{ width: `${this.props.maxWidth}px` }}>
+        <div style={{ width: `${this.props.fixedSize}px` }}>
           <Spinner
             size={SpinnerSize.large}
           />
@@ -105,38 +108,60 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
       let titulo = this._data.query.pages[pageId].title;
       let enlace = `${this.props.rootUrl}/wiki/${this.props.textToSearch}`;
       let imagen = (this._data.query.pages[pageId].thumbnail) ? this._data.query.pages[pageId].thumbnail.source : null;
+      let imagenWidth = (this._data.query.pages[pageId].thumbnail) ? this._data.query.pages[pageId].thumbnail.width : null;
+      let imagenHeight = (this._data.query.pages[pageId].thumbnail) ? this._data.query.pages[pageId].thumbnail.height : null; 
+      // let aspectRatio = imagenWidth / imagenHeight;  
+      let landscape = false;
+      if (this.props.panelOrientation === panelOrientations.landscape)
+        landscape = true;
+      else if (this.props.panelOrientation === panelOrientations.auto && (imagenWidth) && (imagenHeight) && imagenHeight > imagenWidth) {
+        landscape = true;
+      }
+
       return (
         <div
           style={{
             display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start',
-            flexDirection: (this.props.apaisado) ? 'column' : 'row',
+            flexDirection: (landscape) ? 'column' : 'row',
           }}
         >
           <div
             style={{
               padding: '5px',
-              height: (this.props.apaisado) ? `${this.props.maxWidth}px` : undefined,
-              width: (!this.props.apaisado) ? `${this.props.maxWidth}px` : undefined,
+              // height: (landscape) ? `${this.props.fixedSize}px` : undefined,
+              width: (!landscape) ? `${this.props.fixedSize}px` : undefined,
+              maxWidth: (landscape) ? `${this.props.fixedSize * 3}px` : undefined,
               display: 'flex', justifyContent: 'flex-start',
-              flexDirection: (this.props.apaisado) ? 'row' : 'column',
-              borderStyle: 'solid', borderWidth: '1px', borderColor: 'black',
+              flexDirection: (landscape) ? 'row' : 'column',
+              // borderStyle: 'solid', borderWidth: '1px', borderColor: 'black',
             }}
           >
-            <div style={{ margin: '5px', borderStyle: 'solid', borderWidth: '1px', borderColor: 'black', }}>
+            <div style={{
+              maxHeight: (!landscape) ? `${this.props.fixedSize}px` : undefined, 
+              // width: (!landscape) ? `${this.props.fixedSize}px` : `${Math.round(this.props.fixedSize * aspectRatio)}px`,
+              width: (!landscape) ? `${this.props.fixedSize}px` : `200px`,
+              height: (landscape) ? `${this.props.fixedSize}px` : undefined,
+              overflow: 'hidden',
+              // borderStyle: 'solid', borderWidth: '1px', borderColor: 'black',
+            }}
+            >
               <Image
                 src={imagen}
-                height={(this.props.apaisado) ? '100%' : undefined}
-                width={(!this.props.apaisado) ? '100%' : undefined}
+                height={(landscape) ? '100%' : undefined}
+                width={(!landscape) ? '100%' : undefined}
               />
             </div>
-            <div style={{ margin: '5px', borderStyle: 'solid', borderWidth: '1px', borderColor: 'black', }}>
+            <div style={{
+              // margin: '5px',
+              // borderStyle: 'solid', borderWidth: '1px', borderColor: 'black',
+            }}
+            >
               <Label style={{ fontSize: 'large', fontWeight: 'lighter' }}>{titulo}</Label>
               {(this.props.plainText) ?
                 <div style={{ textAlign: 'justify' }} >{htmlOrText}</div>
                 :
                 <div style={{ textAlign: 'justify' }} dangerouslySetInnerHTML={{ __html: htmlOrText }} />
               }
-
               <Link href={enlace} target='_blank'>Saber mas ...</Link>
             </div>
             <div style={{ margin: '10px' }}>
@@ -144,10 +169,9 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
           </div>
 
           {(!this.props.enDesarrollo) ? null :
-            <div style={{ margin: '5px', borderStyle: 'solid', borderWidth: '1px', borderColor: 'black', }}>
+            <div style={{ alignItems: 'left', textAlign: 'left', marginLeft: '5px', maxWidth: '1024px' }}>
+              <a href={this._queryUrl} target='_blank'>{this._queryUrl}</a>
               <pre id="json" style={{ textAlign: 'left' }} >{JSON.stringify(this._data, null, 2)}</pre>
-              {/* <Label >{JSON.stringify(this._data, null, 2)}</Label> */}
-              {/* <Label >{this._data.toString()}</Label> */}
             </div>
           }
         </div>
