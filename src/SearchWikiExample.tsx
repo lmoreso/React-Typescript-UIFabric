@@ -41,15 +41,15 @@ export interface SearchWikiExampleEstates {
 export class SearchWikiExample extends React.Component<SearchWikiExampleProps, SearchWikiExampleEstates> {
 
   private _searchWikiProps: SearchWikiExampleEstates = {
-    wikiUrl: comboIdiomes[0],
-    textToSearch: 'Belgrade',
+    wikiUrl: comboIdiomes[1],
+    textToSearch: 'Guernica, pintura de Picasso',
     fixedSize: 250,
-    numChars: 0,
+    numChars: 300,
     plainText: true,
-    numSentences: 3,
+    numSentences: 0,
     imageSize: 250,
-    enDesarrollo: true,
-    panelOrientation: comboOrientation[0],
+    enDesarrollo: false,
+    panelOrientation: comboOrientation[2],
   };
 
   public constructor(props: SearchWikiExampleProps) {
@@ -175,7 +175,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, S
             Busca en Wikipedia
           </DefaultButton>
           <Label style={{ fontSize: 'large', fontWeight: 'lighter', marginLeft: '10px', }}>{'Configuración de Formato'}</Label>
-          <Label styles={labelStyles}>{'Mostrar la respuesta JSON'}</Label>
+          <Label styles={labelStyles}>{'Modo de Depuración'}</Label>
           <Toggle
             // label={'Mostrar respuesta JSON'}
             checked={this.state.enDesarrollo}
@@ -183,8 +183,8 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, S
               this._searchWikiProps.enDesarrollo = checked!;
               this.setState({ enDesarrollo: checked! });
             }}
-            onText={'Mostrando JSON'}
-            offText={'JSON invisible'}
+            onText={'Depuración activada'}
+            offText={'Depuración desactivada'}
             styles={controlStyles}
           />
           <Label styles={labelStyles}>{'Tamaño fijado del panel'}</Label>

@@ -43,7 +43,8 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
     if (this.props.textToSearch && this.props.textToSearch.length > 0) {
       this.setState({ fetchResult: fetchResults.loading })
       // Componer la query
-      this._queryUrl = `${this.props.rootUrl}/w/api.php?action=query&titles=${this.props.textToSearch}&prop=extracts|pageimages&format=json`
+      this._queryUrl = `${this.props.rootUrl}/w/api.php?action=query&generator=search&gsrlimit=2&gsrsearch=${this.props.textToSearch}`;
+      this._queryUrl = this._queryUrl + `&prop=extracts|pageimages&format=json`
       this._queryUrl = this._queryUrl + `&exintro=&pithumbsize=${(this.props.imageSize && this.props.imageSize > 50) ? this.props.imageSize : 250}`
       if (this.props.numChars && this.props.numChars > 0)
         this._queryUrl = this._queryUrl + `&exchars=${this.props.numChars}`;
@@ -106,16 +107,65 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
       let pageId = Object.keys(this._data.query.pages)[0];
       let htmlOrText = this._data.query.pages[pageId].extract;
       let titulo = this._data.query.pages[pageId].title;
-      let enlace = `${this.props.rootUrl}/wiki/${this.props.textToSearch}`;
+      let enlace = `${this.props.rootUrl}/wiki/${titulo}`;
       let imagen = (this._data.query.pages[pageId].thumbnail) ? this._data.query.pages[pageId].thumbnail.source : null;
       let imagenWidth = (this._data.query.pages[pageId].thumbnail) ? this._data.query.pages[pageId].thumbnail.width : null;
-      let imagenHeight = (this._data.query.pages[pageId].thumbnail) ? this._data.query.pages[pageId].thumbnail.height : null; 
-      // let aspectRatio = imagenWidth / imagenHeight;  
+      let imagenHeight = (this._data.query.pages[pageId].thumbnail) ? this._data.query.pages[pageId].thumbnail.height : null;
+      let aspectRatio = imagenWidth / imagenHeight;
       let landscape = false;
       if (this.props.panelOrientation === panelOrientations.landscape)
         landscape = true;
       else if (this.props.panelOrientation === panelOrientations.auto && (imagenWidth) && (imagenHeight) && imagenHeight > imagenWidth) {
         landscape = true;
+      }
+      // Estilos según orientación
+      const divRootPadding: number = 2;
+      const divMargin: number = 2;
+      let divRootWidth: number | undefined = this.props.fixedSize;
+      let divImagenWidth: number = divRootWidth - divMargin * 2;
+      let divTextWidth: number = divImagenWidth;
+      let divRootMaxWidth: number | undefined = undefined;
+
+      if (landscape) {
+        divTextWidth = this.props.fixedSize - divMargin * 2
+        divImagenWidth = Math.round(this.props.fixedSize * aspectRatio - divMargin * 2);
+        divRootWidth = undefined;
+        divRootMaxWidth = this.props.fixedSize * 3;
+      }
+
+      // Estilos para Depuración
+      let divRootBorder: string | undefined = '1px solid gray';
+      let divImagenBorder: string | undefined = undefined;
+      let divTextBorder: string | undefined = undefined;
+      if (this.props.enDesarrollo) {
+        divRootBorder = '1px solid green';
+        divImagenBorder = '1px solid red';
+        divTextBorder = '1px solid blue';
+      }
+
+      let divRootCSS: React.CSSProperties = {
+        display: 'flex', justifyContent: 'flex-start', flexDirection: (landscape) ? 'row' : 'column',
+        padding: (divRootPadding) ? `${divRootPadding}px` : undefined,
+        width: (divRootWidth) ? `${divRootWidth}px` : undefined,
+        maxWidth: (divRootMaxWidth) ? `${divRootMaxWidth}px` : undefined,
+        border: divRootBorder,
+        overflow: 'hidden',
+        boxShadow: '5px 5px 5px gray',
+      }
+
+      let divImageCSS: React.CSSProperties = {
+        maxHeight: (!landscape) ? `${this.props.fixedSize}px` : undefined,
+        width: divImagenWidth,
+        margin: '2px',
+        height: (landscape) ? `${this.props.fixedSize}px` : undefined,
+        overflow: 'hidden',
+        border: divImagenBorder,
+      }
+
+      let divTextCSS: React.CSSProperties = {
+        margin: '2px',
+        width: (divTextWidth) ? `${divTextWidth}px` : undefined,
+        border: divTextBorder,
       }
 
       return (
@@ -125,38 +175,16 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
             flexDirection: (landscape) ? 'column' : 'row',
           }}
         >
-          <div
-            style={{
-              padding: '5px',
-              // height: (landscape) ? `${this.props.fixedSize}px` : undefined,
-              width: (!landscape) ? `${this.props.fixedSize}px` : undefined,
-              maxWidth: (landscape) ? `${this.props.fixedSize * 3}px` : undefined,
-              display: 'flex', justifyContent: 'flex-start',
-              flexDirection: (landscape) ? 'row' : 'column',
-              // borderStyle: 'solid', borderWidth: '1px', borderColor: 'black',
-            }}
-          >
-            <div style={{
-              maxHeight: (!landscape) ? `${this.props.fixedSize}px` : undefined, 
-              // width: (!landscape) ? `${this.props.fixedSize}px` : `${Math.round(this.props.fixedSize * aspectRatio)}px`,
-              width: (!landscape) ? `${this.props.fixedSize}px` : `200px`,
-              height: (landscape) ? `${this.props.fixedSize}px` : undefined,
-              overflow: 'hidden',
-              // borderStyle: 'solid', borderWidth: '1px', borderColor: 'black',
-            }}
-            >
+          <div style={divRootCSS} >
+            <div style={divImageCSS}>
               <Image
                 src={imagen}
                 height={(landscape) ? '100%' : undefined}
                 width={(!landscape) ? '100%' : undefined}
               />
             </div>
-            <div style={{
-              // margin: '5px',
-              // borderStyle: 'solid', borderWidth: '1px', borderColor: 'black',
-            }}
-            >
-              <Label style={{ fontSize: 'large', fontWeight: 'lighter' }}>{titulo}</Label>
+            <div style={divTextCSS} >
+              <Label style={{ fontSize: 'large', fontWeight: 'lighter' }} >{titulo}</Label>
               {(this.props.plainText) ?
                 <div style={{ textAlign: 'justify' }} >{htmlOrText}</div>
                 :
@@ -164,7 +192,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
               }
               <Link href={enlace} target='_blank'>Saber mas ...</Link>
             </div>
-            <div style={{ margin: '10px' }}>
+            <div style={{ margin: (landscape) ? undefined : '10px' }}>
             </div>
           </div>
 
