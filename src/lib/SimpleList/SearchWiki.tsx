@@ -16,6 +16,7 @@ export interface ISearchWikiProps {
   imageSize?: number,
   enDesarrollo?: boolean;
   panelOrientation?: panelOrientations;
+  rootStyle?: React.CSSProperties;
 }
 
 enum fetchResults { loading, loadedOk, loadedErr }
@@ -134,11 +135,9 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
       }
 
       // Estilos para Depuración
-      let divRootBorder: string | undefined = '1px solid gray';
       let divImagenBorder: string | undefined = undefined;
       let divTextBorder: string | undefined = undefined;
       if (this.props.enDesarrollo) {
-        divRootBorder = '1px solid green';
         divImagenBorder = '1px solid red';
         divTextBorder = '1px solid blue';
       }
@@ -148,9 +147,8 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
         padding: (divRootPadding) ? `${divRootPadding}px` : undefined,
         width: (divRootWidth) ? `${divRootWidth}px` : undefined,
         maxWidth: (divRootMaxWidth) ? `${divRootMaxWidth}px` : undefined,
-        border: divRootBorder,
         overflow: 'hidden',
-        boxShadow: '5px 5px 5px gray',
+        ...this.props.rootStyle,
       }
 
       let divImageCSS: React.CSSProperties = {
