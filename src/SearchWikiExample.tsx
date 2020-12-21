@@ -1,5 +1,5 @@
 import { getTheme, ITheme, Panel, TooltipHost } from 'office-ui-fabric-react';
-import { Button, DefaultButton } from 'office-ui-fabric-react/lib/Button';
+import { ActionButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { Pivot, PivotItem, PivotLinkFormat, PivotLinkSize } from 'office-ui-fabric-react/lib/Pivot';
@@ -32,6 +32,7 @@ interface ISearchWikiPropsStates {
   wikiUrl: IDropdownOption;
   panelOrientation: IDropdownOption;
   textToSearch: string;
+  numItemsToSearch: number;
   fixedSize: number;
   plainText: boolean;
   numChars: number;
@@ -60,6 +61,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
     enDesarrollo: false,
     panelOrientation: comboOrientation[2],
     bordeYSombra: true,
+    numItemsToSearch: 10,
   };
 
   public constructor(props: SearchWikiExampleProps) {
@@ -104,7 +106,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
           hasCloseButton={false}
           styles={{}}
         > */}
-          <Label style={{ fontSize: 'large', fontWeight: 'lighter', /* marginLeft: '10px',  */ }}>{'Configuración'}</Label>
+          <Label style={{ fontSize: 'large', fontWeight: 'lighter', /* marginLeft: '10px',  */ }}>{'Configuración <SearchWiki/>'}</Label>
           <Pivot
             linkSize={PivotLinkSize.large}
             linkFormat={PivotLinkFormat.tabs}
@@ -188,6 +190,19 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                   }}
                   styles={controlStyles}
                 />
+                <Label styles={labelStyles}>{'Nº de páginas a recuperar (de 1 a 20)'}</Label>
+                <Slider
+                  // label="tamaño de la imagen (de 50 a 1000)"
+                  min={1}
+                  max={20}
+                  step={1}
+                  value={this.state.numItemsToSearch}
+                  showValue
+                  onChange={(value: number): void => {
+                    this.setState({ numItemsToSearch: value, canUpdate: true });
+                  }}
+                  styles={controlStyles}
+                />
                 <DefaultButton
                   onClick={(ev) => {
                     this._searchWikiProps = this.state;
@@ -268,17 +283,20 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                         imageSize={this._searchWikiProps.imageSize}
                         panelOrientation={panelOrientations.auto}
                       />
-                  }
-                  }
+                  }}
+                  calloutProps={{
+                    gapSpace: 0,
+                    calloutMaxWidth: 600,
+                  }}
                 >
-                  <Button
+                  <ActionButton
                     onClick={(ev) => {
                       this.setState({ isPanelOpen: true })
                     }}
                     styles={controlStyles}
                   >
                     Pasa el ratón por aquí y/o púlsame para abrir un Panel
-                  </Button>
+                  </ActionButton>
                 </TooltipHost>
                 <Panel
                   isLightDismiss
@@ -307,6 +325,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
           <SearchWiki
             textToSearch={this._searchWikiProps.textToSearch}
             rootUrl={this._searchWikiProps.wikiUrl.text}
+            numItemsToSearch={this._searchWikiProps.numItemsToSearch}
             fixedSize={this._searchWikiProps.fixedSize}
             numChars={this._searchWikiProps.numChars}
             enDesarrollo={this._searchWikiProps.enDesarrollo}

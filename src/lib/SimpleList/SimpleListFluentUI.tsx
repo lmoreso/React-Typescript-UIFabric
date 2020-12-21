@@ -23,6 +23,7 @@ import { Label } from 'office-ui-fabric-react/lib/Label';
 import { StringsToJsx } from './LmbUtiles';
 import { useBoolean } from '@uifabric/react-hooks';
 import { Panel } from 'office-ui-fabric-react';
+import { panelOrientations, SearchWiki } from './SearchWiki';
 
 
 const simpleListFluentUIVersion = '0.0.4';
@@ -413,7 +414,32 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
           </span> as any
       }
       // Contenido de la Celda
-      if (aSlColumn.fieldPanel) {
+      if (aSlColumn.fieldToSearchWiki) {
+        theNewColumn.onRender = (item) => {
+          return (
+            <TooltipHost
+              tooltipProps={{
+                onRenderContent: () =>
+                  <SearchWiki
+                    textToSearch={item[aSlColumn.fieldToSearchWiki!]}
+                    rootUrl={'https://es.wikipedia.org'}
+                    fixedSize={250}
+                    numChars={300}
+                    plainText={true}
+                    imageSize={250}
+                    panelOrientation={panelOrientations.auto}
+                  />
+              }}
+              calloutProps={{
+                gapSpace: 0,
+                calloutMaxWidth: 600,
+              }}
+            >
+              {item[aSlColumn.fieldToSearchWiki!]}
+            </TooltipHost>
+          );
+        }
+      } else if (aSlColumn.fieldPanel) {
         theNewColumn.onRender = (item) => {
           return (
             <div>
@@ -474,11 +500,11 @@ export class SimpleListFluentUI extends React.Component<ISimpleListFluentUIProps
             let txtUrl: string = item[(aSlColumn.fieldUrl) ? aSlColumn.fieldUrl : 0];
             let jsxTooltip: JSX.Element | string = txtUrl;
             if (aSlColumn.txtHeaderTooltip && aSlColumn.txtHeaderTooltip.length > 0) {
-              jsxTooltip = 
-              <span>
+              jsxTooltip =
+                <span>
                   <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }}>{aSlColumn.txtHeaderTooltip}</Label>
                   <Label>{txtUrl}</Label>
-              </span>
+                </span>
             }
             return (
               <TooltipHost

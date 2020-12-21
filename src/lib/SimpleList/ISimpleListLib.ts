@@ -125,6 +125,7 @@ export interface ISimpleListCol {
     field: string;
     width: number;
     txtHeaderTooltip?: string;
+    fieldToSearchWiki?: string;
     fieldTooltip?: string;
     fieldUrl?: string;
     isImage?: boolean;

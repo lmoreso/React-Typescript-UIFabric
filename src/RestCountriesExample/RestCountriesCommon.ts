@@ -43,7 +43,7 @@ export function getRestCountriesColumns(): ISimpleListCol[] {
                 txtHeaderTooltip: strings.click_ToGoWikipediaInEnglish,
             },
             {
-                title: strings.field_SpanishName, field: "Pais", width: 150, fieldUrl: "wikiEsUrl", canSortAndFilter: true,
+                title: strings.field_SpanishName, field: "Pais", width: 150, fieldToSearchWiki: "wikiEs", canSortAndFilter: true,
                 txtHeaderTooltip: strings.click_ToGoWikipediaInSpanish
             },
             {
@@ -119,6 +119,7 @@ export async function DownloadCountries(dataSource: dataSources): Promise<any[]>
             registro.idiomas = (Array.isArray(registro.languages)) ? registro.languages.join(', ') : registro.languages;
             registro.wikiEnUrl = `${URL_WIKIPEDIA_EN}/${registro.name}`;
             registro.wikiEsUrl = `${URL_WIKIPEDIA_ES}/${registro.translations.es}`;
+            registro.wikiEs = `${registro.translations.es}`;
             registro.banderaUrl = `${URL_FLAGS}${registro.alpha3Code.toString().toLowerCase()}.${URL_FLAGS_EXT}`;
             registro.mapsPaisUrl = `${URL_MAPS}${registro.name}, country of ${registro.subregion}`;
             registro.mapsContinenteUrl = `${URL_MAPS}${registro.region}, continent`;
