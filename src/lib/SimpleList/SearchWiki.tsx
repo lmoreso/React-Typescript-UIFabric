@@ -10,7 +10,7 @@ export enum panelOrientations { landscape, portrait, auto }
 export interface ISearchWikiProps {
   rootUrl: string;
   textToSearch: string;
-  numItemsToSearch?: number;
+  numPagesToSearch?: number;
   fixedSize: number;
   plainText?: boolean;
   numChars?: number;
@@ -65,21 +65,21 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
     if (this.props.textToSearch && this.props.textToSearch.length > 0) {
       this.setState({ fetchResult: fetchResults.loading })
       // Componer la query
-      this._queryUrl = `${this.props.rootUrl}/w/api.php?action=query&generator=search`;
-      this._queryUrl = this._queryUrl + `&gsrlimit=${(this.props.numItemsToSearch) ? this.props.numItemsToSearch : 1}`;
-      this._queryUrl = this._queryUrl + `&gsrsearch=${this.props.textToSearch}`;
-      this._queryUrl = this._queryUrl + `&prop=extracts|pageimages&format=json`
-      this._queryUrl = this._queryUrl + `&exintro=&pithumbsize=${(this.props.imageSize && this.props.imageSize > 50) ? this.props.imageSize : 250}`
+      this._queryUrl = `${this.props.rootUrl}/w/api.php?action=query&generator=search`
+        + `&gsrlimit=${(this.props.numPagesToSearch) ? this.props.numPagesToSearch : 1}`
+        + `&gsrsearch=${this.props.textToSearch}`
+        + `&prop=extracts|pageimages&format=json`
+        + `&exintro=&pithumbsize=${(this.props.imageSize && this.props.imageSize > 50) ? this.props.imageSize : 250}`
       if (this.props.numChars && this.props.numChars > 0)
-        this._queryUrl = this._queryUrl + `&exchars=${this.props.numChars}`;
+        this._queryUrl += `&exchars=${this.props.numChars}`;
       else if (this.props.numSentences && this.props.numSentences > 0)
-        this._queryUrl = this._queryUrl + `&exsentences=${this.props.numSentences}`;
-      if (this.props.plainText) this._queryUrl = this._queryUrl + `&explaintext=`;
-      this._queryUrl = this._queryUrl + `&origin=*`;
-      // Descargar el HTML del artículo
+        this._queryUrl += `&exsentences=${this.props.numSentences}`;
+      if (this.props.plainText)
+        this._queryUrl += `&explaintext=`;
+      this._queryUrl += `&origin=*`;
+      // Lanzar Query
       fetch(this._queryUrl)
         .then((res: Response) => {
-          // console.log('Response', res);
           return (res.json());
         })
         .then((data) => {
@@ -130,7 +130,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
       || this.props.plainText !== prevProps.plainText
       || this.props.numSentences !== prevProps.numSentences
       || this.props.imageSize !== prevProps.imageSize
-      || this.props.numItemsToSearch !== prevProps.numItemsToSearch
+      || this.props.numPagesToSearch !== prevProps.numPagesToSearch
     ) {
       this._searchWiki();
     }
@@ -148,7 +148,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
           newIndex
       :
       0;
-    this.setState({ pageIndex: newIndex})
+    this.setState({ pageIndex: newIndex })
   }
 
   private _renderTitle(props: { titulo: string; hidden?: boolean; numPages?: number }): JSX.Element {
@@ -277,7 +277,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
           }}
         >
           <div style={divRootCSS} >
-            <this._renderTitle titulo={titulo} hidden={landscape} numPages={this.state.numPages}/>
+            <this._renderTitle titulo={titulo} hidden={landscape} numPages={this.state.numPages} />
             <div style={divImageCSS}>
               <Image
                 src={imagenUrl}
@@ -286,7 +286,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
               />
             </div>
             <div style={divTextCSS} >
-              <this._renderTitle titulo={titulo} hidden={!landscape} numPages={this.state.numPages}/>
+              <this._renderTitle titulo={titulo} hidden={!landscape} numPages={this.state.numPages} />
               {(this.props.plainText) ?
                 <div style={{ textAlign: 'justify' }} >{htmlOrText}</div>
                 :

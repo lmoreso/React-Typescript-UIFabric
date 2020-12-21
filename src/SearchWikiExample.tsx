@@ -1,13 +1,16 @@
-import { getTheme, ITheme, Panel, TooltipHost } from 'office-ui-fabric-react';
+import * as React from 'react';
+import { Modal, SelectableOptionMenuItemType, } from 'office-ui-fabric-react';
 import { ActionButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { Pivot, PivotItem, PivotLinkFormat, PivotLinkSize } from 'office-ui-fabric-react/lib/Pivot';
-// import { Panel } from 'office-ui-fabric-react/lib/Panel';
-import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
 import { Slider } from 'office-ui-fabric-react/lib/Slider';
+import { ComboBox, IComboBoxOption } from 'office-ui-fabric-react/lib/ComboBox';
 import { Toggle } from 'office-ui-fabric-react/lib/Toggle';
-import * as React from 'react';
+import { Panel } from 'office-ui-fabric-react/lib/Panel';
+import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
+import { getTheme, ITheme, } from 'office-ui-fabric-react/lib/Styling';
+
 import { panelOrientations, SearchWiki } from './lib/SimpleList/SearchWiki';
 
 export interface SearchWikiExampleProps {
@@ -32,7 +35,7 @@ interface ISearchWikiPropsStates {
   wikiUrl: IDropdownOption;
   panelOrientation: IDropdownOption;
   textToSearch: string;
-  numItemsToSearch: number;
+  numPagesToSearch: number;
   fixedSize: number;
   plainText: boolean;
   numChars: number;
@@ -46,6 +49,8 @@ interface ISearchWikiExampleEstates extends ISearchWikiPropsStates {
   canUpdate: boolean;
   confBusqueda: boolean;
   isPanelOpen: boolean;
+  selectComboTextKey: string | number;
+  isModalOpen: boolean;
 }
 
 export class SearchWikiExample extends React.Component<SearchWikiExampleProps, ISearchWikiExampleEstates> {
@@ -61,7 +66,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
     enDesarrollo: false,
     panelOrientation: comboOrientation[2],
     bordeYSombra: true,
-    numItemsToSearch: 10,
+    numPagesToSearch: 10,
   };
 
   public constructor(props: SearchWikiExampleProps) {
@@ -72,6 +77,8 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
       canUpdate: false,
       confBusqueda: true,
       isPanelOpen: false,
+      selectComboTextKey: 'C',
+      isModalOpen: false,
     }
 
     // this._renderHeader = this._renderHeader.bind(this);
@@ -85,27 +92,15 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
     let estilo = { margin: '10px', };
     let controlStyles = { root: { margin: '0 10px 10px 10px', width: '300px', } };
     let labelStyles = { root: { textAlign: 'left', fontSize: 'smaller', marginLeft: '10px', } };
-    // let titleStyles = { root: { textAlign: 'center', fontSize: 'large', marginLeft: '10px', } };
-    // let titleStyles = { fontSize: 'large', fontWeight: 'lighter', marginLeft: '10px', }
 
-    // console.log('render()', this.state);
     return (
       <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', /* maxWidth: '1600px',  */ }}>
         <div style={{
           display: 'flex', justifyContent: 'flex-start', flexDirection: 'column', margin: '10px',
           borderStyle: 'solid', borderWidth: '1px', borderColor: 'gray',
-          // borderLeftStyle: 'solid', borderLeftWidth: '1px', borderLeftColor: 'gray',
-          // width: '300px',
-          // height: '100%',
           boxShadow: '5px 0px 5px gray'
         }}
         >
-          {/* <Panel
-          isBlocking={false}
-          isOpen={true}
-          hasCloseButton={false}
-          styles={{}}
-        > */}
           <Label style={{ fontSize: 'large', fontWeight: 'lighter', /* marginLeft: '10px',  */ }}>{'Configuración <SearchWiki/>'}</Label>
           <Pivot
             linkSize={PivotLinkSize.large}
@@ -116,19 +111,38 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                 textAlign: 'left',
               }
             }}
-
           >
             <PivotItem headerText="Búsqueda" itemIcon="Globe">
               <div>
                 <Label styles={labelStyles}>{'Texto a buscar en la Wiki'}</Label>
-                <SearchBox
-                  placeholder="Texto a buscar en la Wiki"
-                  // onSearch={(text: string): void => {this.setState({textToSearch: text})}}
-                  onChange={(newValue: string) => {
-                    this.setState({ textToSearch: newValue, canUpdate: (newValue && newValue.length) ? true : false })
-                  }}
-                  value={this.state.textToSearch}
+                <ComboBox
+                  selectedKey={this.state.selectComboTextKey}
+                  allowFreeform={true}
+                  autoComplete={'on'}
+                  text={this.state.textToSearch}
+                  options={[
+                    { key: 'Header1', text: 'Castellano', itemType: SelectableOptionMenuItemType.Header },
+                    { key: 'A', text: 'Barcelona' },
+                    { key: 'B', text: 'Picasso' },
+                    { key: 'C', text: 'Guernica, pintura de Picasso' },
+                    { key: 'D', text: 'Belgrado' },
+                    { key: 'divider', text: '-', itemType: SelectableOptionMenuItemType.Divider },
+                    { key: 'Header2', text: 'English', itemType: SelectableOptionMenuItemType.Header },
+                    { key: 'E', text: 'Picasso' },
+                    { key: 'F', text: 'Barcelone' },
+                    { key: 'G', text: 'Belgrade' },
+                  ]}
                   styles={controlStyles}
+                  onChange={(ev, op: IComboBoxOption, index: number, newValue: string) => {
+                    let newText = (op) ? op.text : newValue;
+                    if (newText && newText.length) {
+                      if (op)
+                        this.setState({ textToSearch: newText, selectComboTextKey: op.key, canUpdate: true })
+                      else
+                        this.setState({ textToSearch: newText, canUpdate: true })
+
+                    }
+                  }}
                 />
                 <Label styles={labelStyles}>{'URL de la Wiki'}</Label>
                 <Dropdown
@@ -196,10 +210,10 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                   min={1}
                   max={20}
                   step={1}
-                  value={this.state.numItemsToSearch}
+                  value={this.state.numPagesToSearch}
                   showValue
                   onChange={(value: number): void => {
-                    this.setState({ numItemsToSearch: value, canUpdate: true });
+                    this.setState({ numPagesToSearch: value, canUpdate: true });
                   }}
                   styles={controlStyles}
                 />
@@ -217,7 +231,9 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
               </div>
             </PivotItem>
             <PivotItem headerText="Formato" itemIcon="DeveloperTools">
-              <div>
+              <div style={{
+                display: 'flex', flexDirection: 'column',
+              }}>
                 <Label styles={labelStyles}>{'Modo de Depuración'}</Label>
                 <Toggle
                   // label={'Mostrar respuesta JSON'}
@@ -269,7 +285,23 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                   offText={'Añadir borde y sombra'}
                   styles={controlStyles}
                 />
-                <Label styles={labelStyles}>{'Ejemplos de Uso'}</Label>
+                <Label styles={labelStyles}>{'Otros ejemplos de Uso'}</Label>
+                <ActionButton
+                  onClick={(ev) => {
+                    this.setState({ isPanelOpen: true })
+                  }}
+                  styles={controlStyles}
+                >
+                  Abrir Panel derecho (Orientación vertical, 5 páginas)
+                </ActionButton>
+                <ActionButton
+                  onClick={(ev) => {
+                    this.setState({ isModalOpen: true })
+                  }}
+                  styles={controlStyles}
+                >
+                  Abrir Panel central (Orientación horizontal, 5 páginas)
+                </ActionButton>
                 <TooltipHost
                   tooltipProps={{
                     onRenderContent: () =>
@@ -278,6 +310,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                         rootUrl={this._searchWikiProps.wikiUrl.text}
                         fixedSize={this._searchWikiProps.fixedSize}
                         numChars={this._searchWikiProps.numChars}
+                        numPagesToSearch={1}
                         numSentences={this._searchWikiProps.numSentences}
                         plainText={this._searchWikiProps.plainText}
                         imageSize={this._searchWikiProps.imageSize}
@@ -290,12 +323,9 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                   }}
                 >
                   <ActionButton
-                    onClick={(ev) => {
-                      this.setState({ isPanelOpen: true })
-                    }}
                     styles={controlStyles}
                   >
-                    Pasa el ratón por aquí y/o púlsame para abrir un Panel
+                    Pasa el ratón para ver el 'Tooltip' (Orientación automática, 1 sola página)
                   </ActionButton>
                 </TooltipHost>
                 <Panel
@@ -308,12 +338,29 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                     rootUrl={this._searchWikiProps.wikiUrl.text}
                     fixedSize={this._searchWikiProps.fixedSize}
                     numChars={this._searchWikiProps.numChars}
+                    numPagesToSearch={5}
                     numSentences={this._searchWikiProps.numSentences}
                     plainText={this._searchWikiProps.plainText}
                     imageSize={this._searchWikiProps.imageSize}
                     panelOrientation={panelOrientations.portrait}
                   />
                 </Panel>
+                <Modal
+                  isOpen={this.state.isModalOpen}
+                  onDismiss={() => this.setState({ isModalOpen: false })}
+                >
+                  <SearchWiki
+                    textToSearch={this._searchWikiProps.textToSearch}
+                    rootUrl={this._searchWikiProps.wikiUrl.text}
+                    fixedSize={this._searchWikiProps.fixedSize}
+                    numChars={this._searchWikiProps.numChars}
+                    numPagesToSearch={5}
+                    numSentences={this._searchWikiProps.numSentences}
+                    plainText={this._searchWikiProps.plainText}
+                    imageSize={this._searchWikiProps.imageSize}
+                    panelOrientation={panelOrientations.landscape}
+                  />
+                </Modal>
 
               </div>
             </PivotItem>
@@ -325,7 +372,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
           <SearchWiki
             textToSearch={this._searchWikiProps.textToSearch}
             rootUrl={this._searchWikiProps.wikiUrl.text}
-            numItemsToSearch={this._searchWikiProps.numItemsToSearch}
+            numPagesToSearch={this._searchWikiProps.numPagesToSearch}
             fixedSize={this._searchWikiProps.fixedSize}
             numChars={this._searchWikiProps.numChars}
             enDesarrollo={this._searchWikiProps.enDesarrollo}
