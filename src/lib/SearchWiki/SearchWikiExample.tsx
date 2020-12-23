@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Modal, SelectableOptionMenuItemType, } from 'office-ui-fabric-react';
-import { ActionButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
+import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { Label } from 'office-ui-fabric-react/lib/Label';
 import { Pivot, PivotItem, PivotLinkFormat, PivotLinkSize } from 'office-ui-fabric-react/lib/Pivot';
@@ -11,7 +11,7 @@ import { Panel } from 'office-ui-fabric-react/lib/Panel';
 import { TooltipHost } from 'office-ui-fabric-react/lib/Tooltip';
 import { getTheme, ITheme, } from 'office-ui-fabric-react/lib/Styling';
 
-import { panelOrientations, SearchWiki } from './lib/SimpleList/SearchWiki';
+import { panelOrientations, SearchWiki } from './SearchWiki';
 
 export interface SearchWikiExampleProps {
 
@@ -63,10 +63,10 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
     plainText: true,
     numSentences: 0,
     imageSize: 250,
+    numPagesToSearch: 10,
     enDesarrollo: false,
     panelOrientation: comboOrientation[2],
     bordeYSombra: true,
-    numPagesToSearch: 10,
   };
 
   public constructor(props: SearchWikiExampleProps) {
@@ -98,7 +98,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
         <div style={{
           display: 'flex', justifyContent: 'flex-start', flexDirection: 'column', margin: '10px',
           borderStyle: 'solid', borderWidth: '1px', borderColor: 'gray',
-          boxShadow: '5px 0px 5px gray'
+          boxShadow: '5px 5px 5px gray'
         }}
         >
           <Label style={{ fontSize: 'large', fontWeight: 'lighter', /* marginLeft: '10px',  */ }}>{'Configuración <SearchWiki/>'}</Label>
@@ -286,22 +286,22 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                   styles={controlStyles}
                 />
                 <Label styles={labelStyles}>{'Otros ejemplos de Uso'}</Label>
-                <ActionButton
+                <PrimaryButton
                   onClick={(ev) => {
                     this.setState({ isPanelOpen: true })
                   }}
                   styles={controlStyles}
                 >
                   Abrir Panel derecho (Orientación vertical, 5 páginas)
-                </ActionButton>
-                <ActionButton
+                </PrimaryButton>
+                <PrimaryButton
                   onClick={(ev) => {
                     this.setState({ isModalOpen: true })
                   }}
                   styles={controlStyles}
                 >
                   Abrir Panel central (Orientación horizontal, 5 páginas)
-                </ActionButton>
+                </PrimaryButton>
                 <TooltipHost
                   tooltipProps={{
                     onRenderContent: () =>
@@ -322,11 +322,11 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                     calloutMaxWidth: 600,
                   }}
                 >
-                  <ActionButton
+                  <PrimaryButton
                     styles={controlStyles}
                   >
                     Pasa el ratón para ver el 'Tooltip' (Orientación automática, 1 sola página)
-                  </ActionButton>
+                  </PrimaryButton>
                 </TooltipHost>
                 <Panel
                   isLightDismiss

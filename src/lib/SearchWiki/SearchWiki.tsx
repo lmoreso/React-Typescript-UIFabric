@@ -5,55 +5,36 @@ import { Link } from 'office-ui-fabric-react/lib/Link';
 import { Image } from 'office-ui-fabric-react/lib/Image';
 import { IconButton } from 'office-ui-fabric-react/lib/Button';
 
+import { ExtractWiki, IExtractWikiProps, IWikiExtractResult } from './ExtractWiki';
+
 export enum panelOrientations { landscape, portrait, auto }
 
-export interface ISearchWikiProps {
-  rootUrl: string;
-  textToSearch: string;
-  numPagesToSearch?: number;
-  fixedSize: number;
-  plainText?: boolean;
-  numChars?: number;
-  numSentences?: number,
-  imageSize?: number,
+export interface ISearchWikiProps extends IExtractWikiProps {
   enDesarrollo?: boolean;
   panelOrientation?: panelOrientations;
   rootStyle?: React.CSSProperties;
-}
-
-interface ISearchWikiResult {
-  pageId: string;
-  index: number;
-  textOrHtml: string;
-  title: string;
-  link: string;
-  image?: {
-    url: string;
-    width: number;
-    height: number;
-  };
+  fixedSize: number;
 }
 
 enum fetchResults { loading, loadedOk, loadedErr }
 
 export interface ISearchWikiStates {
   fetchResult: fetchResults;
-  numPages: number;
   pageIndex?: number;
 }
 
 export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiStates> {
-  private _data: any;
-  private _pages: Array<ISearchWikiResult>;
+  // private _data: any;
+  // private _pages: Array<IWikiExtractPage>;
   private _txtError: string;
-  private _queryUrl: string;
+  // private _queryUrl: string;
+  private _wikiRes: IWikiExtractResult;
 
   public constructor(props: ISearchWikiProps) {
     super(props);
 
     this.state = {
       fetchResult: fetchResults.loading,
-      numPages: 0,
     }
 
     this.onChangePage = this.onChangePage.bind(this);
@@ -63,58 +44,17 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
 
   private _searchWiki() {
     if (this.props.textToSearch && this.props.textToSearch.length > 0) {
-      this.setState({ fetchResult: fetchResults.loading })
-      // Componer la query
-      this._queryUrl = `${this.props.rootUrl}/w/api.php?action=query&generator=search`
-        + `&gsrlimit=${(this.props.numPagesToSearch) ? this.props.numPagesToSearch : 1}`
-        + `&gsrsearch=${this.props.textToSearch}`
-        + `&prop=extracts|pageimages&format=json`
-        + `&exintro=&pithumbsize=${(this.props.imageSize && this.props.imageSize > 50) ? this.props.imageSize : 250}`
-      if (this.props.numChars && this.props.numChars > 0)
-        this._queryUrl += `&exchars=${this.props.numChars}`;
-      else if (this.props.numSentences && this.props.numSentences > 0)
-        this._queryUrl += `&exsentences=${this.props.numSentences}`;
-      if (this.props.plainText)
-        this._queryUrl += `&explaintext=`;
-      this._queryUrl += `&origin=*`;
-      // Lanzar Query
-      fetch(this._queryUrl)
-        .then((res: Response) => {
-          return (res.json());
-        })
-        .then((data) => {
-          // console.log('JSON parseado', data);
-          this._data = data;
-          let pages = Object.keys(this._data.query.pages);
-          let thePages = new Array<ISearchWikiResult>();
-          pages.forEach((aPage, index) => {
-            let thePage: ISearchWikiResult = {
-              pageId: aPage,
-              textOrHtml: this._data.query.pages[aPage].extract,
-              title: this._data.query.pages[aPage].title,
-              link: `${this.props.rootUrl}/wiki/${this._data.query.pages[aPage].title}`,
-              index: this._data.query.pages[aPage].index,
-              image: (!this._data.query.pages[aPage].thumbnail) ? undefined :
-                {
-                  url: this._data.query.pages[aPage].thumbnail.source,
-                  height: this._data.query.pages[aPage].thumbnail.height,
-                  width: this._data.query.pages[aPage].thumbnail.width,
-                }
-            }
-            thePages.push(thePage);
-          });
-          this._pages = thePages.sort((a, b) => (a.index > b.index) ? 1 : 0);
-          // console.log(thePages);
-          this.setState({
-            fetchResult: fetchResults.loadedOk,
-            numPages: this._pages.length,
-            pageIndex: 0,
-          })
+      this.setState({ fetchResult: fetchResults.loading });
+      ExtractWiki(this.props)
+        .then((res: IWikiExtractResult) => {
+          // console.log(res)
+          this._wikiRes = res;
+          this.setState({ fetchResult: fetchResults.loadedOk, pageIndex: 0, })
         })
         .catch((error) => {
           console.log(error);
           this._txtError = error.toString();
-          this.setState({ fetchResult: fetchResults.loadedErr, numPages: 0, pageIndex: undefined })
+          this.setState({ fetchResult: fetchResults.loadedErr, pageIndex: undefined })
         });
     }
   }
@@ -139,11 +79,11 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
   private onChangePage(newValue: any): void {
     let newIndex = Number(newValue);
     newIndex = (newIndex || newIndex == 0) ?
-      (newIndex >= this.state.numPages) ?
+      (newIndex >= this._wikiRes.numPages) ?
         0
         :
         (newIndex < 0) ?
-          this.state.numPages
+          this._wikiRes.numPages - 1
           :
           newIndex
       :
@@ -202,7 +142,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
         </div>
       )
     } else {
-      let thePage = this._pages[this.state.pageIndex!];
+      let thePage = this._wikiRes.extractPages![this.state.pageIndex!];
       let htmlOrText = thePage.textOrHtml;
       let titulo = thePage.title;
       let enlace = thePage.link;
@@ -277,7 +217,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
           }}
         >
           <div style={divRootCSS} >
-            <this._renderTitle titulo={titulo} hidden={landscape} numPages={this.state.numPages} />
+            <this._renderTitle titulo={titulo} hidden={landscape} numPages={this._wikiRes.numPages} />
             <div style={divImageCSS}>
               <Image
                 src={imagenUrl}
@@ -286,7 +226,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
               />
             </div>
             <div style={divTextCSS} >
-              <this._renderTitle titulo={titulo} hidden={!landscape} numPages={this.state.numPages} />
+              <this._renderTitle titulo={titulo} hidden={!landscape} numPages={this._wikiRes.numPages} />
               {(this.props.plainText) ?
                 <div style={{ textAlign: 'justify' }} >{htmlOrText}</div>
                 :
@@ -310,9 +250,15 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
 
           {(!this.props.enDesarrollo) ? null :
             <div style={{ alignItems: 'left', textAlign: 'left', marginLeft: '5px', maxWidth: '1024px' }}>
-              <a href={this._queryUrl} target='_blank'>{this._queryUrl}</a>
+              <Label>URL</Label>
+              <a href={this._wikiRes.queryUrl} target='_blank'>{this._wikiRes.queryUrl}</a>
+              <Label>SearchWikiProps</Label>
               <pre id="json" style={{ textAlign: 'left' }} >{JSON.stringify(this.props, null, 2)}</pre>
-              <pre id="json" style={{ textAlign: 'left' }} >{JSON.stringify(this._data, null, 2)}</pre>
+              {(!this._wikiRes.textError || this._wikiRes.textError.length === 0) ? null :
+                <Label>{this._wikiRes.textError}</Label>
+              }
+              <Label>{`Se han encontrado ${this._wikiRes.numPages} Páginas`}</Label>
+              <pre id="json" style={{ textAlign: 'left' }} >{JSON.stringify(this._wikiRes.extractPages, null, 2)}</pre>
             </div>
           }
         </div>

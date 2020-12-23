@@ -23,7 +23,7 @@ import { Label } from 'office-ui-fabric-react/lib/Label';
 import { StringsToJsx } from './LmbUtiles';
 import { useBoolean } from '@uifabric/react-hooks';
 import { Panel } from 'office-ui-fabric-react';
-import { panelOrientations, SearchWiki } from './SearchWiki';
+import { panelOrientations, SearchWiki } from '../SearchWiki/SearchWiki';
 
 
 const simpleListFluentUIVersion = '0.0.4';

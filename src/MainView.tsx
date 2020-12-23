@@ -12,7 +12,7 @@ import { ScrollablePaneDetailsListExample } from './FluentUiExamples/ScrollableP
 import { RestCountriesHTML } from './RestCountriesExample/RestCountriesHTML';
 import { RestCountriesUIFabric } from './RestCountriesExample/RestCountriesUIFabric';
 import { RestCountriesFluentUI } from './RestCountriesExample/RestCountriesFluentUI';
-import { SearchWikiExample } from './SearchWikiExample';
+import { SearchWikiExample } from './lib/SearchWiki/SearchWikiExample';
 
 
 // La primera opció no funciona en producció si la aplicació no està al arrel.
