@@ -6,6 +6,7 @@ import { Image } from 'office-ui-fabric-react/lib/Image';
 import { IconButton } from 'office-ui-fabric-react/lib/Button';
 
 import { ExtractWiki, IExtractWikiProps, IWikiExtractResult } from './ExtractWiki';
+import { Stack } from 'office-ui-fabric-react';
 
 export enum panelOrientations { landscape, portrait, auto }
 
@@ -102,14 +103,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
       )
     else
       return (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
+        <Stack horizontal horizontalAlign='space-between' verticalAlign='center'>
           <IconButton
             hidden={true}
             iconProps={{ iconName: 'ChevronLeft' }}
@@ -121,7 +115,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
             iconProps={{ iconName: 'ChevronRight' }}
             onClick={(ev) => { this.onChangePage(this.state.pageIndex! + 1) }}
           />
-        </div>
+        </Stack>
       );
   }
 
@@ -180,7 +174,6 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
       }
 
       let divRootCSS: React.CSSProperties = {
-        display: 'flex', justifyContent: 'flex-start', flexDirection: (landscape) ? 'row' : 'column',
         padding: (divRootPadding) ? `${divRootPadding}px` : undefined,
         width: (divRootWidth) ? `${divRootWidth}px` : undefined,
         maxWidth: (divRootMaxWidth) ? `${divRootMaxWidth}px` : undefined,
@@ -210,13 +203,13 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
       }
 
       return (
-        <div
-          style={{
-            display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start',
-            flexDirection: (landscape) ? 'column' : 'row',
-          }}
+        <Stack horizontal={!landscape} 
+          // style={{
+          //   display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start',
+          //   flexDirection: (landscape) ? 'column' : 'row',
+          // }}
         >
-          <div style={divRootCSS} >
+          <Stack horizontal={landscape} style={divRootCSS} >
             <this._renderTitle titulo={titulo} hidden={landscape} numPages={this._wikiRes.numPages} />
             <div style={divImageCSS}>
               <Image
@@ -232,21 +225,11 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
                 :
                 <div style={{ textAlign: 'justify' }} dangerouslySetInnerHTML={{ __html: htmlOrText }} />
               }
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-around',
-                  alignItems: 'center',
-                  marginTop: '2px',
-                }}
-              >
-                <Link href={enlace} target='_blank'>Saber mas ...</Link>
-              </div>
+              <Link href={enlace} styles={{ root: { marginTop: '2px' } }} target='_blank'>Saber mas ...</Link>
             </div>
             <div style={{ margin: (landscape) ? undefined : '10px' }}>
             </div>
-          </div>
+          </Stack>
 
           {(!this.props.enDesarrollo) ? null :
             <div style={{ alignItems: 'left', textAlign: 'left', marginLeft: '5px', maxWidth: '1024px' }}>
@@ -261,7 +244,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
               <pre id="json" style={{ textAlign: 'left' }} >{JSON.stringify(this._wikiRes.extractPages, null, 2)}</pre>
             </div>
           }
-        </div>
+        </Stack>
       )
     }
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Modal, SelectableOptionMenuItemType, } from 'office-ui-fabric-react';
+import { Modal, SelectableOptionMenuItemType, Stack, } from 'office-ui-fabric-react';
 import { PrimaryButton, DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import { Dropdown, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import { Label } from 'office-ui-fabric-react/lib/Label';
@@ -89,19 +89,22 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
   }
 
   public render(): JSX.Element {
-    let estilo = { margin: '10px', };
+    // let estilo = { margin: '10px', };
     let controlStyles = { root: { margin: '0 10px 10px 10px', width: '300px', } };
     let labelStyles = { root: { textAlign: 'left', fontSize: 'smaller', marginLeft: '10px', } };
 
+
     return (
-      <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', /* maxWidth: '1600px',  */ }}>
-        <div style={{
+      // <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', /* maxWidth: '1600px',  */ }}>
+      <Stack horizontal>
+        {/* <div style={{
           display: 'flex', justifyContent: 'flex-start', flexDirection: 'column', margin: '10px',
           borderStyle: 'solid', borderWidth: '1px', borderColor: 'gray',
           boxShadow: '5px 5px 5px gray'
         }}
-        >
-          <Label style={{ fontSize: 'large', fontWeight: 'lighter', /* marginLeft: '10px',  */ }}>{'Configuración <SearchWiki/>'}</Label>
+        > */}
+        <Stack styles={{ root: { margin: '10px', borderStyle: 'solid', borderWidth: '1px', borderColor: 'gray', boxShadow: '5px 5px 5px gray', } }}>
+          <Label style={{ fontSize: 'large', fontWeight: 'lighter', /* marginLeft: '10px',  */ }}>{'Configuración <SearchWiki />'}</Label>
           <Pivot
             linkSize={PivotLinkSize.large}
             linkFormat={PivotLinkFormat.tabs}
@@ -113,7 +116,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
             }}
           >
             <PivotItem headerText="Búsqueda" itemIcon="Globe">
-              <div>
+              <Stack>
                 <Label styles={labelStyles}>{'Texto a buscar en la Wiki'}</Label>
                 <ComboBox
                   selectedKey={this.state.selectComboTextKey}
@@ -228,12 +231,10 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                 >
                   Busca en Wikipedia
                 </DefaultButton>
-              </div>
+              </Stack>
             </PivotItem>
             <PivotItem headerText="Formato" itemIcon="DeveloperTools">
-              <div style={{
-                display: 'flex', flexDirection: 'column',
-              }}>
+              <Stack>
                 <Label styles={labelStyles}>{'Modo de Depuración'}</Label>
                 <Toggle
                   // label={'Mostrar respuesta JSON'}
@@ -291,6 +292,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                     this.setState({ isPanelOpen: true })
                   }}
                   styles={controlStyles}
+                  style={{ fontSize: 'smaller', fontWeight: 'lighter', }}
                 >
                   Abrir Panel derecho (Orientación vertical, 5 páginas)
                 </PrimaryButton>
@@ -299,6 +301,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                     this.setState({ isModalOpen: true })
                   }}
                   styles={controlStyles}
+                  style={{ fontSize: 'smaller', fontWeight: 'lighter', }}
                 >
                   Abrir Panel central (Orientación horizontal, 5 páginas)
                 </PrimaryButton>
@@ -324,6 +327,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                 >
                   <PrimaryButton
                     styles={controlStyles}
+                    style={{ fontSize: 'smaller', fontWeight: 'lighter', }}
                   >
                     Pasa el ratón para ver el 'Tooltip' (Orientación automática, 1 sola página)
                   </PrimaryButton>
@@ -361,32 +365,30 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                     panelOrientation={panelOrientations.landscape}
                   />
                 </Modal>
-
-              </div>
+              </Stack>
             </PivotItem>
           </Pivot>
           <div style={{ margin: '10px' }}></div>
           {/* </Panel> */}
-        </div>
-        <div style={{ ...estilo, backgroundColor: 'white', }}>
-          <SearchWiki
-            textToSearch={this._searchWikiProps.textToSearch}
-            rootUrl={this._searchWikiProps.wikiUrl.text}
-            numPagesToSearch={this._searchWikiProps.numPagesToSearch}
-            fixedSize={this._searchWikiProps.fixedSize}
-            numChars={this._searchWikiProps.numChars}
-            enDesarrollo={this._searchWikiProps.enDesarrollo}
-            numSentences={this._searchWikiProps.numSentences}
-            plainText={this._searchWikiProps.plainText}
-            imageSize={this._searchWikiProps.imageSize}
-            panelOrientation={this._searchWikiProps.panelOrientation.key as panelOrientations}
-            rootStyle={(!this._searchWikiProps.bordeYSombra) ? undefined : {
-              border: '1px solid gray',
-              boxShadow: '5px 5px 5px gray',
-            }}
-          />
-        </div>
-      </div>
+        </Stack>
+        <SearchWiki
+          textToSearch={this._searchWikiProps.textToSearch}
+          rootUrl={this._searchWikiProps.wikiUrl.text}
+          numPagesToSearch={this._searchWikiProps.numPagesToSearch}
+          fixedSize={this._searchWikiProps.fixedSize}
+          numChars={this._searchWikiProps.numChars}
+          enDesarrollo={this._searchWikiProps.enDesarrollo}
+          numSentences={this._searchWikiProps.numSentences}
+          plainText={this._searchWikiProps.plainText}
+          imageSize={this._searchWikiProps.imageSize}
+          panelOrientation={this._searchWikiProps.panelOrientation.key as panelOrientations}
+          rootStyle={(!this._searchWikiProps.bordeYSombra) ? undefined : {
+            border: '1px solid gray',
+            boxShadow: '5px 5px 5px gray',
+            margin: '10px'
+          }}
+        />
+      </Stack>
     )
   }
 }
