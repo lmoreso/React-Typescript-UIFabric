@@ -99,7 +99,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
       )
     else if (!props.numPages || props.numPages <= 1)
       return (
-        <Label style={{ fontSize: 'large', fontWeight: 'lighter' }} >{props.titulo}</Label>
+        <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }} >{props.titulo}</Label>
       )
     else
       return (
@@ -109,7 +109,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
             iconProps={{ iconName: 'ChevronLeft' }}
             onClick={(ev) => { this.onChangePage(this.state.pageIndex! - 1) }}
           />
-          <Label style={{ fontSize: 'large', fontWeight: 'lighter' }} >{props.titulo}</Label>
+          <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }} >{props.titulo}</Label>
           <IconButton
             hidden={false}
             iconProps={{ iconName: 'ChevronRight' }}
@@ -136,6 +136,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
         </div>
       )
     } else {
+      // Determinar orientación
       let thePage = this._wikiRes.extractPages![this.state.pageIndex!];
       let htmlOrText = thePage.textOrHtml;
       let titulo = thePage.title;
@@ -143,72 +144,59 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
       let imagenUrl = (thePage.image) ? thePage.image.url : undefined;
       let imagenWidth = (thePage.image) ? thePage.image.width : undefined;
       let imagenHeight = (thePage.image) ? thePage.image.height : undefined;
-      let aspectRatio = (thePage.image) ? imagenWidth! / imagenHeight! : undefined;
+      let aspectRatio = (thePage.image) ? imagenWidth! / imagenHeight! : 0;
       let landscape = false;
       if (this.props.panelOrientation === panelOrientations.landscape)
         landscape = true;
       else if (this.props.panelOrientation === panelOrientations.auto && (imagenWidth) && (imagenHeight) && imagenHeight > imagenWidth) {
         landscape = true;
       }
+
+      // Estilos para Depuración
+      let divsBorder: string | undefined = (this.props.enDesarrollo) ? '1px solid red' : undefined;
+
       // Estilos según orientación
       const divRootPadding: number = 2;
       const divMargin: number = 2;
-      let divRootWidth: number | undefined = this.props.fixedSize;
-      let divImagenWidth: number = (aspectRatio) ? divRootWidth - divMargin * 2 : 0;
-      let divTextWidth: number = divImagenWidth;
-      let divRootMaxWidth: number | undefined = undefined;
-
-      if (landscape) {
-        divTextWidth = this.props.fixedSize - divMargin * 2
-        divImagenWidth = (aspectRatio) ? Math.round(this.props.fixedSize * aspectRatio! - divMargin * 2) : 0;
-        divRootWidth = undefined;
-        divRootMaxWidth = this.props.fixedSize * 3;
-      }
-
-      // Estilos para Depuración
-      let divImagenBorder: string | undefined = undefined;
-      let divTextBorder: string | undefined = undefined;
-      if (this.props.enDesarrollo) {
-        divImagenBorder = '1px solid red';
-        divTextBorder = '1px solid blue';
-      }
+      let divImagenWidth: number;
+      let divTextWidth: number;
 
       let divRootCSS: React.CSSProperties = {
-        padding: (divRootPadding) ? `${divRootPadding}px` : undefined,
-        width: (divRootWidth) ? `${divRootWidth}px` : undefined,
-        maxWidth: (divRootMaxWidth) ? `${divRootMaxWidth}px` : undefined,
         overflow: 'hidden',
         ...this.props.rootStyle,
+        padding: divRootPadding,
       }
 
-      let divImageCSS: React.CSSProperties = (aspectRatio) ?
-        {
-          maxHeight: (!landscape) ? `${this.props.fixedSize}px` : undefined,
-          width: divImagenWidth,
-          margin: '2px',
-          height: (landscape) ? `${this.props.fixedSize}px` : undefined,
-          overflow: 'hidden',
-          border: divImagenBorder,
-        }
-        :
-        {
-          width: 0,
-          height: 0,
-        }
+      let divImageCSS: React.CSSProperties = {
+        margin: `${divMargin}px`,
+        overflow: 'hidden',
+        border: divsBorder,
+      }
 
       let divTextCSS: React.CSSProperties = {
-        margin: '2px',
-        width: (divTextWidth) ? `${divTextWidth}px` : undefined,
-        border: divTextBorder,
+        margin: `${divMargin}px`,
+        border: divsBorder,
       }
 
+      if (landscape) {
+        divImagenWidth = (aspectRatio) ? Math.round(this.props.fixedSize * aspectRatio! - divMargin * 2) : 0;
+        // divTextWidth = Math.round((this.props.fixedSize - divMargin * 2) * ((aspectRatio) ? aspectRatio : 1));
+        divTextWidth = this.props.fixedSize - divMargin * 2;
+
+        divRootCSS.maxWidth = `${this.props.fixedSize * 3}px`;
+        divImageCSS.height = `${this.props.fixedSize}px`
+      } else {
+        divTextWidth = this.props.fixedSize - divMargin * 2 - divRootPadding * 2 - 2;
+        divImagenWidth = (aspectRatio) ? divTextWidth : 0;
+
+        divRootCSS.width = `${this.props.fixedSize}px`;
+        divImageCSS.maxHeight = `${this.props.fixedSize}px`
+      }
+      divImageCSS.width = `${divImagenWidth}px`
+      divTextCSS.width = `${divTextWidth}px`
+
       return (
-        <Stack horizontal={!landscape} 
-          // style={{
-          //   display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start',
-          //   flexDirection: (landscape) ? 'column' : 'row',
-          // }}
-        >
+        <Stack horizontal={!landscape} >
           <Stack horizontal={landscape} style={divRootCSS} >
             <this._renderTitle titulo={titulo} hidden={landscape} numPages={this._wikiRes.numPages} />
             <div style={divImageCSS}>

@@ -57,7 +57,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
   private _theme: ITheme = getTheme();
   private _searchWikiProps: ISearchWikiPropsStates = {
     wikiUrl: comboIdiomes[1],
-    textToSearch: 'Guernica, pintura de Picasso',
+    textToSearch: 'Belgrado',//'Guernica, pintura de Picasso',
     fixedSize: 250,
     numChars: 300,
     plainText: true,
@@ -65,7 +65,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
     imageSize: 250,
     numPagesToSearch: 10,
     enDesarrollo: false,
-    panelOrientation: comboOrientation[2],
+    panelOrientation: comboOrientation[1],
     bordeYSombra: true,
   };
 
@@ -96,7 +96,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
 
     return (
       // <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', /* maxWidth: '1600px',  */ }}>
-      <Stack horizontal>
+      <Stack horizontal verticalAlign='start'>
         {/* <div style={{
           display: 'flex', justifyContent: 'flex-start', flexDirection: 'column', margin: '10px',
           borderStyle: 'solid', borderWidth: '1px', borderColor: 'gray',

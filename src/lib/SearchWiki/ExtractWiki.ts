@@ -10,7 +10,7 @@ export interface IExtractWikiProps {
 }
 
 export const EXTRACT_WIKI_DEFAULTS: IExtractWikiProps = {
-    textToSearch: 'Guernica, pintura de Picasso',
+    textToSearch: 'Belgrado',//'Guernica, pintura de Picasso',
     rootUrl: 'https://es.wikipedia.org',
     numPagesToSearch: 1,
     plainText: true,
