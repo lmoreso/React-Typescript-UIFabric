@@ -15,20 +15,18 @@ export interface ISearchWikiProps extends IExtractWikiProps {
   panelOrientation?: panelOrientations;
   rootStyle?: React.CSSProperties;
   fixedSize: number;
+  textLinkWiki?: string;
 }
 
 enum fetchResults { loading, loadedOk, loadedErr }
 
-export interface ISearchWikiStates {
+interface ISearchWikiStates {
   fetchResult: fetchResults;
   pageIndex?: number;
 }
 
 export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiStates> {
-  // private _data: any;
-  // private _pages: Array<IWikiExtractPage>;
   private _txtError: string;
-  // private _queryUrl: string;
   private _wikiRes: IWikiExtractResult;
 
   public constructor(props: ISearchWikiProps) {
@@ -92,28 +90,30 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
     this.setState({ pageIndex: newIndex })
   }
 
-  private _renderTitle(props: { titulo: string; hidden?: boolean; numPages?: number }): JSX.Element {
+  private _renderTitle(props: { titulo: string; hidden?: boolean; numPages?: number; style?: React.CSSProperties }): JSX.Element {
     if (props.hidden)
       return (
         <span></span>
       )
     else if (!props.numPages || props.numPages <= 1)
       return (
-        <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }} >{props.titulo}</Label>
+        <Label style={{ fontSize: 'medium', fontWeight: 'lighter', ...props.style, textAlign: 'center' }} >{props.titulo}</Label>
       )
     else
       return (
-        <Stack horizontal horizontalAlign='space-between' verticalAlign='center'>
+        <Stack horizontal horizontalAlign='space-between' verticalAlign='center' style={{ ...props.style }}>
           <IconButton
             hidden={true}
             iconProps={{ iconName: 'ChevronLeft' }}
             onClick={(ev) => { this.onChangePage(this.state.pageIndex! - 1) }}
+            style={{ ...props.style }}
           />
-          <Label style={{ fontSize: 'medium', fontWeight: 'lighter' }} >{props.titulo}</Label>
+          <Label style={{ fontSize: 'medium', fontWeight: 'lighter', textAlign: 'center', ...props.style }} >{props.titulo}</Label>
           <IconButton
             hidden={false}
             iconProps={{ iconName: 'ChevronRight' }}
             onClick={(ev) => { this.onChangePage(this.state.pageIndex! + 1) }}
+            style={{ ...props.style }}
           />
         </Stack>
       );
@@ -178,6 +178,10 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
         border: divsBorder,
       }
 
+      let divsBorderCSS: React.CSSProperties = {
+        border: divsBorder,
+      }
+
       if (landscape) {
         divImagenWidth = (aspectRatio) ? Math.round(this.props.fixedSize * aspectRatio! - divMargin * 2) : 0;
         // divTextWidth = Math.round((this.props.fixedSize - divMargin * 2) * ((aspectRatio) ? aspectRatio : 1));
@@ -198,7 +202,7 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
       return (
         <Stack horizontal={!landscape} >
           <Stack horizontal={landscape} style={divRootCSS} >
-            <this._renderTitle titulo={titulo} hidden={landscape} numPages={this._wikiRes.numPages} />
+            <this._renderTitle titulo={titulo} hidden={landscape} numPages={this._wikiRes.numPages} style={divsBorderCSS} />
             <div style={divImageCSS}>
               <Image
                 src={imagenUrl}
@@ -206,17 +210,26 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
                 width={(!landscape) ? '100%' : undefined}
               />
             </div>
-            <div style={divTextCSS} >
-              <this._renderTitle titulo={titulo} hidden={!landscape} numPages={this._wikiRes.numPages} />
+            <Stack style={divTextCSS} >
+              <this._renderTitle titulo={titulo} hidden={!landscape} numPages={this._wikiRes.numPages} style={divsBorderCSS} />
               {(this.props.plainText) ?
-                <div style={{ textAlign: 'justify' }} >{htmlOrText}</div>
+                <div style={{ textAlign: 'justify', border: divsBorder }} >{htmlOrText}</div>
                 :
-                <div style={{ textAlign: 'justify' }} dangerouslySetInnerHTML={{ __html: htmlOrText }} />
+                <div style={{ textAlign: 'justify', border: divsBorder }} dangerouslySetInnerHTML={{ __html: htmlOrText }} />
               }
-              <Link href={enlace} styles={{ root: { marginTop: '2px' } }} target='_blank'>Saber mas ...</Link>
-            </div>
-            <div style={{ margin: (landscape) ? undefined : '10px' }}>
-            </div>
+              <Link
+                hidden={(!this.props.textLinkWiki || this.props.textLinkWiki.length == 0)}
+                href={enlace}
+                target='_blank'
+                styles={{ root: { marginTop: '2px', border: divsBorder, textAlign: 'center' } }}
+              >
+                <Stack horizontal horizontalAlign='center' verticalAlign='center'>
+                  <Image src={`${this.props.rootUrl}/favicon.ico`} width='25px' height='25px' />
+                  {this.props.textLinkWiki}
+                </Stack>
+              </Link>
+            </Stack>
+            <div style={{ margin: (landscape) ? undefined : '10px', border: divsBorder }} />
           </Stack>
 
           {(!this.props.enDesarrollo) ? null :
@@ -224,12 +237,12 @@ export class SearchWiki extends React.Component<ISearchWikiProps, ISearchWikiSta
               <Label>URL</Label>
               <a href={this._wikiRes.queryUrl} target='_blank'>{this._wikiRes.queryUrl}</a>
               <Label>SearchWikiProps</Label>
-              <pre id="json" style={{ textAlign: 'left' }} >{JSON.stringify(this.props, null, 2)}</pre>
+              <pre style={{ textAlign: 'left' }} >{JSON.stringify(this.props, null, 2)}</pre>
               {(!this._wikiRes.textError || this._wikiRes.textError.length === 0) ? null :
                 <Label>{this._wikiRes.textError}</Label>
               }
-              <Label>{`Se han encontrado ${this._wikiRes.numPages} Páginas`}</Label>
-              <pre id="json" style={{ textAlign: 'left' }} >{JSON.stringify(this._wikiRes.extractPages, null, 2)}</pre>
+              {/* <Label>{`Se han encontrado ${this._wikiRes.numPages} Páginas`}</Label>
+              <pre style={{ textAlign: 'left' }} >{JSON.stringify(this._wikiRes.extractPages, null, 2)}</pre> */}
             </div>
           }
         </Stack>

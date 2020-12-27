@@ -17,11 +17,21 @@ export interface SearchWikiExampleProps {
 
 }
 
+
+
+
 const comboIdiomes: Array<IDropdownOption> = [
   { key: 'EN', text: 'https://en.wikipedia.org' },
   { key: 'ES', text: 'https://es.wikipedia.org' },
   { key: 'FR', text: 'https://fr.wikipedia.org' },
   { key: 'CA', text: 'https://ca.wikipedia.org' },
+];
+
+const comboTextLinkWiki: Array<IComboBoxOption> = [
+  { key: 'EN', text: 'Go https://en.wikipedia.org' },
+  { key: 'ES', text: 'Ir a Wikipedia ...' },
+  { key: 'FR', text: 'Aller a le Wiki' },
+  { key: 'CA', text: 'Saber-ne mes...' },
 ];
 
 const comboOrientation: Array<IDropdownOption> = [
@@ -30,6 +40,18 @@ const comboOrientation: Array<IDropdownOption> = [
   { key: panelOrientations.auto, text: 'Automático' },
 ];
 
+const comboTextSearch: Array<IComboBoxOption> = [
+  { key: 'Header1', text: 'Castellano', itemType: SelectableOptionMenuItemType.Header },
+  { key: 'A', text: 'Barcelona' },
+  { key: 'B', text: 'Picasso' },
+  { key: 'C', text: 'Guernica, pintura de Picasso' },
+  { key: 'D', text: 'Belgrado' },
+  { key: 'divider', text: '-', itemType: SelectableOptionMenuItemType.Divider },
+  { key: 'Header2', text: 'English', itemType: SelectableOptionMenuItemType.Header },
+  { key: 'E', text: 'Picasso' },
+  { key: 'F', text: 'Barcelone' },
+  { key: 'G', text: 'Belgrade' },
+]
 
 interface ISearchWikiPropsStates {
   wikiUrl: IDropdownOption;
@@ -43,13 +65,15 @@ interface ISearchWikiPropsStates {
   imageSize: number,
   enDesarrollo: boolean;
   bordeYSombra: boolean;
+  textLinkWiki?: string;
 }
 
 interface ISearchWikiExampleEstates extends ISearchWikiPropsStates {
   canUpdate: boolean;
   confBusqueda: boolean;
   isPanelOpen: boolean;
-  selectComboTextKey: string | number;
+  selectComboSearchTextKey: string | number;
+  selectComboLinkTextKey: string | number | undefined;
   isModalOpen: boolean;
 }
 
@@ -67,6 +91,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
     enDesarrollo: false,
     panelOrientation: comboOrientation[1],
     bordeYSombra: true,
+    textLinkWiki: 'Saber-ne mes ...'
   };
 
   public constructor(props: SearchWikiExampleProps) {
@@ -77,8 +102,9 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
       canUpdate: false,
       confBusqueda: true,
       isPanelOpen: false,
-      selectComboTextKey: 'C',
+      selectComboSearchTextKey: 'C',
       isModalOpen: false,
+      selectComboLinkTextKey: 'CA',
     }
 
     // this._renderHeader = this._renderHeader.bind(this);
@@ -119,28 +145,17 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
               <Stack>
                 <Label styles={labelStyles}>{'Texto a buscar en la Wiki'}</Label>
                 <ComboBox
-                  selectedKey={this.state.selectComboTextKey}
+                  selectedKey={this.state.selectComboSearchTextKey}
                   allowFreeform={true}
                   autoComplete={'on'}
                   text={this.state.textToSearch}
-                  options={[
-                    { key: 'Header1', text: 'Castellano', itemType: SelectableOptionMenuItemType.Header },
-                    { key: 'A', text: 'Barcelona' },
-                    { key: 'B', text: 'Picasso' },
-                    { key: 'C', text: 'Guernica, pintura de Picasso' },
-                    { key: 'D', text: 'Belgrado' },
-                    { key: 'divider', text: '-', itemType: SelectableOptionMenuItemType.Divider },
-                    { key: 'Header2', text: 'English', itemType: SelectableOptionMenuItemType.Header },
-                    { key: 'E', text: 'Picasso' },
-                    { key: 'F', text: 'Barcelone' },
-                    { key: 'G', text: 'Belgrade' },
-                  ]}
+                  options={comboTextSearch}
                   styles={controlStyles}
                   onChange={(ev, op: IComboBoxOption, index: number, newValue: string) => {
                     let newText = (op) ? op.text : newValue;
                     if (newText && newText.length) {
                       if (op)
-                        this.setState({ textToSearch: newText, selectComboTextKey: op.key, canUpdate: true })
+                        this.setState({ textToSearch: newText, selectComboSearchTextKey: op.key, canUpdate: true })
                       else
                         this.setState({ textToSearch: newText, canUpdate: true })
 
@@ -286,7 +301,26 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                   offText={'Añadir borde y sombra'}
                   styles={controlStyles}
                 />
-                <Label styles={labelStyles}>{'Otros ejemplos de Uso'}</Label>
+                <Label styles={labelStyles}>{'Texto para el Enlace a la Wiki'}</Label>
+                <ComboBox
+                  selectedKey={this.state.selectComboLinkTextKey}
+                  allowFreeform={true}
+                  autoComplete={'on'}
+                  text={this.state.textLinkWiki}
+                  options={comboTextLinkWiki}
+                  styles={controlStyles}
+                  onChange={(ev, op: IComboBoxOption, index: number, newValue: string) => {
+                    let newText = (op) ? op.text : newValue;
+                    if (op) {
+                      this._searchWikiProps.textLinkWiki = newText;
+                      this.setState({ textLinkWiki: newText, selectComboLinkTextKey: op.key })
+                    } else {
+                      this._searchWikiProps.textLinkWiki = newText;
+                      this.setState({ textLinkWiki: newText, selectComboLinkTextKey: undefined })
+                    }
+                  }}
+                />
+                <Label styles={labelStyles}>{'Ejemplos de Uso'}</Label>
                 <PrimaryButton
                   onClick={(ev) => {
                     this.setState({ isPanelOpen: true })
@@ -318,6 +352,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                         plainText={this._searchWikiProps.plainText}
                         imageSize={this._searchWikiProps.imageSize}
                         panelOrientation={panelOrientations.auto}
+                        textLinkWiki={this._searchWikiProps.textLinkWiki}
                       />
                   }}
                   calloutProps={{
@@ -347,6 +382,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                     plainText={this._searchWikiProps.plainText}
                     imageSize={this._searchWikiProps.imageSize}
                     panelOrientation={panelOrientations.portrait}
+                    textLinkWiki={this._searchWikiProps.textLinkWiki}
                   />
                 </Panel>
                 <Modal
@@ -363,6 +399,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
                     plainText={this._searchWikiProps.plainText}
                     imageSize={this._searchWikiProps.imageSize}
                     panelOrientation={panelOrientations.landscape}
+                    textLinkWiki={this._searchWikiProps.textLinkWiki}
                   />
                 </Modal>
               </Stack>
@@ -387,6 +424,7 @@ export class SearchWikiExample extends React.Component<SearchWikiExampleProps, I
             boxShadow: '5px 5px 5px gray',
             margin: '10px'
           }}
+          textLinkWiki={this._searchWikiProps.textLinkWiki}
         />
       </Stack>
     )
